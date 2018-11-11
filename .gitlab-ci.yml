@@ -1,0 +1,39 @@
+image: maven:3.5.2-jdk-8
+
+stages:
+- build
+- test
+
+build:
+  stage: build
+  artifacts:
+    paths:
+    - 'Core/target/*.jar'
+    - 'MariaDB/target/*.jar'
+    - 'MySQL/target/*.jar'
+    - 'PostgreSQL/target/*.jar'
+    - 'SQLite/target/*.jar'
+    - 'Shade/target/*.jar'
+    expire_in: 1 week
+  script:
+  - 'mvn clean install -B -Dmaven.test.skip=true'
+
+variables:
+  POSTGRES_DB: ezsql
+  POSTGRES_USER: ezsql
+  POSTGRES_PASSWORD: "1234"
+  MYSQL_DATABASE: ezsql
+  MYSQL_ROOT_PASSWORD: 1234
+  MYSQL_USER: ezsql
+  MYSQL_PASSWORD: 1234
+
+test:
+  stage: test
+  services:
+  - postgres:latest
+  - mariadb:latest
+  script:
+  - export MARIADB_HOST=mariadb
+  - export PSQL_HOST=postgres
+  - export MYSQL_HOST=mariadb
+  - 'mvn test -B'
