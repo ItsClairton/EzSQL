@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ezsql-all</artifactId>
+        <groupId>com.gitlab.pauloo27</groupId>
+        <version>0.3.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ezsql-sqlite</artifactId>
+    <name>EzSQL-SQLite</name>
+
+    <dependencies>
+        <!-- EzSQL -->
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>ezsql</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <!-- SQLite Driver -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.23.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- EzSQL Tester -->     
+        <dependency>
+            <groupId>com.gitlab.pauloo27</groupId>
+            <artifactId>ezsql-tester</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

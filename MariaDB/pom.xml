@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ezsql-all</artifactId>
+        <groupId>com.gitlab.pauloo27</groupId>
+        <version>0.3.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ezsql-mariadb</artifactId>
+    <name>EzSQL-MariaDB</name>
+
+    <dependencies>
+        <!-- EzSQL -->
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>ezsql</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <!-- MariaDB Driver -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.2.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- EzSQL Tester -->
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>ezsql-tester</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
