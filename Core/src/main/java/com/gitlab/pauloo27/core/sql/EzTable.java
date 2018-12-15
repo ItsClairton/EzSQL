@@ -66,17 +66,14 @@ public class EzTable {
     /**
      * Truncates the table.
      *
-     * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzUpdateResult truncate() throws SQLException {
+    public void truncate() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         if (this.sql.getType() == EzSQLType.SQLITE) {
-            PreparedStatement statement = sql.getConnection().prepareStatement(String.format("DELETE FROM %s;", this.getName()));
-            return new EzUpdateResult(statement);
+            sql.getConnection().prepareStatement(String.format("DELETE FROM %s;", this.getName())).close();
         } else {
-            PreparedStatement statement = sql.getConnection().prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName()));
-            return new EzUpdateResult(statement);
+            sql.getConnection().prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())).close();
         }
     }
 
@@ -112,6 +109,17 @@ public class EzTable {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         // No EzStatement? Yeah, Insert haven't WHERE
         return new EzUpdateResult(sql.build(insert, this));
+    }
+
+    /**
+     * Inserts values into the table and then close.
+     *
+     * @param insert The Insert statement.
+     * @throws SQLException Problems to execute the statement.
+     */
+    public void insertAndClose(EzInsert insert) throws SQLException {
+        if (!sql.isConnected()) throw new SQLException("Not connected.");
+        sql.executeAndClose(sql.build(insert, this));
     }
 
     /**

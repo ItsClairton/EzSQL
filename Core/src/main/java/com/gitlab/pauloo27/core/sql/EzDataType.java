@@ -51,6 +51,7 @@ public enum EzDataType {
     // POSTGRESQL
     SERIAL,
     BIGSERIAL,
+    INTERVAL,
     // CUSTOM TYPES
     PRIMARY_KEY;
 

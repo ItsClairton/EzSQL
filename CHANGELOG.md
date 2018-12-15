@@ -4,13 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - ????-??-??
+## [0.3.0] - 2018-12-15
 
 ### Added
 - `withDefaultValue(Object defaultValue, boolean asString)` function.
+- Javadoc deploy to the Gitlab pages in the Gitlab CI.
+- `INTERVAL` Data Type (from PostgreSQL).
+- `EzColumnBuilder(name, dataTypeName, attributes...)` constructor that use the data type name instead of a EzDataType.
+- `withCustomDriver(driverClass)` function.
+- `executeStatementAndClose(statement, values)` function.
+- `prepareStatement(statement, values)` function.
+- `insertAndClose(statement)` function.
 
 ### Changed
-- The project structure. The EzSQL code is separeted from the drivers.
+- The project structure. The EzSQL code is separated from the drivers.
+- The EzTable#truncate() structure. Instead of returning a result its just close the statement.
 
 ### Fixed
 - The space before the comma (`,`) between the columns in the `CREATE TABLE` statement.

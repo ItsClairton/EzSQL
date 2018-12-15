@@ -8,6 +8,6 @@ public class Tests {
 
     @Test
     public void testWithMySQL() throws SQLException, ClassNotFoundException {
-        Tester.testWith(new EzSQL(EzSQLType.MYSQL).withAddress(Tester.MYSQL_HOST).withLogin("ezsql", "1234"));
+        Tester.testWith(new EzSQL(EzSQLType.MYSQL).withAddress(Tester.MYSQL_HOST, Tester.MYSQL_PORT).withLogin("ezsql", "1234"));
     }
 }

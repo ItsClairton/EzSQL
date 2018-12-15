@@ -5,7 +5,7 @@
 
     <groupId>com.gitlab.pauloo27</groupId>
     <artifactId>ezsql-parent</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
 
     <name>EzSQL-Parent</name>
     <modelVersion>4.0.0</modelVersion>
@@ -29,12 +29,6 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
-        </dependency>
-        <!-- Apache Commons -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
         </dependency>
     </dependencies>
 

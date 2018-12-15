@@ -8,6 +8,6 @@ public class Tests {
 
     @Test
     public void testWithPostgreSQL() throws SQLException, ClassNotFoundException {
-        Tester.testWith(new EzSQL(EzSQLType.POSTGRESQL).withAddress(Tester.PSQL_HOST).withLogin("ezsql", "1234"));
+        Tester.testWith(new EzSQL(EzSQLType.POSTGRESQL).withAddress(Tester.PSQL_HOST, Tester.PSQL_PORT).withLogin("ezsql", "1234"));
     }
 }

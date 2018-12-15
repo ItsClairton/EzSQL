@@ -177,8 +177,8 @@ public abstract class EzStatement {
                                 EzWhereCondition.Parentheses p = (EzWhereCondition.Parentheses) entry;
                                 return (p.getSeparator() == null ? "" : p.getSeparator() + " ") + p.getType().toString();
                             } else {
-                                EzWhereCondition.Where where = ((EzWhereCondition.WhereStatement)entry).getWhere();
-                                EzWhereCondition.Where.WhereSeparator separator = ((EzWhereCondition.WhereStatement)entry).getSeparator();
+                                EzWhereCondition.Where where = ((EzWhereCondition.WhereStatement) entry).getWhere();
+                                EzWhereCondition.Where.WhereSeparator separator = ((EzWhereCondition.WhereStatement) entry).getSeparator();
 
                                 return String.format("%s %s %s", (separator == null ? "" : separator.name()), where.getColumnName(), where.getType().toString());
                             }
