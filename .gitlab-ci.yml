@@ -1,22 +1,23 @@
 image: maven:3.5.2-jdk-8
 
 stages:
-- build
-- test
+  - build
+  - test
+  - page
 
 build:
   stage: build
   artifacts:
     paths:
-    - 'Core/target/*.jar'
-    - 'MariaDB/target/*.jar'
-    - 'MySQL/target/*.jar'
-    - 'PostgreSQL/target/*.jar'
-    - 'SQLite/target/*.jar'
-    - 'Shade/target/*.jar'
+      - 'Core/target/*.jar'
+      - 'MariaDB/target/*.jar'
+      - 'MySQL/target/*.jar'
+      - 'PostgreSQL/target/*.jar'
+      - 'SQLite/target/*.jar'
+      - 'Shade/target/*.jar'
     expire_in: 1 week
   script:
-  - 'mvn clean install -B -Dmaven.test.skip=true'
+    - 'mvn clean install -B -Dmaven.test.skip=true'
 
 variables:
   POSTGRES_DB: ezsql
@@ -30,10 +31,33 @@ variables:
 test:
   stage: test
   services:
-  - postgres:latest
-  - mariadb:latest
+    - postgres:latest
+    - mariadb:latest
   script:
-  - export MARIADB_HOST=mariadb
-  - export PSQL_HOST=postgres
-  - export MYSQL_HOST=mariadb
-  - 'mvn test -B'
+    - export MARIADB_HOST=mariadb
+    - export PSQL_HOST=postgres
+    - export MYSQL_HOST=mariadb
+    - 'mvn test -B'
+
+cache:
+  paths:
+    - 'Core/target'
+    - 'MariaDB/target'
+    - 'MySQL/target'
+    - 'PostgreSQL/target'
+    - 'SQLite/target'
+    - 'Shade/target'
+
+pages:
+  only:
+    - master
+  stage: page
+  artifacts:
+    paths:
+      - 'public'
+  script:
+    - 'mkdir public'
+    - 'cd Core'
+    - 'mvn javadoc:javadoc'
+    - 'cd ..'
+    - 'cp -r Core/target/site/apidocs/* public/'

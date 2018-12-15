@@ -122,6 +122,30 @@ public class EzColumnBuilder {
     }
 
     /**
+     * Builds a column using a data type from {@link EzDataType} and attributes from {@link EzAttribute}.
+     *
+     * @param name         The column's name.
+     * @param dataTypeName The column's data type.
+     * @param attributes   The column's attributes.
+     */
+    public EzColumnBuilder(String name, String dataTypeName, EzAttribute... attributes) {
+        this(name, dataTypeName);
+        withAttributes(attributes);
+    }
+
+    /**
+     * Builds a column using a data type from {@link EzDataType} and attributes from {@link EzAttribute}.
+     *
+     * @param name         The column's name.
+     * @param dataTypeName The column's data type.
+     * @param attributes   The column's attributes.
+     */
+    public EzColumnBuilder(String name, String dataTypeName, String... attributes) {
+        this(name, dataTypeName);
+        withAttributes(attributes);
+    }
+
+    /**
      * Builds a column using a String with the raw data type name.
      *
      * @param name         The column's name.

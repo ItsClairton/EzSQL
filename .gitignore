@@ -34,3 +34,6 @@ manifest.mf
 
 # M$ Code
 .vscode
+
+# Wiki
+*.wiki

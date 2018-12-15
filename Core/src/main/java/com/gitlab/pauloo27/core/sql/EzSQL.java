@@ -2,17 +2,15 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * <h1>EzSQL</h1>
+ * <h1>The main EzSQL class with the builds and main functions. Where the magic happens.</h1>
  * <p>EzSQL is simple way to connect and use SQL, without writing queries, just with code.</p>
  *
  * @author Paulo
@@ -53,6 +51,10 @@ public class EzSQL {
      * If true, the database will be created if not exists.
      */
     private boolean createDefaultDatabaseIfNotExists = false;
+    /**
+     * A custom JDBC driver.
+     */
+    private String customDriverClass;
 
     /**
      * Builds the EzSQL.
@@ -80,7 +82,7 @@ public class EzSQL {
      * value will get from the {@link EzSQLType#getPort()}.
      *
      * @param address The server's address.
-     * @param port    The server's port
+     * @param port    The server's port. If the port is less than 0 the default port will be used.
      * @return The current object instance.
      */
     public EzSQL withAddress(String address, int port) {
@@ -96,7 +98,6 @@ public class EzSQL {
      * @param address The server's address.
      * @return The current object instance.
      */
-
     public EzSQL withAddress(String address) {
         this.address = address;
         return this;
@@ -109,7 +110,6 @@ public class EzSQL {
      * @param password The user's password.
      * @return The current object instance.
      */
-
     public EzSQL withLogin(String username, String password) {
         this.username = username;
         this.password = password;
@@ -122,7 +122,6 @@ public class EzSQL {
      * @param username The user's name.
      * @return The current object instance.
      */
-
     public EzSQL withLogin(String username) {
         this.username = username;
         return this;
@@ -157,11 +156,21 @@ public class EzSQL {
     }
 
     /**
+     * Sets a custom JDBC driver. If it's null (and it's by default) the default driver for the SQL Type will be used.
+     *
+     * @param customDriverClass The custom driver class.
+     * @return The current object instance.
+     */
+    public EzSQL withCustomDriver(String customDriverClass) {
+        this.customDriverClass = customDriverClass;
+        return this;
+    }
+
+    /**
      * Checks if the SQL is ready to connect.
      *
      * @return If the address is not null.
      */
-
     public boolean readyToConnect() {
         return (this.address != null) && !(isType(EzSQLType.POSTGRESQL) && defaultDatabase == null);
     }
@@ -171,21 +180,20 @@ public class EzSQL {
      *
      * @return The server's port.
      */
-
     public int getPort() {
         if (type == EzSQLType.SQLITE) throw new NullPointerException("SQLite have not port");
-        return port == null ? this.type.getPort() : port;
+        return port == null || port < 0 ? this.type.getPort() : port;
     }
 
     /**
-     * Register the SQL Driver. In JDBC's versions equals or newer than 4.0 (Java 7) is not necessary.
+     * Register the SQL Driver. In JDBC's versions equals or newer than 4.0 (Java 7) is not necessary if the services
+     * file (META-INF.services/java.sql.Driver) is in the jar.
      *
      * @return The current object instance.
      * @throws ClassNotFoundException Invalid driver class.
      */
-
     public EzSQL registerDriver() throws ClassNotFoundException {
-        Class.forName(this.type.getDriverClass());
+        Class.forName(customDriverClass == null ? this.type.getDriverClass() : customDriverClass);
         return this;
     }
 
@@ -199,7 +207,6 @@ public class EzSQL {
         if (!this.readyToConnect()) throw new SQLException("Not ready to connect");
         if (this.type.isServer()) {
             String url = this.type.getURLBase() + this.address + ":" + this.getPort();
-
 
             if (this.defaultDatabase != null && (!this.createDefaultDatabaseIfNotExists || isType(EzSQLType.POSTGRESQL))) {
                 url += "/" + this.defaultDatabase;
@@ -226,7 +233,6 @@ public class EzSQL {
      * @param type The type to compare.
      * @return If the type of the SQL is the same of the parameter type.
      */
-
     public boolean isType(EzSQLType type) {
         return this.type == type;
     }
@@ -237,7 +243,6 @@ public class EzSQL {
      * @return The current database. If the SQL is SQLite return null.
      * @throws SQLException Problems to execute the statement.
      */
-
     public EzDatabase getCurrentDatabase() throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         if (this.getType() == EzSQLType.SQLITE) return null; // SQLite have just one database per file.
@@ -253,7 +258,7 @@ public class EzSQL {
      */
     public EzSQL changeDatabase(EzDatabase database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeAndClose(this.connection.prepareStatement(String.format("USE %s;", database.getName())));
+        this.executeStatementAndClose("USE %s", database.getName());
         return this;
     }
 
@@ -263,7 +268,6 @@ public class EzSQL {
      * @param statement The statement.
      * @throws SQLException Problems to execute the statement.
      */
-
     public void executeAndClose(PreparedStatement statement) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         statement.execute();
@@ -351,6 +355,33 @@ public class EzSQL {
         return statement;
     }
 
+    /**
+     * Builds a PreparedStatement in inline.
+     *
+     * @param statement The SQL statement.
+     * @param values    The array os values.
+     * @return The builded PreparedStatement.
+     * @throws SQLException Error to create the statement.
+     */
+    public PreparedStatement prepareStatement(String statement, Object... values) throws SQLException {
+        PreparedStatement stmt = getConnection().prepareStatement(statement);
+        setValuesObjects(stmt, new AtomicInteger(), Arrays.asList(values));
+        return stmt;
+    }
+
+    /**
+     * Executes a non-PreparedStatement then and close. Note that use statement is unsafe for users values. The values
+     * will be defined using {@link String#format(String, Object...)}, so take care of the user inputs.
+     *
+     * @param statement    The Statement.
+     * @param unsafeValues The array of values.
+     * @throws SQLException Error to create or run the statement.
+     */
+    public void executeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.execute(String.format(statement, unsafeValues));
+        stmt.close();
+    }
 
     /**
      * Sets the where condition objects to a statement for each '?' in the query.
@@ -383,7 +414,6 @@ public class EzSQL {
      * @param i         A atomic int of the index of the first '?'.
      * @param setList   The list of the set statements.
      */
-
     public void setSetObjects(PreparedStatement statement, AtomicInteger i, Collection<Map.Entry<String, Object>> setList) {
         setList.forEach(set -> {
             try {
@@ -402,7 +432,6 @@ public class EzSQL {
      * @param i         A atomic int of the index of the first '?'.
      * @param values    The list of the values.
      */
-    @SuppressWarnings("WeakerAccess")
     public void setValuesObjects(PreparedStatement statement, AtomicInteger i, List<Object> values) {
         values.forEach(value -> {
             try {
@@ -450,7 +479,6 @@ public class EzSQL {
      *
      * @return The connection.
      */
-
     public Connection getConnection() {
         return connection;
     }
@@ -486,7 +514,6 @@ public class EzSQL {
      * @param name The database's name.
      * @return The database.
      */
-
     public EzDatabase getDatabase(String name) {
         return new EzDatabase(this, name);
     }
@@ -500,9 +527,8 @@ public class EzSQL {
      */
     public EzTable createIfNotExists(EzTableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeAndClose(this.getConnection().prepareStatement(String.format("CREATE TABLE IF NOT EXISTS %s (%s);", table.getName(), table.toSQL(type))));
+        this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(type));
         return new EzTable(this, table.getName());
-
     }
 
     /**
@@ -512,10 +538,9 @@ public class EzSQL {
      * @return The database.
      * @throws SQLException Problems to execute the statement.
      */
-
     public EzDatabase createIfNotExists(EzDatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeAndClose(this.getConnection().prepareStatement(String.format("CREATE DATABASE IF NOT EXISTS %s;", database.getName())));
+        this.executeStatementAndClose("CREATE DATABASE IF NOT EXISTS %s", database.getName());
         return new EzDatabase(this, database.getName());
     }
 
@@ -526,10 +551,9 @@ public class EzSQL {
      * @return The table.
      * @throws SQLException Problems to execute the statement.
      */
-
     public EzTable create(EzTableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeAndClose(this.getConnection().prepareStatement(String.format("CREATE TABLE %s (%s);", table.getName(), table.toSQL(type))));
+        this.executeStatementAndClose("CREATE TABLE %s (%s);", table.getName(), table.toSQL(type));
         return new EzTable(this, table.getName());
     }
 
@@ -540,10 +564,9 @@ public class EzSQL {
      * @return The database.
      * @throws SQLException Problems to execute the statement.
      */
-
     public EzDatabase create(EzDatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeAndClose(this.getConnection().prepareStatement(String.format("CREATE DATABASE %s;", database.getName())));
+        this.executeStatementAndClose("CREATE DATABASE %s", database.getName());
         return new EzDatabase(this, database.getName());
     }
 

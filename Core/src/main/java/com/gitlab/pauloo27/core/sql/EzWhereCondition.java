@@ -361,37 +361,8 @@ public class EzWhereCondition {
      * Adds parentheses to statement.
      */
     public static class Parentheses implements WhereStatementBase {
-        /**
-         * Parentheses type (open or close).
-         */
-        public enum ParenthesesType {
-            /**
-             * Open parentheses "(".
-             */
-            OPEN("("),
-            /**
-             * Close parentheses ")".
-             */
-            CLOSE(")");
-
-            private String string;
-
-            ParenthesesType(String string) {
-                this.string = string;
-            }
-
-            /**
-             * Returns the String value of the type ("(" or ")").
-             */
-            @Override
-            public String toString() {
-                return string;
-            }
-        }
-
         private ParenthesesType type;
         private Where.WhereSeparator separator;
-
         /**
          * Adds a parentheses to statement.
          *
@@ -419,6 +390,34 @@ public class EzWhereCondition {
          */
         public Where.WhereSeparator getSeparator() {
             return separator;
+        }
+
+        /**
+         * Parentheses type (open or close).
+         */
+        public enum ParenthesesType {
+            /**
+             * Open parentheses "(".
+             */
+            OPEN("("),
+            /**
+             * Close parentheses ")".
+             */
+            CLOSE(")");
+
+            private String string;
+
+            ParenthesesType(String string) {
+                this.string = string;
+            }
+
+            /**
+             * Returns the String value of the type ("(" or ")").
+             */
+            @Override
+            public String toString() {
+                return string;
+            }
         }
     }
 
