@@ -1,5 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
+import com.google.common.base.Preconditions;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -28,6 +30,7 @@ public class EzDatabase {
      * @param name The database's name.
      */
     public EzDatabase(EzSQL sql, String name) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(name), name + " is not a valid name");
         this.name = name;
         this.sql = sql;
     }

@@ -83,6 +83,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
     public EzStatement equals(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.EQUALS), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -97,6 +98,7 @@ public class EzWhereCondition {
      */
 
     public EzStatement different(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.DIFFERENT), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -110,6 +112,7 @@ public class EzWhereCondition {
      */
 
     public EzStatement notNull(String columnName) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -124,6 +127,7 @@ public class EzWhereCondition {
      */
 
     public EzStatement atLeast(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_LEAST), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -138,6 +142,7 @@ public class EzWhereCondition {
      */
 
     public EzStatement atMost(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_MOST), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -152,6 +157,7 @@ public class EzWhereCondition {
      */
 
     public EzStatement lessThan(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.LESS_THAN), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -166,6 +172,7 @@ public class EzWhereCondition {
      */
 
     public EzStatement moreThan(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.MORE_THAN), previousSeparator));
         previousSeparator = null;
         return statement;
@@ -239,7 +246,8 @@ public class EzWhereCondition {
          * @param type       The type of Where Condition.
          */
         public Where(String columnName, Object value, WhereType type) {
-            Preconditions.checkNotNull(value, "The value can be null");
+            Preconditions.checkNotNull(value, "The value cannot be null");
+            Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
             this.type = type;
             this.columnName = columnName;
             this.value = value;
@@ -363,6 +371,7 @@ public class EzWhereCondition {
     public static class Parentheses implements WhereStatementBase {
         private ParenthesesType type;
         private Where.WhereSeparator separator;
+
         /**
          * Adds a parentheses to statement.
          *

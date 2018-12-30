@@ -69,6 +69,7 @@ public abstract class EzStatement {
      * @return The current object instance.
      */
     public EzStatement orderBy(String columnName, OrderByType orderBy) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.orderBy = new AbstractMap.SimpleEntry<>(orderBy, columnName);
         return this;
     }
@@ -216,7 +217,9 @@ public abstract class EzStatement {
     public String joinToString() {
         if (joinList.size() == 0)
             return "";
-        String sb = this.joinList.stream().map(join -> join.getType().name() + " JOIN " + join.getTableName() + " " + "ON " + join.getColumn() + " = " + join.getJoinedColumn() + " ").collect(Collectors.joining());
+        String sb = this.joinList.stream().map(join ->
+                String.format("%s JOIN %s ON %s = %s ", join.getType().name(), join.getTableName(), join.getColumn(),
+                        join.getJoinedColumn())).collect(Collectors.joining());
         return sb.trim();
     }
 
@@ -266,6 +269,9 @@ public abstract class EzStatement {
          * @param type         The Join's type.
          */
         public Join(String tableName, String column, String joinedColumn, JoinType type) {
+            Preconditions.checkArgument(EzSQL.checkEntryName(tableName), tableName + " is not a valid name");
+            Preconditions.checkArgument(EzSQL.checkEntryName(column), column + " is not a valid name");
+            Preconditions.checkArgument(EzSQL.checkEntryName(joinedColumn), joinedColumn + " is not a valid name");
             this.tableName = tableName;
             this.column = column;
             this.joinedColumn = joinedColumn;
@@ -322,12 +328,10 @@ public abstract class EzStatement {
             /**
              * Right join.
              */
-
             RIGHT,
             /**
              * Left join.
              */
-
             LEFT
         }
     }

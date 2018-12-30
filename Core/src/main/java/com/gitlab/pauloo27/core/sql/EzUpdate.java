@@ -1,5 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
+import com.google.common.base.Preconditions;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class EzUpdate extends EzStatement {
      * @return The current object instance.
      */
     public EzUpdate set(String columnName, Object value) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         sets.add(new AbstractMap.SimpleEntry<>(columnName, value));
         return this;
     }

@@ -1,6 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 
 import java.security.InvalidParameterException;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ public class EzInsert extends EzStatement {
      * @param values      The values to insert.
      */
     public EzInsert(String columnsName, EzValue... values) {
+        Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         this.columnsName = columnsName;
         this.valueList = Arrays.asList(values);
     }
@@ -41,6 +43,7 @@ public class EzInsert extends EzStatement {
      * @param values      The values to insert.
      */
     public EzInsert(String columnsName, Object... values) {
+        Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         this.columnsName = columnsName;
         this.objectList = Arrays.asList(values);
     }
