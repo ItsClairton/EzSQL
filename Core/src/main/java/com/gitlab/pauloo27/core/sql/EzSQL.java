@@ -67,6 +67,25 @@ public class EzSQL {
     }
 
     /**
+     * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection.
+     * Uses a regex that checks if the string is only of alphabetical characters ({@code \w*}).
+     *
+     * @param name The string to check.
+     * @return If the name contains only alphabetical characters.
+     */
+    public static boolean checkEntryName(String name) {
+        if (name.contains(".")) {
+            String[] names = name.split("\\.");
+            if (names.length != 2)
+                return false;
+
+            return Arrays.stream(names).allMatch(EzSQL::checkEntryName);
+        } else {
+            return name.matches("\\w*");
+        }
+    }
+
+    /**
      * Sets the SQL Type to SQLITE.
      *
      * @param filePath The SQLIte file path.
@@ -205,6 +224,8 @@ public class EzSQL {
      */
     public EzSQL connect() throws SQLException {
         if (!this.readyToConnect()) throw new SQLException("Not ready to connect");
+        if (defaultDatabase != null && !checkEntryName(defaultDatabase))
+            throw new SQLException(defaultDatabase + " is not a valid name");
         if (this.type.isServer()) {
             String url = this.type.getURLBase() + this.address + ":" + this.getPort();
 
@@ -316,14 +337,15 @@ public class EzSQL {
      * Builds a insert returning statement.
      *
      * @param insert      The insert statement.
-     * @param columnNames The returning columns' names separated by ", ".
+     * @param columnsName The returning columns' names separated by ", ".
      * @param table       The table.
      * @return The current object instance.
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzInsert insert, String columnNames, EzTable table) throws SQLException {
+    public PreparedStatement build(EzInsert insert, String columnsName, EzTable table) throws SQLException {
+        Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         PreparedStatement statement = this.getConnection().prepareStatement(
-                String.format("INSERT INTO %s (%s) VALUES %s RETURNING %s;", table.getName(), insert.getColumnsName(), insert.valuesToString(), columnNames));
+                String.format("INSERT INTO %s (%s) VALUES %s RETURNING %s;", table.getName(), insert.getColumnsName(), insert.valuesToString(), columnsName));
 
         setValuesObjects(statement, new AtomicInteger(), insert.getValues());
         return statement;

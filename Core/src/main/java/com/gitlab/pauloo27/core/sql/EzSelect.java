@@ -2,6 +2,8 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
+import java.util.Arrays;
+
 /**
  * The select statement.
  *
@@ -24,6 +26,7 @@ public class EzSelect extends EzStatement {
     public EzSelect(String columnsName) {
         Preconditions.checkNotNull(columnsName, "Columns cannot be null");
         Preconditions.checkArgument(!columnsName.isEmpty(), "Columns cannot be null");
+        Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         this.columnNames = columnsName;
     }
 
