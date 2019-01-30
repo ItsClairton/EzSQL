@@ -1,110 +1,53 @@
 package com.gitlab.pauloo27.core.sql;
 
+import java.util.List;
+
 /**
  * SQL data types.
  *
  * @author Paulo
- * @version 2.0
+ * @version 3.0
  * @since 0.1.0
  */
-public enum EzDataType {
-    // JDBC standart types
-    BIT,
-    TINYINT,
-    SMALLINT,
-    INTEGER,
-    BIGINT,
-    FLOAT,
-    REAL,
-    DOUBLE,
-    NUMERIC,
-    DECIMAL,
-    CHAR,
-    VARCHAR,
-    LONGVARCHAR,
-    DATE,
-    TIME,
-    TIMESTAMP,
-    BINARY,
-    VARBINARY,
-    LONGVARBINARY,
-    NULL,
-    OTHER,
-    JAVA_OBJECT,
-    DISTINCT,
-    STRUCT,
-    ARRAY,
-    BLOB,
-    CLOB,
-    REF,
-    DATALINK,
-    BOOLEAN,
-    ROWID,
-    NCHAR,
-    NVARCHAR,
-    LONGNVARCHAR,
-    NCLOB,
-    SQLXML,
-    REF_CURSOR,
-    TIME_WITH_TIMEZONE,
-    TIMESTAMP_WITH_TIMEZONE,
-    // POSTGRESQL
-    SERIAL,
-    BIGSERIAL,
-    INTERVAL,
-    // CUSTOM TYPES
-    PRIMARY_KEY;
+public class EzDataType {
 
-    /**
-     * Converts the data type to MySQL.
-     *
-     * @return The enum converted to MySQL.
-     */
-    private String toMySQL() {
-        if (this == PRIMARY_KEY)
-            return "INTEGER";
-        else
-            return this.name();
+    private final String sql;
+    private final List<EzAttribute> validAttributes;
+    private final List<EzAttribute> forcedAttributes;
+    private final String customName;
+
+    public EzDataType(String sql, List<EzAttribute> validAttributes) {
+        this(sql, validAttributes, null, null);
     }
 
-    /**
-     * Converts the data type to SQLite.
-     *
-     * @return The enum converted to SQLite.
-     */
-    private String toSQLite() {
-        if (this == PRIMARY_KEY)
-            return "INTEGER";
-        else
-            return this.name();
+    public EzDataType(String sql, List<EzAttribute> validAttributes, List<EzAttribute> forcedAttributes, String customName) {
+        this.sql = sql;
+        this.validAttributes = validAttributes;
+        this.forcedAttributes = forcedAttributes;
+        this.customName = customName;
     }
 
-    /**
-     * Converts the data type to PostgreSQL.
-     *
-     * @return The enum converted to PostgreSQL.
-     */
-    private String toPostgreSQL() {
-        if (this == PRIMARY_KEY)
-            return "SERIAL";
-        else
-            return this.name();
+    public String toSQL() {
+        return sql;
     }
 
-    /**
-     * Gets the data type converted to SQL.
-     *
-     * @param type The type of the SQL.
-     * @return The data type converted to SQL query.
-     */
-    public String toSQL(EzSQLType type) {
-        if (type.isMySQLLike())
-            return toMySQL();
-        if (type == EzSQLType.POSTGRESQL)
-            return toPostgreSQL();
-        if (type == EzSQLType.SQLITE)
-            return toSQLite();
-        else
-            return null;
+    public boolean hasCustomName() {
+        return customName != null;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public List<EzAttribute> getValidAttributes() {
+        return validAttributes;
+    }
+
+    public List<EzAttribute> getForcedAttributes() {
+        return forcedAttributes;
+    }
+
+    public boolean isValid(EzAttribute attribute) {
+        return validAttributes.contains(attribute);
     }
 }

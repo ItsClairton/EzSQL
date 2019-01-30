@@ -1,5 +1,6 @@
 package com.gitlab.pauloo27.core.sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
  * Builds a table.
  *
  * @author Paulo
- * @version 2.0
+ * @version 3.0
  * @since 0.1.0
  */
 public class EzTableBuilder {
@@ -65,16 +66,20 @@ public class EzTableBuilder {
     /**
      * Gets the table converted to SQL.
      *
-     * @param type The type of the SQL.
      * @return The table converted to SQL query.
      */
 
-    public String toSQL(EzSQLType type) {
+    public String toSQL(EzSQL sql) {
         return
                 this.getColumns().stream().map(column -> {
-                    if (column.getDataType() == EzDataType.PRIMARY_KEY)
-                        column.withAttributes(EzAttribute.NOT_NULL, EzAttribute.PRIMARY_KEY, EzAttribute.AUTO_INCREMENT);
-                    return column.toSQL(type);
+                    if (column.getDataType().getForcedAttributes() != null) {
+                        try {
+                            column.withAttributes(column.getDataType().getForcedAttributes().toArray(new EzAttribute[0]));
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return column.toSQL(sql);
                 }).collect(Collectors.joining(", ")).trim();
     }
 

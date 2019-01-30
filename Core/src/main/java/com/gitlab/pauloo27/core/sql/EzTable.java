@@ -3,13 +3,14 @@ package com.gitlab.pauloo27.core.sql;
 import com.google.common.base.Preconditions;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * The SQL Table.
  *
  * @author Paulo
- * @version 2.0
+ * @version 3.0
  * @since 0.1.0
  */
 public class EzTable {
@@ -21,7 +22,7 @@ public class EzTable {
     /**
      * The SQL where the table is.
      */
-    private EzSQL sql;
+    protected EzSQL<EzDatabase, EzTable> sql;
 
     /**
      * Gets a table from the SQL.
@@ -30,7 +31,7 @@ public class EzTable {
      * @param name The table's name.
      */
 
-    public EzTable(EzSQL sql, String name) {
+    public EzTable(EzSQL<EzDatabase, EzTable> sql, String name) {
         Preconditions.checkArgument(EzSQL.checkEntryName(name), name + " is not a valid name");
         this.name = name;
         this.sql = sql;
@@ -44,24 +45,10 @@ public class EzTable {
      */
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        if (this.sql.getType().isMySQLLike()) {
-            PreparedStatement statement = sql.getConnection().prepareStatement(String.format("SHOW TABLES LIKE '%s';", this.name));
-            EzQueryResult result = new EzQueryResult(statement);
-            boolean hasNext = result.getResultSet().next();
-            result.close();
-            return hasNext;
-        } else if (this.sql.getType() == EzSQLType.POSTGRESQL) {
-            PreparedStatement statement = sql.getConnection().prepareStatement(String.format("SELECT tablename FROM pg_catalog.pg_tables WHERE tablename = '%s';", this.name));
-            EzQueryResult result = new EzQueryResult(statement);
-            boolean hasNext = result.getResultSet().next();
-            result.close();
-            return hasNext;
-        } else if (this.sql.getType() == EzSQLType.SQLITE) {
-            PreparedStatement statement = sql.getConnection().prepareStatement(String.format("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%s';", this.name));
-            EzQueryResult result = new EzQueryResult(statement);
-            boolean hasNext = result.getResultSet().next();
-            result.close();
-            return hasNext;
+        // TODO Change to EzTable#count when it's implemented
+        try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM information_schema.tables where table_name = ?;", getName()).executeQuery()) {
+            if(result.next())
+                return result.getInt(1) == 1;
         }
         return false;
     }
@@ -73,11 +60,7 @@ public class EzTable {
      */
     public void truncate() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
-        if (this.sql.getType() == EzSQLType.SQLITE) {
-            sql.getConnection().prepareStatement(String.format("DELETE FROM %s;", this.getName())).close();
-        } else {
-            sql.getConnection().prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())).close();
-        }
+        sql.getConnection().prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())).close();
     }
 
     /**
@@ -123,22 +106,6 @@ public class EzTable {
     public void insertAndClose(EzInsert insert) throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         sql.executeAndClose(sql.build(insert, this));
-    }
-
-    /**
-     * Inserts values into the table and returns one or more values.
-     *
-     * @param insert      The Insert statement.
-     * @param columnNames The returning columns' names separated by ", ".
-     * @return The returning values.
-     * @throws SQLException Problems to execute the statement.
-     */
-    public EzQueryResult insertReturning(EzInsert insert, String columnNames) throws SQLException {
-        if (!sql.isConnected()) throw new SQLException("Not connected.");
-        if (sql.getType() != EzSQLType.POSTGRESQL)
-            throw new SQLException("Insert returning is only valid to PostgreSQL");
-        // No EzStatement? Yeah, Insert haven't WHERE
-        return new EzQueryResult(sql.build(insert, columnNames, this));
     }
 
     /**

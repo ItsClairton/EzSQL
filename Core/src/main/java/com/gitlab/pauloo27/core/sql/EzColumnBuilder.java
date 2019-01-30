@@ -1,5 +1,6 @@
 package com.gitlab.pauloo27.core.sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
  * Builds a column.
  *
  * @author Paulo
- * @version 2.0
+ * @version 3.0
  * @since 0.1.0
  */
 public class EzColumnBuilder {
@@ -52,7 +53,7 @@ public class EzColumnBuilder {
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, EzAttribute... attributes) {
+    public EzColumnBuilder(String name, EzDataType dataType, EzAttribute... attributes) throws SQLException {
         this(name, dataType);
         withAttributes(attributes);
     }
@@ -101,7 +102,7 @@ public class EzColumnBuilder {
      * @param length     The column's length.
      * @param attributes The column's attributes.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, int length, EzAttribute... attributes) {
+    public EzColumnBuilder(String name, EzDataType dataType, int length, EzAttribute... attributes) throws SQLException {
         this(name, dataType);
         withLength(length);
         withAttributes(attributes);
@@ -128,7 +129,7 @@ public class EzColumnBuilder {
      * @param dataTypeName The column's data type.
      * @param attributes   The column's attributes.
      */
-    public EzColumnBuilder(String name, String dataTypeName, EzAttribute... attributes) {
+    public EzColumnBuilder(String name, String dataTypeName, EzAttribute... attributes) throws SQLException {
         this(name, dataTypeName);
         withAttributes(attributes);
     }
@@ -176,7 +177,7 @@ public class EzColumnBuilder {
      * @param length       The column's length.
      * @param attributes   The column's attributes.
      */
-    public EzColumnBuilder(String name, String dataTypeName, int length, EzAttribute... attributes) {
+    public EzColumnBuilder(String name, String dataTypeName, int length, EzAttribute... attributes) throws SQLException {
         this(name, dataTypeName);
         withLength(length);
         withAttributes(attributes);
@@ -202,7 +203,17 @@ public class EzColumnBuilder {
      * @param attributes Array of attributes.
      * @return The current object instance.
      */
-    public EzColumnBuilder withAttributes(EzAttribute... attributes) {
+    public EzColumnBuilder withAttributes(EzAttribute... attributes) throws SQLException {
+        if (dataType != null) {
+            EzAttribute invalidAttribute = Arrays.stream(attributes)
+                    .filter(attribute -> !dataType.isValid(attribute))
+                    .findFirst()
+                    .orElse(null);
+
+            if (invalidAttribute != null)
+                throw new SQLException("Attribute " + invalidAttribute.toSQL() + " is not valid to type " + dataType.toSQL());
+
+        }
         Arrays.stream(attributes).filter(attribute -> !this.attributes.contains(attribute)).forEach(attribute -> this.attributes.add(attribute));
         return this;
     }
@@ -260,7 +271,6 @@ public class EzColumnBuilder {
      *
      * @return The length.
      */
-
     public Integer getLength() {
         return length;
     }
@@ -286,12 +296,10 @@ public class EzColumnBuilder {
     /**
      * Gets the column data type name. Return {@link #dataType} if not null and otherwise {@link #dataTypeName}.
      *
-     * @param type The type of the SQL.
      * @return The data type converted to String.
      */
-
-    public String dataTypeToString(EzSQLType type) {
-        return (this.dataType == null ? dataTypeName : this.dataType.toSQL(type));
+    public String dataTypeToString(EzSQL sql) {
+        return this.dataType == null ? dataTypeName : sql.build(this.dataType);
     }
 
     /**
@@ -299,7 +307,6 @@ public class EzColumnBuilder {
      *
      * @return The length converted to String or a empty String if the length is null.
      */
-
     public String lengthToString() {
         return length != null ? String.format("(%d)", length) : "";
     }
@@ -307,13 +314,11 @@ public class EzColumnBuilder {
     /**
      * Gets the column attributes converted to string. Join the {@link #attributes} and the {@link #attributeNames}
      *
-     * @param type The type of the SQL.
      * @return The attributes converted to String.
      */
-
-    public String attributesToString(EzSQLType type) {
-        return String.format("%s %s", this.attributes.stream().map(attribute -> attribute.toSQL(type))
-                .collect(Collectors.joining(" ")), this.attributeNames.stream().collect(Collectors.joining(" "))).trim();
+    public String attributesToString(EzSQL sql) {
+        return String.format("%s %s", this.attributes.stream().map(sql::build)
+                .collect(Collectors.joining(" ")), String.join(" ", this.attributeNames)).trim();
     }
 
     /**
@@ -322,7 +327,6 @@ public class EzColumnBuilder {
      *
      * @return The default value converted to String.
      */
-
     public String defaultValueToString() {
         return defaultValue != null ? String.format("DEFAULT %s", defaultValue) : "";
     }
@@ -330,19 +334,34 @@ public class EzColumnBuilder {
     /**
      * Converts the column to SQL.
      *
-     * @param type The type of the SQL.
      * @return The column converted to SQL query.
      */
-
-    public String toSQL(EzSQLType type) {
+    public String toSQL(EzSQL sql) {
         // name data_type len? attributes? ('DEFAULT' default_value)?
         return String.format("%s %s %s %s %s",
                 this.name,
-                dataTypeToString(type),
+                dataTypeToString(sql),
                 lengthToString(),
-                attributesToString(type),
+                attributesToString(sql),
                 defaultValueToString()
         ).replaceAll("\\s+", " ").trim();
     }
+
+    public List<EzAttribute> getAttributes() {
+        return attributes;
+    }
+
+    public List<String> getAttributeNames() {
+        return attributeNames;
+    }
+
+    public Object getDefaultValue() {
+        return defaultValue;
+    }
+
+    public String getDataTypeName() {
+        return dataTypeName;
+    }
+
 
 }

@@ -39,7 +39,6 @@ public class Tester {
     }
 
     public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException {
-        System.out.printf("Testing %s...%n", sql.getType().name());
         // connects
         sql.registerDriver();
         sql.withDefaultDatabase("ezsql", true).connect();
@@ -48,15 +47,15 @@ public class Tester {
         // creates table
         EzTable table = sql.createIfNotExists(
                 new EzTableBuilder("friends")
-                        .withColumn(new EzColumnBuilder("id", EzDataType.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("name", EzDataType.VARCHAR)
+                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new EzColumnBuilder("name", EzDefaultDataTypes.VARCHAR)
                                 .withLength(30)
-                                .withAttributes(EzAttribute.NOT_NULL, EzAttribute.UNIQUE))
-                        .withColumn(new EzColumnBuilder("age", EzDataType.INTEGER)
-                                .withAttributes(EzAttribute.NOT_NULL))
-                        .withColumn(new EzColumnBuilder("phone", EzDataType.INTEGER)
-                                .withAttributes(EzAttribute.UNIQUE, EzAttribute.NOT_NULL))
-                        .withColumn(new EzColumnBuilder("email", EzDataType.VARCHAR)
+                                .withAttributes(EzDefaultAttributes.NOT_NULL, EzDefaultAttributes.UNIQUE))
+                        .withColumn(new EzColumnBuilder("age", EzDefaultDataTypes.INTEGER)
+                                .withAttributes(EzDefaultAttributes.NOT_NULL))
+                        .withColumn(new EzColumnBuilder("phone", EzDefaultDataTypes.INTEGER)
+                                .withAttributes(EzDefaultAttributes.UNIQUE, EzDefaultAttributes.NOT_NULL))
+                        .withColumn(new EzColumnBuilder("email", EzDefaultDataTypes.VARCHAR)
                                 .withLength(30)
                                 .withDefaultValue("No e-mail")));
         // inserts data
@@ -66,22 +65,6 @@ public class Tester {
                 new EzInsert.EzValue("Mark", 92, 911, "mark@sample.com"))).close();
         // inserts more data
         table.insert(new EzInsert("name, age, phone", "Doe John", 18, 321)).close();
-        // inserts returning (PostgreSQL only)
-        if (sql.getType() == EzSQLType.POSTGRESQL) {
-            int id;
-            try (EzQueryResult result = table.insertReturning(new EzInsert("name, age, phone", "PSQL", 22, 999), "id")) {
-                ResultSet rs = result.getResultSet();
-                if (rs.next()) {
-                    id = rs.getInt("id");
-                    System.out.printf("PSQL's id: %d%n", id);
-                    System.out.println("=======");
-                    Assert.assertEquals(5, id);
-                } else {
-                    throw new NullPointerException("Returning id cannot be null");
-                }
-            }
-            table.delete(new EzDelete().where().equals("id", id));
-        }
         // reads data
         reads(table, "0c1d8224e6ba56271a3694bd2882af7a657203064440ac5eb4c22f5ba306b0ac");
         System.out.println("=======");
@@ -137,7 +120,7 @@ public class Tester {
         // Now, test join:
         //testJoin(sql);
         sql.disconnect();
-        System.out.printf("Test %s ended%n", sql.getType().name());
+//        System.out.printf("Test %s ended%n", sql.getType().name());
     }
 
     private static void reads(EzTable table, String expectedHash) throws SQLException {
@@ -184,22 +167,22 @@ public class Tester {
     public static void testJoin(EzSQL sql) throws SQLException {
         EzTable clients = sql.createIfNotExists(
                 new EzTableBuilder("clients")
-                        .withColumn(new EzColumnBuilder("id", EzDataType.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("name", EzDataType.VARCHAR, 64))
-                        .withColumn(new EzColumnBuilder("phone", EzDataType.VARCHAR, 64))
+                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new EzColumnBuilder("name", EzDefaultDataTypes.VARCHAR, 64))
+                        .withColumn(new EzColumnBuilder("phone", EzDefaultDataTypes.VARCHAR, 64))
         );
         EzTable employees = sql.createIfNotExists(
                 new EzTableBuilder("employees")
-                        .withColumn(new EzColumnBuilder("id", EzDataType.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("name", EzDataType.VARCHAR, 64))
-                        .withColumn(new EzColumnBuilder("phone", EzDataType.VARCHAR, 64))
+                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new EzColumnBuilder("name", EzDefaultDataTypes.VARCHAR, 64))
+                        .withColumn(new EzColumnBuilder("phone", EzDefaultDataTypes.VARCHAR, 64))
         );
         EzTable requests = sql.createIfNotExists(
                 new EzTableBuilder("requests")
-                        .withColumn(new EzColumnBuilder("id", EzDataType.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("employee", EzDataType.INTEGER))
-                        .withColumn(new EzColumnBuilder("client", EzDataType.INTEGER))
-                        .withColumn(new EzColumnBuilder("createIn", EzDataType.TIMESTAMP))
+                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new EzColumnBuilder("employee", EzDefaultDataTypes.INTEGER))
+                        .withColumn(new EzColumnBuilder("client", EzDefaultDataTypes.INTEGER))
+                        .withColumn(new EzColumnBuilder("createIn", EzDefaultDataTypes.TIMESTAMP))
         );
 
         // TODO insert

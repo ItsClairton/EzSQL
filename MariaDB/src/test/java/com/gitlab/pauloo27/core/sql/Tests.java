@@ -8,6 +8,6 @@ public class Tests {
 
     @Test
     public void testWithMariaDB() throws SQLException, ClassNotFoundException {
-        Tester.testWith(new EzSQL(EzSQLType.MARIADB).withAddress(Tester.MARIADB_HOST, Tester.MARIADB_PORT).withLogin("ezsql", "1234"));
+        Tester.testWith(new EzMariaDB().withAddress(Tester.MARIADB_HOST, Tester.MARIADB_PORT).withLogin("ezsql", "1234"));
     }
 }
