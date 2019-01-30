@@ -8,13 +8,14 @@ import java.sql.SQLException;
 
 public class Tests {
 
-    @Test
     public void testWithPostgreSQL() throws SQLException, ClassNotFoundException {
         Tester.testWith(new EzPostgreSQL().withAddress(Tester.PSQL_HOST, Tester.PSQL_PORT).withLogin("ezsql", "1234"));
     }
 
     @Test
-    public void testInsertReturning() throws SQLException {
+    public void testInsertReturning() throws SQLException, ClassNotFoundException {
+        testWithPostgreSQL();
+
         EzPostgreSQL sql = (EzPostgreSQL) new EzPostgreSQL()
                 .withAddress(Tester.PSQL_HOST, Tester.PSQL_PORT)
                 .withLogin("ezsql", "1234")
