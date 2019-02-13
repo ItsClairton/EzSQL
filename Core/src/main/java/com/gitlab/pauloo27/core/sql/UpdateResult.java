@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * @version 2.0
  * @since 0.1.0
  */
-public class EzUpdateResult extends EzResult {
+public class UpdateResult extends Result {
 
     /**
      * The updated rows.
@@ -25,7 +25,7 @@ public class EzUpdateResult extends EzResult {
      * @throws SQLException Problems to execute the statement.
      */
 
-    public EzUpdateResult(PreparedStatement statement) throws SQLException {
+    public UpdateResult(PreparedStatement statement) throws SQLException {
         super(statement);
         this.result = this.getStatement().executeUpdate();
     }

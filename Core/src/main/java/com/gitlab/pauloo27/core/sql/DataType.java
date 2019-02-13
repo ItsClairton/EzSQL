@@ -9,18 +9,18 @@ import java.util.List;
  * @version 3.0
  * @since 0.1.0
  */
-public class EzDataType {
+public class DataType {
 
     private final String sql;
-    private final List<EzAttribute> validAttributes;
-    private final List<EzAttribute> forcedAttributes;
+    private final List<Attribute> validAttributes;
+    private final List<Attribute> forcedAttributes;
     private final String customName;
 
-    public EzDataType(String sql, List<EzAttribute> validAttributes) {
+    public DataType(String sql, List<Attribute> validAttributes) {
         this(sql, validAttributes, null, null);
     }
 
-    public EzDataType(String sql, List<EzAttribute> validAttributes, List<EzAttribute> forcedAttributes, String customName) {
+    public DataType(String sql, List<Attribute> validAttributes, List<Attribute> forcedAttributes, String customName) {
         this.sql = sql;
         this.validAttributes = validAttributes;
         this.forcedAttributes = forcedAttributes;
@@ -39,15 +39,15 @@ public class EzDataType {
         return customName;
     }
 
-    public List<EzAttribute> getValidAttributes() {
+    public List<Attribute> getValidAttributes() {
         return validAttributes;
     }
 
-    public List<EzAttribute> getForcedAttributes() {
+    public List<Attribute> getForcedAttributes() {
         return forcedAttributes;
     }
 
-    public boolean isValid(EzAttribute attribute) {
+    public boolean isValid(Attribute attribute) {
         return validAttributes.contains(attribute);
     }
 }

@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * @version 2.0
  * @since 0.1.0
  */
-public class EzQueryResult extends EzResult {
+public class QueryResult extends Result {
 
     /**
      * The result set.
@@ -26,7 +26,7 @@ public class EzQueryResult extends EzResult {
      * @throws SQLException Problems to execute the statement.
      */
 
-    public EzQueryResult(PreparedStatement statement) throws SQLException {
+    public QueryResult(PreparedStatement statement) throws SQLException {
         super(statement);
         this.result = this.getStatement().executeQuery();
     }

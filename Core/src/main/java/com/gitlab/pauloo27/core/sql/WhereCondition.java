@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @since 0.2.0
  */
-public class EzWhereCondition {
+public class WhereCondition {
 
     /**
      * The where statements.
@@ -22,7 +22,7 @@ public class EzWhereCondition {
     /**
      * The base statement.
      */
-    private EzStatement statement;
+    private StatementBase statement;
     /**
      * The previous separator.
      */
@@ -33,7 +33,7 @@ public class EzWhereCondition {
      *
      * @param statement The base statement.
      */
-    EzWhereCondition(EzStatement statement) {
+    WhereCondition(StatementBase statement) {
         this.statement = statement;
     }
 
@@ -61,7 +61,7 @@ public class EzWhereCondition {
      *
      * @return The current statement.
      */
-    public EzWhereCondition openParentheses() {
+    public WhereCondition openParentheses() {
         this.statements.add(new Parentheses(Parentheses.ParenthesesType.OPEN, previousSeparator));
         previousSeparator = null;
         return this;
@@ -82,7 +82,7 @@ public class EzWhereCondition {
      * @param value      The expected value.
      * @return The current object instance.
      */
-    public EzStatement equals(String columnName, Object value) {
+    public StatementBase equals(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.EQUALS), previousSeparator));
         previousSeparator = null;
@@ -97,7 +97,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
 
-    public EzStatement different(String columnName, Object value) {
+    public StatementBase different(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.DIFFERENT), previousSeparator));
         previousSeparator = null;
@@ -111,7 +111,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
 
-    public EzStatement notNull(String columnName) {
+    public StatementBase notNull(String columnName) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName), previousSeparator));
         previousSeparator = null;
@@ -126,7 +126,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
 
-    public EzStatement atLeast(String columnName, Object value) {
+    public StatementBase atLeast(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_LEAST), previousSeparator));
         previousSeparator = null;
@@ -141,7 +141,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
 
-    public EzStatement atMost(String columnName, Object value) {
+    public StatementBase atMost(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_MOST), previousSeparator));
         previousSeparator = null;
@@ -156,7 +156,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
 
-    public EzStatement lessThan(String columnName, Object value) {
+    public StatementBase lessThan(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.LESS_THAN), previousSeparator));
         previousSeparator = null;
@@ -171,7 +171,7 @@ public class EzWhereCondition {
      * @return The current object instance.
      */
 
-    public EzStatement moreThan(String columnName, Object value) {
+    public StatementBase moreThan(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.MORE_THAN), previousSeparator));
         previousSeparator = null;

@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * @version 2.0
  * @since 0.1.0
  */
-public abstract class EzResult implements AutoCloseable {
+public abstract class Result implements AutoCloseable {
 
     /**
      * The statement to execute.
@@ -22,7 +22,7 @@ public abstract class EzResult implements AutoCloseable {
      *
      * @param statement The statement.
      */
-    public EzResult(PreparedStatement statement) {
+    public Result(PreparedStatement statement) {
         this.statement = statement;
     }
 

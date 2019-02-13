@@ -7,7 +7,7 @@ package com.gitlab.pauloo27.core.sql;
  * @version 2.0
  * @since 0.1.0
  */
-public class EzDatabaseBuilder {
+public class DatabaseBuilder {
 
     /**
      * The database's name.
@@ -19,7 +19,7 @@ public class EzDatabaseBuilder {
      *
      * @param name The database's name.
      */
-    public EzDatabaseBuilder(String name) {
+    public DatabaseBuilder(String name) {
         this.name = name;
     }
 

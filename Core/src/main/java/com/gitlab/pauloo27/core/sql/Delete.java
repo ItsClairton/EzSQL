@@ -7,13 +7,13 @@ package com.gitlab.pauloo27.core.sql;
  * @version 2.0
  * @since 0.1.0
  */
-public class EzDelete extends EzStatement {
+public class Delete extends StatementBase {
 
     /**
      * Converts the statement to SQL.
      *
      * @return The class converted to SQL.
-     * @deprecated Use {{@link EzSQL#build(EzDelete, EzTable)}} instead.
+     * @deprecated Use {{@link EzSQL#build(Delete, Table)}} instead.
      */
     @SuppressWarnings("deprecation")
     @Deprecated

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @version 2.0
  * @since 0.1.0
  */
-public abstract class EzStatement {
+public abstract class StatementBase {
 
     /**
      * List of Join statements.
@@ -25,7 +25,7 @@ public abstract class EzStatement {
     /**
      * List of Where conditions.
      */
-    protected EzWhereCondition whereConditions = new EzWhereCondition(this);
+    protected WhereCondition whereConditions = new WhereCondition(this);
 
     /**
      * The order's type and the column name.
@@ -68,13 +68,13 @@ public abstract class EzStatement {
      * @param orderBy    The order type.
      * @return The current object instance.
      */
-    public EzStatement orderBy(String columnName, OrderByType orderBy) {
+    public StatementBase orderBy(String columnName, OrderByType orderBy) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.orderBy = new AbstractMap.SimpleEntry<>(orderBy, columnName);
         return this;
     }
 
-    public EzStatement closeParentheses() {
+    public StatementBase closeParentheses() {
         this.whereConditions.closeParentheses();
         return this;
     }
@@ -84,7 +84,7 @@ public abstract class EzStatement {
      *
      * @return The current object instance.
      */
-    public EzWhereCondition where() {
+    public WhereCondition where() {
         Preconditions.checkArgument(whereConditions.getWhereStatements().isEmpty(), "A where statement already created. Use and() and or() to add another statement");
         return whereConditions;
     }
@@ -94,9 +94,9 @@ public abstract class EzStatement {
      *
      * @return The current object instance.
      */
-    public EzWhereCondition and() {
+    public WhereCondition and() {
         Preconditions.checkNotNull(whereConditions, "A where statement not created. Use where() to create one");
-        whereConditions.separate(EzWhereCondition.Where.WhereSeparator.AND);
+        whereConditions.separate(WhereCondition.Where.WhereSeparator.AND);
         return whereConditions;
     }
 
@@ -105,9 +105,9 @@ public abstract class EzStatement {
      *
      * @return The current object instance.
      */
-    public EzWhereCondition or() {
+    public WhereCondition or() {
         Preconditions.checkNotNull(whereConditions, "A where statement not created. Use where() to create one");
-        whereConditions.separate(EzWhereCondition.Where.WhereSeparator.OR);
+        whereConditions.separate(WhereCondition.Where.WhereSeparator.OR);
         return whereConditions;
     }
 
@@ -118,7 +118,7 @@ public abstract class EzStatement {
      * @return The current object instance.
      */
 
-    public EzStatement join(Join join) {
+    public StatementBase join(Join join) {
         this.joinList.add(join);
         return this;
     }
@@ -129,7 +129,7 @@ public abstract class EzStatement {
      * @return The statements' Where Conditions.
      */
 
-    public EzWhereCondition getWhereConditions() {
+    public WhereCondition getWhereConditions() {
         return whereConditions;
     }
 
@@ -149,7 +149,7 @@ public abstract class EzStatement {
      * @param limit The statement's limit.
      * @return The current object instance.
      */
-    public EzStatement limit(Integer limit) {
+    public StatementBase limit(Integer limit) {
         this.limit = limit;
         return this;
     }
@@ -174,12 +174,12 @@ public abstract class EzStatement {
         if (this.whereConditions.getWhereStatements().isEmpty()) return "";
         return String.format("WHERE %s", this.whereConditions.getWhereStatements().stream()
                 .map(entry -> {
-                            if (entry instanceof EzWhereCondition.Parentheses) {
-                                EzWhereCondition.Parentheses p = (EzWhereCondition.Parentheses) entry;
+                            if (entry instanceof WhereCondition.Parentheses) {
+                                WhereCondition.Parentheses p = (WhereCondition.Parentheses) entry;
                                 return (p.getSeparator() == null ? "" : p.getSeparator() + " ") + p.getType().toString();
                             } else {
-                                EzWhereCondition.Where where = ((EzWhereCondition.WhereStatement) entry).getWhere();
-                                EzWhereCondition.Where.WhereSeparator separator = ((EzWhereCondition.WhereStatement) entry).getSeparator();
+                                WhereCondition.Where where = ((WhereCondition.WhereStatement) entry).getWhere();
+                                WhereCondition.Where.WhereSeparator separator = ((WhereCondition.WhereStatement) entry).getSeparator();
 
                                 return String.format("%s %s %s", (separator == null ? "" : separator.name()), where.getColumnName(), where.getType().toString());
                             }

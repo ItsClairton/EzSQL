@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * @version 3.0
  * @since 0.1.0
  */
-public class EzTable {
+public class Table {
 
     /**
      * The table's name.
@@ -22,7 +22,7 @@ public class EzTable {
     /**
      * The SQL where the table is.
      */
-    protected EzSQL<EzDatabase, EzTable> sql;
+    protected EzSQL<Database, Table> sql;
 
     /**
      * Gets a table from the SQL.
@@ -31,7 +31,7 @@ public class EzTable {
      * @param name The table's name.
      */
 
-    public EzTable(EzSQL<EzDatabase, EzTable> sql, String name) {
+    public Table(EzSQL<Database, Table> sql, String name) {
         Preconditions.checkArgument(EzSQL.checkEntryName(name), name + " is not a valid name");
         this.name = name;
         this.sql = sql;
@@ -78,10 +78,10 @@ public class EzTable {
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzUpdateResult drop() throws SQLException {
+    public UpdateResult drop() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
         PreparedStatement statement = sql.getConnection().prepareStatement(String.format("DROP TABLE %s;", this.getName()));
-        return new EzUpdateResult(statement);
+        return new UpdateResult(statement);
     }
 
     /**
@@ -91,10 +91,10 @@ public class EzTable {
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzUpdateResult insert(EzInsert insert) throws SQLException {
+    public UpdateResult insert(Insert insert) throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         // No EzStatement? Yeah, Insert haven't WHERE
-        return new EzUpdateResult(sql.build(insert, this));
+        return new UpdateResult(sql.build(insert, this));
     }
 
     /**
@@ -103,7 +103,7 @@ public class EzTable {
      * @param insert The Insert statement.
      * @throws SQLException Problems to execute the statement.
      */
-    public void insertAndClose(EzInsert insert) throws SQLException {
+    public void insertAndClose(Insert insert) throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         sql.executeAndClose(sql.build(insert, this));
     }
@@ -115,10 +115,10 @@ public class EzTable {
      * @return The query result.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzQueryResult select(EzStatement select) throws SQLException {
+    public QueryResult select(StatementBase select) throws SQLException {
         // EzStatement to avoid type cast on the call.
-        if (!(select instanceof EzSelect)) throw new IllegalArgumentException("The parameter should to be EzSelect");
-        return this.select((EzSelect) select);
+        if (!(select instanceof Select)) throw new IllegalArgumentException("The parameter should to be EzSelect");
+        return this.select((Select) select);
     }
 
     /**
@@ -129,8 +129,8 @@ public class EzTable {
      * @throws SQLException Problems to execute the statement.
      */
 
-    public EzQueryResult select(EzSelect select) throws SQLException {
-        return new EzQueryResult(sql.build(select, this));
+    public QueryResult select(Select select) throws SQLException {
+        return new QueryResult(sql.build(select, this));
     }
 
     /**
@@ -140,9 +140,9 @@ public class EzTable {
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzUpdateResult update(EzStatement update) throws SQLException {
-        if (!(update instanceof EzUpdate)) throw new IllegalArgumentException("The parameter should be EzUpdate");
-        return this.update((EzUpdate) update);
+    public UpdateResult update(StatementBase update) throws SQLException {
+        if (!(update instanceof Update)) throw new IllegalArgumentException("The parameter should be EzUpdate");
+        return this.update((Update) update);
     }
 
     /**
@@ -153,9 +153,9 @@ public class EzTable {
      * @throws SQLException Problems to execute the statement.
      */
 
-    public EzUpdateResult update(EzUpdate update) throws SQLException {
+    public UpdateResult update(Update update) throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
-        return new EzUpdateResult(sql.build(update, this));
+        return new UpdateResult(sql.build(update, this));
     }
 
     /**
@@ -165,10 +165,10 @@ public class EzTable {
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzUpdateResult delete(EzStatement delete) throws SQLException {
+    public UpdateResult delete(StatementBase delete) throws SQLException {
         // EzStatement to avoid type cast on the call.
-        if (!(delete instanceof EzDelete)) throw new IllegalArgumentException("The parameter should be EzDelete");
-        return this.delete((EzDelete) delete);
+        if (!(delete instanceof Delete)) throw new IllegalArgumentException("The parameter should be EzDelete");
+        return this.delete((Delete) delete);
     }
 
     /**
@@ -179,9 +179,9 @@ public class EzTable {
      * @throws SQLException Problems to execute the statement.
      */
 
-    public EzUpdateResult delete(EzDelete delete) throws SQLException {
+    public UpdateResult delete(Delete delete) throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
-        return new EzUpdateResult(sql.build(delete, this));
+        return new UpdateResult(sql.build(delete, this));
     }
 
 }

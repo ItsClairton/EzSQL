@@ -45,37 +45,37 @@ public class Tester {
         // drops the table if exists
         if (sql.getTable("friends").exists()) sql.getTable("friends").drop();
         // creates table
-        EzTable table = sql.createIfNotExists(
-                new EzTableBuilder("friends")
-                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("name", EzDefaultDataTypes.VARCHAR)
+        Table table = sql.createIfNotExists(
+                new TableBuilder("friends")
+                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR)
                                 .withLength(30)
-                                .withAttributes(EzDefaultAttributes.NOT_NULL, EzDefaultAttributes.UNIQUE))
-                        .withColumn(new EzColumnBuilder("age", EzDefaultDataTypes.INTEGER)
-                                .withAttributes(EzDefaultAttributes.NOT_NULL))
-                        .withColumn(new EzColumnBuilder("phone", EzDefaultDataTypes.INTEGER)
-                                .withAttributes(EzDefaultAttributes.UNIQUE, EzDefaultAttributes.NOT_NULL))
-                        .withColumn(new EzColumnBuilder("email", EzDefaultDataTypes.VARCHAR)
+                                .withAttributes(DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE))
+                        .withColumn(new ColumnBuilder("age", DefaultDataTypes.INTEGER)
+                                .withAttributes(DefaultAttributes.NOT_NULL))
+                        .withColumn(new ColumnBuilder("phone", DefaultDataTypes.INTEGER)
+                                .withAttributes(DefaultAttributes.UNIQUE, DefaultAttributes.NOT_NULL))
+                        .withColumn(new ColumnBuilder("email", DefaultDataTypes.VARCHAR)
                                 .withLength(30)
                                 .withDefaultValue("No e-mail")));
         // inserts data
-        table.insert(new EzInsert("name, age, phone, email",
-                new EzInsert.EzValue("Paulo' or 1=1", 12, 666, "sql_injection@test.com"),
-                new EzInsert.EzValue("John Doe", 21, 123, "john_doe@sample.com"),
-                new EzInsert.EzValue("Mark", 92, 911, "mark@sample.com"))).close();
+        table.insert(new Insert("name, age, phone, email",
+                new Insert.EzValue("Paulo' or 1=1", 12, 666, "sql_injection@test.com"),
+                new Insert.EzValue("John Doe", 21, 123, "john_doe@sample.com"),
+                new Insert.EzValue("Mark", 92, 911, "mark@sample.com"))).close();
         // inserts more data
-        table.insert(new EzInsert("name, age, phone", "Doe John", 18, 321)).close();
+        table.insert(new Insert("name, age, phone", "Doe John", 18, 321)).close();
         // reads data
         reads(table, "0c1d8224e6ba56271a3694bd2882af7a657203064440ac5eb4c22f5ba306b0ac");
         System.out.println("=======");
         // updates
-        table.update(new EzUpdate().set("name", "John").where().equals("name", "Doe John")).close();
+        table.update(new Update().set("name", "John").where().equals("name", "Doe John")).close();
         // reads again
         reads(table, "32ebd11565862dce4b4ce285003e356d0afb34bcb7297af79cd8067205b819a8");
         System.out.println("=======");
         // reads where the age is at least 18
-        try (EzQueryResult result = table.select(new EzSelect("name")
-                .orderBy("name", EzStatement.OrderByType.ASC)
+        try (QueryResult result = table.select(new Select("name")
+                .orderBy("name", StatementBase.OrderByType.ASC)
                 .where()
                 .atLeast("age", 18)
                 .limit(10))) {
@@ -91,8 +91,8 @@ public class Tester {
         }
         System.out.println("=======");
         // reads where the age is at least 18 and less than 60
-        try (EzQueryResult result = table.select(new EzSelect("name")
-                .orderBy("name", EzStatement.OrderByType.ASC)
+        try (QueryResult result = table.select(new Select("name")
+                .orderBy("name", StatementBase.OrderByType.ASC)
                 .where()
                 .atLeast("age", 18)
                 .and()
@@ -103,8 +103,8 @@ public class Tester {
         }
         System.out.println("=======");
         // reads where age is less than 18
-        try (EzQueryResult result = table.select(new EzSelect("name")
-                .orderBy("name", EzStatement.OrderByType.ASC)
+        try (QueryResult result = table.select(new Select("name")
+                .orderBy("name", StatementBase.OrderByType.ASC)
                 .where()
                 .lessThan("age", 18)
                 .limit(3))) {
@@ -114,7 +114,7 @@ public class Tester {
         }
         System.out.println("=======");
         // deletes
-        table.delete(new EzDelete().where().equals("name", "John Doe"));
+        table.delete(new Delete().where().equals("name", "John Doe"));
         // reads again
         reads(table, "95a5947b39c17fb00ff326642402549f4e1fb2e25db69ba9a8fb7275039a350a");
         // Now, test join:
@@ -123,9 +123,9 @@ public class Tester {
 //        System.out.printf("Test %s ended%n", sql.getType().name());
     }
 
-    private static void reads(EzTable table, String expectedHash) throws SQLException {
-        try (EzQueryResult result = table.select(new EzSelect("name, phone, email, age")
-                .orderBy("name", EzStatement.OrderByType.ASC)
+    private static void reads(Table table, String expectedHash) throws SQLException {
+        try (QueryResult result = table.select(new Select("name, phone, email, age")
+                .orderBy("name", StatementBase.OrderByType.ASC)
                 .limit(10))) {
             ResultSet rs = result.getResultSet();
             // String to hash
@@ -165,34 +165,34 @@ public class Tester {
     }
 
     public static void testJoin(EzSQL sql) throws SQLException {
-        EzTable clients = sql.createIfNotExists(
-                new EzTableBuilder("clients")
-                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("name", EzDefaultDataTypes.VARCHAR, 64))
-                        .withColumn(new EzColumnBuilder("phone", EzDefaultDataTypes.VARCHAR, 64))
+        Table clients = sql.createIfNotExists(
+                new TableBuilder("clients")
+                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 64))
+                        .withColumn(new ColumnBuilder("phone", DefaultDataTypes.VARCHAR, 64))
         );
-        EzTable employees = sql.createIfNotExists(
-                new EzTableBuilder("employees")
-                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("name", EzDefaultDataTypes.VARCHAR, 64))
-                        .withColumn(new EzColumnBuilder("phone", EzDefaultDataTypes.VARCHAR, 64))
+        Table employees = sql.createIfNotExists(
+                new TableBuilder("employees")
+                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 64))
+                        .withColumn(new ColumnBuilder("phone", DefaultDataTypes.VARCHAR, 64))
         );
-        EzTable requests = sql.createIfNotExists(
-                new EzTableBuilder("requests")
-                        .withColumn(new EzColumnBuilder("id", EzDefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new EzColumnBuilder("employee", EzDefaultDataTypes.INTEGER))
-                        .withColumn(new EzColumnBuilder("client", EzDefaultDataTypes.INTEGER))
-                        .withColumn(new EzColumnBuilder("createIn", EzDefaultDataTypes.TIMESTAMP))
+        Table requests = sql.createIfNotExists(
+                new TableBuilder("requests")
+                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
+                        .withColumn(new ColumnBuilder("employee", DefaultDataTypes.INTEGER))
+                        .withColumn(new ColumnBuilder("client", DefaultDataTypes.INTEGER))
+                        .withColumn(new ColumnBuilder("createIn", DefaultDataTypes.TIMESTAMP))
         );
 
         // TODO insert
-        try (EzQueryResult result = requests.select(
-                new EzSelect("requests.id, clients.name client, employees.name employee")
+        try (QueryResult result = requests.select(
+                new Select("requests.id, clients.name client, employees.name employee")
                         .join(
-                                new EzStatement.Join("clients", "requests.client",
-                                        "clients.id", EzStatement.Join.JoinType.INNER))
-                        .join(new EzStatement.Join("employees", "requests.employee",
-                                "employees.id", EzStatement.Join.JoinType.INNER))
+                                new StatementBase.Join("clients", "requests.client",
+                                        "clients.id", StatementBase.Join.JoinType.INNER))
+                        .join(new StatementBase.Join("employees", "requests.employee",
+                                "employees.id", StatementBase.Join.JoinType.INNER))
                         .where().notNull("requests.client"))) {
             ResultSet rs = result.getResultSet();
             while (rs.next()) {

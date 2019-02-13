@@ -1,6 +1,6 @@
 package com.gitlab.pauloo27.core.sql;
 
-public class EzMariaDB extends EzSQL<EzDatabase, EzTable> {
+public class EzMariaDB extends EzSQL<Database, Table> {
     @Override
     public int getDefaultPort() {
         return 3306;
@@ -17,12 +17,12 @@ public class EzMariaDB extends EzSQL<EzDatabase, EzTable> {
     }
 
     @Override
-    protected EzDatabase getDatabaseByName(String name) {
-        return new EzDatabase(this, name);
+    protected Database getDatabaseByName(String name) {
+        return new Database(this, name);
     }
 
     @Override
-    protected EzTable getTableByName(String name) {
-        return new EzTable(this, name);
+    protected Table getTableByName(String name) {
+        return new Table(this, name);
     }
 }

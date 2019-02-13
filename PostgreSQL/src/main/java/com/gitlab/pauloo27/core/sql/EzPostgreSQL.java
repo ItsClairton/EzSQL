@@ -3,7 +3,7 @@ package com.gitlab.pauloo27.core.sql;
 
 import java.sql.SQLException;
 
-public class EzPostgreSQL extends EzSQL<EzPostgreSQLDatabase, EzPostgreSQLTable> {
+public class EzPostgreSQL extends EzSQL<PostgreSQLDatabase, PostgreSQLTable> {
     @Override
     public int getDefaultPort() {
         return 5432;
@@ -20,13 +20,13 @@ public class EzPostgreSQL extends EzSQL<EzPostgreSQLDatabase, EzPostgreSQLTable>
     }
 
     @Override
-    protected EzPostgreSQLDatabase getDatabaseByName(String name) {
-        return new EzPostgreSQLDatabase(this, name);
+    protected PostgreSQLDatabase getDatabaseByName(String name) {
+        return new PostgreSQLDatabase(this, name);
     }
 
     @Override
-    protected EzPostgreSQLTable getTableByName(String name) {
-        return new EzPostgreSQLTable(this, name);
+    protected PostgreSQLTable getTableByName(String name) {
+        return new PostgreSQLTable(this, name);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class EzPostgreSQL extends EzSQL<EzPostgreSQLDatabase, EzPostgreSQLTable>
     }
 
     @Override
-    public String build(EzAttribute attribute) {
+    public String build(Attribute attribute) {
         if (attribute.toSQL().equalsIgnoreCase("AUTO_INCREMENT"))
             // TODO warn that it is not a valid attribute
             return "";
@@ -44,7 +44,7 @@ public class EzPostgreSQL extends EzSQL<EzPostgreSQLDatabase, EzPostgreSQLTable>
     }
 
     @Override
-    public String build(EzDataType dataType) {
+    public String build(DataType dataType) {
         if (dataType.hasCustomName() && dataType.getCustomName().equalsIgnoreCase("PRIMARY_KEY"))
             return "SERIAL";
 
@@ -52,7 +52,7 @@ public class EzPostgreSQL extends EzSQL<EzPostgreSQLDatabase, EzPostgreSQLTable>
     }
 
     @Override
-    public EzSQL<EzPostgreSQLDatabase, EzPostgreSQLTable> connect() throws SQLException {
+    public EzSQL<PostgreSQLDatabase, PostgreSQLTable> connect() throws SQLException {
         if (createDefaultDatabaseIfNotExists)
             createDefaultDatabaseIfNotExists = false;
         return super.connect();

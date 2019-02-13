@@ -3,7 +3,7 @@ package com.gitlab.pauloo27.core.sql;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class EzSQLite extends EzSQL<EzSQLiteDatabase, EzSQLiteTable> {
+public class EzSQLite extends EzSQL<SQLiteDatabase, SQLiteTable> {
 
     public EzSQLite(String filePath) {
         withAddress(filePath);
@@ -20,7 +20,7 @@ public class EzSQLite extends EzSQL<EzSQLiteDatabase, EzSQLiteTable> {
     }
 
     @Override
-    public EzSQLiteDatabase getCurrentDatabase() throws SQLException {
+    public SQLiteDatabase getCurrentDatabase() throws SQLException {
         throw new NullPointerException("SQLite have just one database per file");
     }
 
@@ -35,13 +35,13 @@ public class EzSQLite extends EzSQL<EzSQLiteDatabase, EzSQLiteTable> {
     }
 
     @Override
-    protected EzSQLiteDatabase getDatabaseByName(String name) {
-        return new EzSQLiteDatabase(this, name);
+    protected SQLiteDatabase getDatabaseByName(String name) {
+        return new SQLiteDatabase(this, name);
     }
 
     @Override
-    protected EzSQLiteTable getTableByName(String name) {
-        return new EzSQLiteTable(this, name);
+    protected SQLiteTable getTableByName(String name) {
+        return new SQLiteTable(this, name);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class EzSQLite extends EzSQL<EzSQLiteDatabase, EzSQLiteTable> {
     }
 
     @Override
-    public String build(EzAttribute attribute) {
+    public String build(Attribute attribute) {
         if (attribute.toSQL().equalsIgnoreCase("AUTO_INCREMENT")) {
             return "AUTOINCREMENT";
         }

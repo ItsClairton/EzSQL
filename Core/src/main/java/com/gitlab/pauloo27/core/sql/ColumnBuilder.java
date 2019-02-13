@@ -13,22 +13,22 @@ import java.util.stream.Collectors;
  * @version 3.0
  * @since 0.1.0
  */
-public class EzColumnBuilder {
+public class ColumnBuilder {
 
     /**
      * The column's data type.
      */
-    private EzDataType dataType;
+    private DataType dataType;
     /**
      * The columns' name.
      */
     private String name;
     /**
-     * The column's attributes. An ArrayList of {@link EzAttribute}.
+     * The column's attributes. An ArrayList of {@link Attribute}.
      */
-    private List<EzAttribute> attributes = new ArrayList<>();
+    private List<Attribute> attributes = new ArrayList<>();
     /**
-     * The column's attributes. An ArrayList of String. If an attribute is not in {@link EzAttribute}, this store an
+     * The column's attributes. An ArrayList of String. If an attribute is not in {@link Attribute}, this store an
      * array of raw attribute names.
      */
     private List<String> attributeNames = new ArrayList<>();
@@ -41,107 +41,107 @@ public class EzColumnBuilder {
      */
     private Object defaultValue;
     /**
-     * The columns data type raw name. If the data type is not in {@link EzDataType}, this store the raw data type
+     * The columns data type raw name. If the data type is not in {@link DataType}, this store the raw data type
      * name.
      */
     private String dataTypeName;
 
     /**
-     * Builds a column using a data type from {@link EzDataType} and attributes from {@link EzAttribute}.
+     * Builds a column using a data type from {@link DataType} and attributes from {@link Attribute}.
      *
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, EzAttribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, DataType dataType, Attribute... attributes) throws SQLException {
         this(name, dataType);
         withAttributes(attributes);
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType} and attributes from raw String.
+     * Builds a column using a data type from {@link DataType} and attributes from raw String.
      *
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, String... attributes) {
+    public ColumnBuilder(String name, DataType dataType, String... attributes) {
         this(name, dataType);
         withAttributes(attributes);
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType}.
+     * Builds a column using a data type from {@link DataType}.
      *
      * @param name     The column's name.
      * @param dataType The column's data type.
-     * @see #EzColumnBuilder(String, String) Builds using a String as data type.
+     * @see #ColumnBuilder(String, String) Builds using a String as data type.
      */
-    public EzColumnBuilder(String name, EzDataType dataType) {
+    public ColumnBuilder(String name, DataType dataType) {
         this.name = name;
         this.dataType = dataType;
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType} and a length.
+     * Builds a column using a data type from {@link DataType} and a length.
      *
      * @param name     The column's name.
      * @param dataType The column's data type.
      * @param length   The column's length.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, int length) {
+    public ColumnBuilder(String name, DataType dataType, int length) {
         this(name, dataType);
         withLength(length);
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType}, attributes from {@link EzAttribute} and a length.
+     * Builds a column using a data type from {@link DataType}, attributes from {@link Attribute} and a length.
      *
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param length     The column's length.
      * @param attributes The column's attributes.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, int length, EzAttribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) throws SQLException {
         this(name, dataType);
         withLength(length);
         withAttributes(attributes);
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType}, attributes from a raw String and a length.
+     * Builds a column using a data type from {@link DataType}, attributes from a raw String and a length.
      *
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param length     The column's length.
      * @param attributes The column's attributes.
      */
-    public EzColumnBuilder(String name, EzDataType dataType, int length, String... attributes) {
+    public ColumnBuilder(String name, DataType dataType, int length, String... attributes) {
         this(name, dataType);
         withLength(length);
         withAttributes(attributes);
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType} and attributes from {@link EzAttribute}.
+     * Builds a column using a data type from {@link DataType} and attributes from {@link Attribute}.
      *
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      * @param attributes   The column's attributes.
      */
-    public EzColumnBuilder(String name, String dataTypeName, EzAttribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, String dataTypeName, Attribute... attributes) throws SQLException {
         this(name, dataTypeName);
         withAttributes(attributes);
     }
 
     /**
-     * Builds a column using a data type from {@link EzDataType} and attributes from {@link EzAttribute}.
+     * Builds a column using a data type from {@link DataType} and attributes from {@link Attribute}.
      *
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      * @param attributes   The column's attributes.
      */
-    public EzColumnBuilder(String name, String dataTypeName, String... attributes) {
+    public ColumnBuilder(String name, String dataTypeName, String... attributes) {
         this(name, dataTypeName);
         withAttributes(attributes);
     }
@@ -152,7 +152,7 @@ public class EzColumnBuilder {
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      */
-    public EzColumnBuilder(String name, String dataTypeName) {
+    public ColumnBuilder(String name, String dataTypeName) {
         this.name = name;
         this.dataTypeName = dataTypeName;
     }
@@ -164,20 +164,20 @@ public class EzColumnBuilder {
      * @param dataTypeName The column's data type.
      * @param length       The column's length.
      */
-    public EzColumnBuilder(String name, String dataTypeName, int length) {
+    public ColumnBuilder(String name, String dataTypeName, int length) {
         this(name, dataTypeName);
         withLength(length);
     }
 
     /**
-     * Builds a column using a String with the raw data type name, a length and attributes from {@link EzAttribute}.
+     * Builds a column using a String with the raw data type name, a length and attributes from {@link Attribute}.
      *
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      * @param length       The column's length.
      * @param attributes   The column's attributes.
      */
-    public EzColumnBuilder(String name, String dataTypeName, int length, EzAttribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, String dataTypeName, int length, Attribute... attributes) throws SQLException {
         this(name, dataTypeName);
         withLength(length);
         withAttributes(attributes);
@@ -191,7 +191,7 @@ public class EzColumnBuilder {
      * @param length       The column's length.
      * @param attributes   The column's attributes.
      */
-    public EzColumnBuilder(String name, String dataTypeName, int length, String... attributes) {
+    public ColumnBuilder(String name, String dataTypeName, int length, String... attributes) {
         this(name, dataTypeName);
         withLength(length);
         withAttributes(attributes);
@@ -203,9 +203,9 @@ public class EzColumnBuilder {
      * @param attributes Array of attributes.
      * @return The current object instance.
      */
-    public EzColumnBuilder withAttributes(EzAttribute... attributes) throws SQLException {
+    public ColumnBuilder withAttributes(Attribute... attributes) throws SQLException {
         if (dataType != null) {
-            EzAttribute invalidAttribute = Arrays.stream(attributes)
+            Attribute invalidAttribute = Arrays.stream(attributes)
                     .filter(attribute -> !dataType.isValid(attribute))
                     .findFirst()
                     .orElse(null);
@@ -224,7 +224,7 @@ public class EzColumnBuilder {
      * @param attributes Array of attributes.
      * @return The current object instance.
      */
-    public EzColumnBuilder withAttributes(String... attributes) {
+    public ColumnBuilder withAttributes(String... attributes) {
         Arrays.stream(attributes).filter(attribute -> !this.attributeNames.contains(attribute)).forEach(attribute -> this.attributeNames.add(attribute));
         return this;
     }
@@ -235,7 +235,7 @@ public class EzColumnBuilder {
      * @param length The column's value.
      * @return The current object instance.
      */
-    public EzColumnBuilder withLength(int length) {
+    public ColumnBuilder withLength(int length) {
         this.length = length;
         return this;
     }
@@ -248,7 +248,7 @@ public class EzColumnBuilder {
      *                     {@code '} (e.g. {@code 'hello'}), otherwise as plain text.
      * @return The current object instance.
      */
-    public EzColumnBuilder withDefaultValue(Object defaultValue, boolean asString) {
+    public ColumnBuilder withDefaultValue(Object defaultValue, boolean asString) {
         if (defaultValue instanceof String && asString) this.defaultValue = "'" + defaultValue + "'";
         else this.defaultValue = defaultValue;
         return this;
@@ -261,7 +261,7 @@ public class EzColumnBuilder {
      * @param defaultValue The default column's value.
      * @return The current object instance.
      */
-    public EzColumnBuilder withDefaultValue(Object defaultValue) {
+    public ColumnBuilder withDefaultValue(Object defaultValue) {
         withDefaultValue(defaultValue, true);
         return this;
     }
@@ -289,7 +289,7 @@ public class EzColumnBuilder {
      *
      * @return The column's data type.
      */
-    public EzDataType getDataType() {
+    public DataType getDataType() {
         return this.dataType;
     }
 
@@ -347,7 +347,7 @@ public class EzColumnBuilder {
         ).replaceAll("\\s+", " ").trim();
     }
 
-    public List<EzAttribute> getAttributes() {
+    public List<Attribute> getAttributes() {
         return attributes;
     }
 

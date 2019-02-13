@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
  * @version 3.0
  * @since 0.1.0
  */
-public class EzTableBuilder {
+public class TableBuilder {
 
     /**
      * The table's column.
      */
-    private List<EzColumnBuilder> columns = new ArrayList<>();
+    private List<ColumnBuilder> columns = new ArrayList<>();
     /**
      * The table's name.
      */
@@ -29,7 +29,7 @@ public class EzTableBuilder {
      *
      * @param name The table's name.
      */
-    public EzTableBuilder(String name) {
+    public TableBuilder(String name) {
         this.name = name;
     }
 
@@ -48,7 +48,7 @@ public class EzTableBuilder {
      * @return The table's columns.
      */
 
-    public List<EzColumnBuilder> getColumns() {
+    public List<ColumnBuilder> getColumns() {
         return columns;
     }
 
@@ -58,7 +58,7 @@ public class EzTableBuilder {
      * @param columns The columns.
      * @return The current object instance.
      */
-    public EzTableBuilder withColumn(EzColumnBuilder... columns) {
+    public TableBuilder withColumn(ColumnBuilder... columns) {
         this.columns.addAll(Arrays.asList(columns));
         return this;
     }
@@ -74,7 +74,7 @@ public class EzTableBuilder {
                 this.getColumns().stream().map(column -> {
                     if (column.getDataType().getForcedAttributes() != null) {
                         try {
-                            column.withAttributes(column.getDataType().getForcedAttributes().toArray(new EzAttribute[0]));
+                            column.withAttributes(column.getDataType().getForcedAttributes().toArray(new Attribute[0]));
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }

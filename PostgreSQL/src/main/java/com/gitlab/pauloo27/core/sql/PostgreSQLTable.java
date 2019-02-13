@@ -3,14 +3,14 @@ package com.gitlab.pauloo27.core.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class EzPostgreSQLTable extends EzTable {
+public class PostgreSQLTable extends Table {
     /**
      * Gets a table from the SQL.
      *
      * @param sql  The SQL.
      * @param name The table's name.
      */
-    public EzPostgreSQLTable(EzSQL sql, String name) {
+    public PostgreSQLTable(EzSQL sql, String name) {
         super(sql, name);
     }
 
@@ -33,10 +33,10 @@ public class EzPostgreSQLTable extends EzTable {
      * @return The returning values.
      * @throws SQLException Problems to execute the statement.
      */
-    public EzQueryResult insertReturning(EzInsert insert, String columnNames) throws SQLException {
+    public QueryResult insertReturning(Insert insert, String columnNames) throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         // No EzStatement? Yeah, Insert haven't WHERE
-        return new EzQueryResult(sql.build(insert, columnNames, this));
+        return new QueryResult(sql.build(insert, columnNames, this));
     }
 
 

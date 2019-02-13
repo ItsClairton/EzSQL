@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @version 2.0
  * @since 0.1.0
  */
-public class EzUpdate extends EzStatement {
+public class Update extends StatementBase {
 
     /**
      * The list of map (column's name, value) of values to set.
@@ -29,7 +29,7 @@ public class EzUpdate extends EzStatement {
      * @param value      The new value.
      * @return The current object instance.
      */
-    public EzUpdate set(String columnName, Object value) {
+    public Update set(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         sets.add(new AbstractMap.SimpleEntry<>(columnName, value));
         return this;
@@ -48,7 +48,7 @@ public class EzUpdate extends EzStatement {
      * Gets the statement converted to SQL.
      *
      * @return The class converted to SQL.
-     * @deprecated Use {{@link EzSQL#build(EzUpdate, EzTable)} instead.
+     * @deprecated Use {{@link EzSQL#build(Update, Table)} instead.
      */
     @SuppressWarnings("deprecation")
     @Override

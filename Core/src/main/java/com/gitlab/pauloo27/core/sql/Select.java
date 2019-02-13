@@ -11,7 +11,7 @@ import java.util.Arrays;
  * @version 2.0
  * @since 0.1.0
  */
-public class EzSelect extends EzStatement {
+public class Select extends StatementBase {
 
     /**
      * The columns' name to select.
@@ -23,7 +23,7 @@ public class EzSelect extends EzStatement {
      *
      * @param columnsName The columns name.
      */
-    public EzSelect(String columnsName) {
+    public Select(String columnsName) {
         Preconditions.checkNotNull(columnsName, "Columns cannot be null");
         Preconditions.checkArgument(!columnsName.isEmpty(), "Columns cannot be null");
         Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
@@ -44,7 +44,7 @@ public class EzSelect extends EzStatement {
      * Gets the statement converted to SQL.
      *
      * @return The class converted to SQL.
-     * @deprecated Use {@link EzSQL#build(EzSelect, EzTable)} instead.
+     * @deprecated Use {@link EzSQL#build(Select, Table)} instead.
      */
     @SuppressWarnings("deprecation")
     @Deprecated

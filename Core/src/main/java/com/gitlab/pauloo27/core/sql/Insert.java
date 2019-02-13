@@ -16,40 +16,40 @@ import java.util.stream.Collectors;
  * @version 3.0
  * @since 0.1.0
  */
-public class EzInsert extends EzStatement {
+public class Insert extends StatementBase {
 
     private String columnsName;
     private List<EzValue> valueList;
     private List<Object> objectList;
 
     /**
-     * Inserts data in the database. This constructor is more verbose than {@link #EzInsert(String, Object...)} but is
+     * Inserts data in the database. This constructor is more verbose than {@link #Insert(String, Object...)} but is
      * more simple to understand with many values.
      *
      * @param columnsName The ordered columns name separated by ", ".
      * @param values      The values to insert.
      */
-    public EzInsert(String columnsName, EzValue... values) {
+    public Insert(String columnsName, EzValue... values) {
         Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         this.columnsName = columnsName;
         this.valueList = Arrays.asList(values);
     }
 
     /**
-     * Inserts data in the database. This constructor is less verbose than {@link #EzInsert(String, EzValue...)} but is
+     * Inserts data in the database. This constructor is less verbose than {@link #Insert(String, EzValue...)} but is
      * more hard to understand with many values.
      *
      * @param columnsName The ordered columns name separated by ", ".
      * @param values      The values to insert.
      */
-    public EzInsert(String columnsName, Object... values) {
+    public Insert(String columnsName, Object... values) {
         Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         this.columnsName = columnsName;
         this.objectList = Arrays.asList(values);
     }
 
     /**
-     * Gets the values to insert if the used constructor is {@link #EzInsert(String, EzValue...)}.
+     * Gets the values to insert if the used constructor is {@link #Insert(String, EzValue...)}.
      *
      * @return The values.
      */
@@ -58,7 +58,7 @@ public class EzInsert extends EzStatement {
     }
 
     /**
-     * Gets the values to insert if the used constructor is {@link #EzInsert(String, Object...)}.
+     * Gets the values to insert if the used constructor is {@link #Insert(String, Object...)}.
      *
      * @return The values.
      */
@@ -121,7 +121,7 @@ public class EzInsert extends EzStatement {
      * Gets the statement converted to SQL.
      *
      * @return The class converted to SQL.
-     * @deprecated Use {@link EzSQL#build(EzInsert, EzTable)} instead.
+     * @deprecated Use {@link EzSQL#build(Insert, Table)} instead.
      */
     @SuppressWarnings("deprecation")
     @Deprecated
@@ -131,7 +131,7 @@ public class EzInsert extends EzStatement {
     }
 
     /**
-     * Represents the values to insert. Used in {@link EzInsert#EzInsert(String, EzValue...)} constructor.
+     * Represents the values to insert. Used in {@link Insert#Insert(String, EzValue...)} constructor.
      */
     public static class EzValue {
         private List<Object> values;

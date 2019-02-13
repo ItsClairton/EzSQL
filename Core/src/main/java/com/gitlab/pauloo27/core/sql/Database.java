@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * @version 4.0
  * @since 0.1.0
  */
-public class EzDatabase {
+public class Database {
 
     /**
      * The database's name.
@@ -29,7 +29,7 @@ public class EzDatabase {
      * @param sql  The SQL.
      * @param name The database's name.
      */
-    public EzDatabase(EzSQL sql, String name) {
+    public Database(EzSQL sql, String name) {
         Preconditions.checkArgument(EzSQL.checkEntryName(name), name + " is not a valid name");
         this.name = name;
         this.sql = sql;
@@ -53,7 +53,7 @@ public class EzDatabase {
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
         try (PreparedStatement statement = sql.getConnection().prepareStatement(String.format("SHOW DATABASES LIKE '%s';", this.getName()))) {
-            EzQueryResult result = new EzQueryResult(statement);
+            QueryResult result = new QueryResult(statement);
             return result.getResultSet().next();
         }
     }

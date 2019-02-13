@@ -3,14 +3,14 @@ package com.gitlab.pauloo27.core.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class EzSQLiteTable extends EzTable {
+public class SQLiteTable extends Table {
     /**
      * Gets a table from the SQL.
      *
      * @param sql  The SQL.
      * @param name The table's name.
      */
-    public EzSQLiteTable(EzSQL sql, String name) {
+    public SQLiteTable(EzSQL sql, String name) {
         super(sql, name);
     }
 

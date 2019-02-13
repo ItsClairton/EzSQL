@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 2.0
  * @since 0.1.0
  */
-public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends EzTable> {
+public abstract class EzSQL<DatabaseType extends Database, TableType extends Table> {
 
     /**
      * The SQL connection.
@@ -224,7 +224,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
             this.connection = DriverManager.getConnection(url, username, password);
 
         if (this.createDefaultDatabaseIfNotExists)
-            this.changeDatabase(this.createIfNotExists(new EzDatabaseBuilder(this.defaultDatabase)));
+            this.changeDatabase(this.createIfNotExists(new DatabaseBuilder(this.defaultDatabase)));
 
         return this;
     }
@@ -274,7 +274,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The current object instance.
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzSelect select, TableType table) throws SQLException {
+    public PreparedStatement build(Select select, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("SELECT %s FROM %s;", String.join(", ", select.getColumnNames()), (table.getName() + " " +
                         select.joinToString() + " " +
@@ -287,11 +287,11 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
         return statement;
     }
 
-    public String build(EzDataType dataType) {
+    public String build(DataType dataType) {
         return dataType.toSQL();
     }
 
-    public String build(EzAttribute attribute) {
+    public String build(Attribute attribute) {
         return attribute.toSQL();
     }
 
@@ -304,7 +304,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The current object instance.
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzInsert insert, TableType table) throws SQLException {
+    public PreparedStatement build(Insert insert, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("INSERT INTO %s (%s) VALUES %s;", table.getName(), insert.getColumnsName(), insert.valuesToString()));
 
@@ -321,7 +321,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The current object instance.
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzInsert insert, String columnsName, TableType table) throws SQLException {
+    public PreparedStatement build(Insert insert, String columnsName, TableType table) throws SQLException {
         Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("INSERT INTO %s (%s) VALUES %s RETURNING %s;", table.getName(), insert.getColumnsName(), insert.valuesToString(), columnsName));
@@ -338,7 +338,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The current object instance.
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzUpdate update, TableType table) throws SQLException {
+    public PreparedStatement build(Update update, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("UPDATE %s %s %s %s %s %s;",
                         table.getName(),
@@ -391,13 +391,13 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @param i          A atomic int of the index of the first '?'.
      * @param statements The list of the where conditions.
      */
-    public void setWhereObjects(PreparedStatement statement, AtomicInteger i, Collection<EzWhereCondition.WhereStatementBase> statements) {
+    public void setWhereObjects(PreparedStatement statement, AtomicInteger i, Collection<WhereCondition.WhereStatementBase> statements) {
         statements.forEach(statementBase -> {
-            if (statementBase instanceof EzWhereCondition.Parentheses)
+            if (statementBase instanceof WhereCondition.Parentheses)
                 return;
 
-            EzWhereCondition.Where where = ((EzWhereCondition.WhereStatement) statementBase).getWhere();
-            if (where.getType() == EzWhereCondition.Where.WhereType.NOT_NULL)
+            WhereCondition.Where where = ((WhereCondition.WhereStatement) statementBase).getWhere();
+            if (where.getType() == WhereCondition.Where.WhereType.NOT_NULL)
                 return;
             try {
                 // Note that the setObject function starts with 1
@@ -452,7 +452,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The current object instance.
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzDelete delete, TableType table) throws SQLException {
+    public PreparedStatement build(Delete delete, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("DELETE FROM %s %s %s %s %s;",
                         table.getName(),
@@ -491,7 +491,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
     }
 
     /**
-     * Gets an instance of {@link EzTable} using the table name.
+     * Gets an instance of {@link Table} using the table name.
      *
      * @param name The table's name.
      * @return The table.
@@ -501,7 +501,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
     }
 
     /**
-     * Gets an instance of {@link EzDatabase} using the database name.
+     * Gets an instance of {@link Database} using the database name.
      *
      * @param name The database's name.
      * @return The database.
@@ -517,7 +517,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The table.
      * @throws SQLException Problems to execute the statement.
      */
-    public TableType createIfNotExists(EzTableBuilder table) throws SQLException {
+    public TableType createIfNotExists(TableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(this));
         return getTableByName(table.getName());
@@ -530,7 +530,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The database.
      * @throws SQLException Problems to execute the statement.
      */
-    public DatabaseType createIfNotExists(EzDatabaseBuilder database) throws SQLException {
+    public DatabaseType createIfNotExists(DatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE DATABASE IF NOT EXISTS %s", database.getName());
         return getDatabaseByName(database.getName());
@@ -547,7 +547,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The table.
      * @throws SQLException Problems to execute the statement.
      */
-    public TableType create(EzTableBuilder table) throws SQLException {
+    public TableType create(TableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE TABLE %s (%s);", table.getName(), table.toSQL(this));
         return getTableByName(table.getName());
@@ -560,7 +560,7 @@ public abstract class EzSQL<DatabaseType extends EzDatabase, TableType extends E
      * @return The database.
      * @throws SQLException Problems to execute the statement.
      */
-    public DatabaseType create(EzDatabaseBuilder database) throws SQLException {
+    public DatabaseType create(DatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE DATABASE %s", database.getName());
         return getDatabaseByName(database.getName());
