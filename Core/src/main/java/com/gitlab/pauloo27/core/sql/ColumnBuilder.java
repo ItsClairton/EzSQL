@@ -52,6 +52,7 @@ public class ColumnBuilder {
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
+     * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder(String name, DataType dataType, Attribute... attributes) throws SQLException {
         this(name, dataType);
@@ -101,6 +102,7 @@ public class ColumnBuilder {
      * @param dataType   The column's data type.
      * @param length     The column's length.
      * @param attributes The column's attributes.
+     * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) throws SQLException {
         this(name, dataType);
@@ -128,6 +130,7 @@ public class ColumnBuilder {
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      * @param attributes   The column's attributes.
+     * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder(String name, String dataTypeName, Attribute... attributes) throws SQLException {
         this(name, dataTypeName);
@@ -176,6 +179,7 @@ public class ColumnBuilder {
      * @param dataTypeName The column's data type.
      * @param length       The column's length.
      * @param attributes   The column's attributes.
+     * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder(String name, String dataTypeName, int length, Attribute... attributes) throws SQLException {
         this(name, dataTypeName);
@@ -202,6 +206,7 @@ public class ColumnBuilder {
      *
      * @param attributes Array of attributes.
      * @return The current object instance.
+     * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder withAttributes(Attribute... attributes) throws SQLException {
         if (dataType != null) {
@@ -296,6 +301,7 @@ public class ColumnBuilder {
     /**
      * Gets the column data type name. Return {@link #dataType} if not null and otherwise {@link #dataTypeName}.
      *
+     * @param sql The current EzSQL connection.
      * @return The data type converted to String.
      */
     public String dataTypeToString(EzSQL sql) {
@@ -314,6 +320,7 @@ public class ColumnBuilder {
     /**
      * Gets the column attributes converted to string. Join the {@link #attributes} and the {@link #attributeNames}
      *
+     * @param sql The current EzSQL connection.
      * @return The attributes converted to String.
      */
     public String attributesToString(EzSQL sql) {
@@ -334,6 +341,7 @@ public class ColumnBuilder {
     /**
      * Converts the column to SQL.
      *
+     * @param sql The current EzSQL connection.
      * @return The column converted to SQL query.
      */
     public String toSQL(EzSQL sql) {

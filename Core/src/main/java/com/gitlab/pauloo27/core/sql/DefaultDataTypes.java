@@ -2,6 +2,13 @@ package com.gitlab.pauloo27.core.sql;
 
 import java.util.Arrays;
 
+/**
+ * SQL data types.
+ *
+ * @author Paulo
+ * @version 1.0
+ * @since 0.4.0
+ */
 public class DefaultDataTypes {
     public final static DataType BIT = new DataType("BIT", DefaultAttributes.getNumberAttributes());
     public final static DataType TINYINT = new DataType("TINYINT", DefaultAttributes.getNumberAttributes());
@@ -42,6 +49,7 @@ public class DefaultDataTypes {
     public final static DataType REF_CURSOR = new DataType("REF_CURSOR", DefaultAttributes.getDefaultAttributes());
     public final static DataType TIME_WITH_TIMEZONE = new DataType("TIME_WITH_TIMEZONE", DefaultAttributes.getDefaultAttributes());
     public final static DataType TIMESTAMP_WITH_TIMEZONE = new DataType("TIMESTAMP_WITH_TIMEZONE", DefaultAttributes.getDefaultAttributes());
+
     // custom wrappers
     public final static DataType PRIMARY_KEY = new DataType("INTEGER", DefaultAttributes.getNumberAttributes(),
             Arrays.asList(DefaultAttributes.PRIMARY_KEY, DefaultAttributes.AUTO_INCREMENT), "PRIMARY_KEY");

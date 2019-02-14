@@ -3,6 +3,13 @@ package com.gitlab.pauloo27.core.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * The SQL Table.
+ *
+ * @author Paulo
+ * @version 1.0
+ * @since 0.4.0
+ */
 public class PostgreSQLTable extends Table {
     /**
      * Gets a table from the SQL.
@@ -14,6 +21,12 @@ public class PostgreSQLTable extends Table {
         super(sql, name);
     }
 
+    /**
+     * Checks if the table exists.
+     *
+     * @return If the table exists.
+     * @throws SQLException Problems to execute the statement.
+     */
     @Override
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");

@@ -66,9 +66,9 @@ public class TableBuilder {
     /**
      * Gets the table converted to SQL.
      *
+     * @param sql The current EzSQL connection.
      * @return The table converted to SQL query.
      */
-
     public String toSQL(EzSQL sql) {
         return
                 this.getColumns().stream().map(column -> {

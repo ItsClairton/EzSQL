@@ -3,6 +3,13 @@ package com.gitlab.pauloo27.core.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * The SQL Table.
+ *
+ * @author Paulo
+ * @version 1.0
+ * @since 0.4.0
+ */
 public class SQLiteTable extends Table {
     /**
      * Gets a table from the SQL.

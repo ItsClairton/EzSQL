@@ -1,19 +1,40 @@
 package com.gitlab.pauloo27.core.sql;
 
-
 import java.sql.SQLException;
 
+/**
+ * The PostgreSQL implementation of EzSQL.
+ *
+ * @author Paulo
+ * @version 1.0
+ * @since 0.4.0
+ */
 public class EzPostgreSQL extends EzSQL<PostgreSQLDatabase, PostgreSQLTable> {
+    /**
+     * Gets the default SQL server's port.
+     *
+     * @return {@code 5432}.
+     */
     @Override
     public int getDefaultPort() {
         return 5432;
     }
 
+    /**
+     * Gets the URL Base.
+     *
+     * @return {@code jdbc:postgresql://}.
+     */
     @Override
     public String getURLBase() {
         return "jdbc:postgresql://";
     }
 
+    /**
+     * Gets the SQL driver class path.
+     *
+     * @return {@code org.postgresql.Driver}.
+     */
     @Override
     public String getDriverClass() {
         return "org.postgresql.Driver";
@@ -37,10 +58,17 @@ public class EzPostgreSQL extends EzSQL<PostgreSQLDatabase, PostgreSQLTable> {
     @Override
     public String build(Attribute attribute) {
         if (attribute.toSQL().equalsIgnoreCase("AUTO_INCREMENT"))
-            // TODO warn that it is not a valid attribute
+            // TODO warn that it's not a valid attribute
             return "";
 
         return super.build(attribute);
+    }
+
+    @Override
+    public EzSQL<PostgreSQLDatabase, PostgreSQLTable> connect() throws SQLException {
+        if (createDefaultDatabaseIfNotExists)
+            createDefaultDatabaseIfNotExists = false;
+        return super.connect();
     }
 
     @Override
@@ -49,13 +77,6 @@ public class EzPostgreSQL extends EzSQL<PostgreSQLDatabase, PostgreSQLTable> {
             return "SERIAL";
 
         return super.build(dataType);
-    }
-
-    @Override
-    public EzSQL<PostgreSQLDatabase, PostgreSQLTable> connect() throws SQLException {
-        if (createDefaultDatabaseIfNotExists)
-            createDefaultDatabaseIfNotExists = false;
-        return super.connect();
     }
 }
 

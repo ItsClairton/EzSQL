@@ -13,8 +13,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <h1>The main EzSQL class with the builds and main functions. Where the magic happens.</h1>
  * <p>EzSQL is simple way to connect and use SQL, without writing queries, just with code.</p>
  *
+ * @param <DatabaseType> The Database class.
+ * @param <TableType>    The Table class.
  * @author Paulo
- * @version 2.0
+ * @version 3.0
  * @since 0.1.0
  */
 public abstract class EzSQL<DatabaseType extends Database, TableType extends Table> {
@@ -175,8 +177,18 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return (this.address != null);
     }
 
+    /**
+     * Gets the default SQL server's port.
+     *
+     * @return The default SQL server's port.
+     */
     public abstract int getDefaultPort();
 
+    /**
+     * Gets the URL Base.
+     *
+     * @return The URL Base.
+     */
     public abstract String getURLBase();
 
     /**
@@ -188,6 +200,11 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return port == null || port < 0 ? getDefaultPort() : port;
     }
 
+    /**
+     * Gets the SQL driver class path.
+     *
+     * @return The SQL driver class path.
+     */
     public abstract String getDriverClass();
 
     /**
@@ -287,14 +304,25 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return statement;
     }
 
+    /**
+     * Builds a data type.
+     *
+     * @param dataType The data type object to build.
+     * @return The data type converted to SQL.
+     */
     public String build(DataType dataType) {
         return dataType.toSQL();
     }
 
+    /**
+     * Builds a data attribute.
+     *
+     * @param attribute The data attribute object to build.
+     * @return The data attribute converted to SQL.
+     */
     public String build(Attribute attribute) {
         return attribute.toSQL();
     }
-
 
     /**
      * Builds a insert statement.
@@ -536,8 +564,20 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return getDatabaseByName(database.getName());
     }
 
+    /**
+     * Gets a database by its name.
+     *
+     * @param name The database name.
+     * @return The database object.
+     */
     protected abstract DatabaseType getDatabaseByName(String name);
 
+    /**
+     * Gets a table by its name.
+     *
+     * @param name The table name.
+     * @return The table object.
+     */
     protected abstract TableType getTableByName(String name);
 
     /**

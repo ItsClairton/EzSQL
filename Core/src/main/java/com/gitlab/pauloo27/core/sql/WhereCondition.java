@@ -188,7 +188,13 @@ public class WhereCondition {
      * Where condition statements.
      */
     public static class WhereStatement implements WhereStatementBase {
+        /**
+         * The where condition (AND or OR).
+         */
         private Where where;
+        /**
+         * The where condition separator, used if there's another where after this one.
+         */
         private Where.WhereSeparator separator;
 
         /**
@@ -369,7 +375,13 @@ public class WhereCondition {
      * Adds parentheses to statement.
      */
     public static class Parentheses implements WhereStatementBase {
+        /**
+         * The parentheses type (OPEN or CLOSE).
+         */
         private ParenthesesType type;
+        /**
+         * The where condition separator, used if there's another where after this one.
+         */
         private Where.WhereSeparator separator;
 
         /**
@@ -414,8 +426,16 @@ public class WhereCondition {
              */
             CLOSE(")");
 
+            /**
+             * The type coverted to String.
+             */
             private String string;
 
+            /**
+             * Builds the parentheses type.
+             *
+             * @param string The prentheses converted to String.
+             */
             ParenthesesType(String string) {
                 this.string = string;
             }
