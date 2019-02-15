@@ -60,9 +60,9 @@ public class Tester {
                                 .withDefaultValue("No e-mail")));
         // inserts data
         table.insert(new Insert("name, age, phone, email",
-                new Insert.EzValue("Paulo' or 1=1", 12, 666, "sql_injection@test.com"),
-                new Insert.EzValue("John Doe", 21, 123, "john_doe@sample.com"),
-                new Insert.EzValue("Mark", 92, 911, "mark@sample.com"))).close();
+                "Paulo' or 1=1", 12, 666, "sql_injection@test.com",
+                "John Doe", 21, 123, "john_doe@sample.com",
+                "Mark", 92, 911, "mark@sample.com")).close();
         // inserts more data
         table.insert(new Insert("name, age, phone", "Doe John", 18, 321)).close();
         // reads data
