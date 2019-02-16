@@ -63,18 +63,20 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Uses a regex that checks if the string is only of alphabetical characters ({@code \w*}).
      *
      * @param name The string to check.
-     * @return If the name contains only alphabetical characters.
+     * @return If the name contains only alphabetical characters and a dot or it's a asterisk.
      */
     public static boolean checkEntryName(String name) {
+        if (name.equals("*"))
+            return true;
+
         if (name.contains(".")) {
             String[] names = name.split("\\.");
             if (names.length != 2)
                 return false;
 
             return Arrays.stream(names).allMatch(EzSQL::checkEntryName);
-        } else {
+        } else
             return name.matches("\\w*");
-        }
     }
 
     /**
