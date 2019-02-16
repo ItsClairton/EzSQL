@@ -77,7 +77,7 @@ public class DataType {
     /**
      * Gets the custom name. The custom name is the name of the custom data type.
      * <p>
-     * Using the wrapper {@link DefaultDataTypes#PRIMARY_KEY} as example, the type name is {@code INTEGER} because it's
+     * Using the wrapper {@link DefaultDataType#PRIMARY_KEY} as example, the type name is {@code INTEGER} because it's
      * a {@code INTEGER} value while the custom name is {@code PRIMARY_KEY}. The custom name is used to the build to
      * check if the type is a real {@code INTEGER} or a {@code PRIMARY_KEY} wrapped to {@code INTEGER}.
      *

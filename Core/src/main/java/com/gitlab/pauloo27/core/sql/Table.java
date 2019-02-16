@@ -2,9 +2,13 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
+import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The SQL Table.
@@ -60,7 +64,7 @@ public class Table {
      */
     public void truncate() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
-        sql.getConnection().prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())).close();
+        sql.executeAndClose(sql.prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())));
     }
 
     /**
@@ -95,6 +99,42 @@ public class Table {
         return new Insert(sql, this, columnsName, values);
     }
 
+    public <T> Insert insert(T object) {
+        Class<T> clazz = (Class<T>) object.getClass();
+
+        StringBuilder sb = new StringBuilder();
+        List<Object> values = new ArrayList<>();
+
+        Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
+            field.setAccessible(true);
+
+            if (sb.length() != 0)
+                sb.append(", ");
+
+            if (field.isAnnotationPresent(Id.class))
+                return;
+
+            try {
+                String name = field.getName();
+                Object value = field.get(object);
+
+                if (value == null)
+                    return;
+
+                if (field.isAnnotationPresent(Name.class))
+                    name = field.getAnnotation(Name.class).value();
+
+                sb.append(name);
+
+                values.add(value);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return new Insert(sql, this, sb.toString(), values.toArray());
+    }
+
     /**
      * Selects values from the table.
      *
@@ -106,12 +146,64 @@ public class Table {
     }
 
     /**
+     * Selects alues from the table. Is the same that use {@code #select("*")}.
+     *
+     * @return The select statement.
+     * @see #select(String) to specify the columns to select.
+     */
+    public Select select() {
+        return this.select("*");
+    }
+
+    /**
      * Updates table's values.
      *
      * @return The update statement.
      */
     public Update update() {
         return new Update(sql, this);
+    }
+
+    public <T> Update update(T object) {
+        Class<T> clazz = (Class<T>) object.getClass();
+
+        Field idField = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .findFirst().orElse(null);
+
+        try {
+            String idColumn = idField.getName();
+            int id = (int) idField.get(object);
+
+            Preconditions.checkNotNull(idField);
+
+            Update update = new Update(sql, this).where().equals(idColumn, id);
+
+            Arrays.stream(clazz.getDeclaredFields()).filter(field -> !field.getName().equals(idColumn))
+                    .forEach(field -> {
+                        field.setAccessible(true);
+
+                        String name = field.getName();
+
+                        if (field.isAnnotationPresent(Name.class))
+                            name = field.getAnnotation(Name.class).value();
+
+                        Object value = null;
+                        try {
+                            value = field.get(object);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+
+                        update.set(name, value);
+                    });
+
+            return update;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**
@@ -121,6 +213,26 @@ public class Table {
      */
     public Delete delete() {
         return new Delete(sql, this);
+    }
+
+    public <T> Delete delete(T object) {
+        Class<T> clazz = (Class<T>) object.getClass();
+
+        Field idField = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .findFirst().orElse(null);
+
+        try {
+            String idColumn = idField.getName();
+            int id = (int) idField.get(object);
+
+            Preconditions.checkNotNull(idField);
+
+            return new Delete(sql, this).where().equals(idColumn, id);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

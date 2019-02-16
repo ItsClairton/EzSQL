@@ -35,7 +35,7 @@ public class ColumnBuilder {
     /**
      * The max column value length. Eg: {@code VARCHAR(20)} - 20 is the length.
      */
-    private Integer length;
+    private int length;
     /**
      * The column's default value.
      */
@@ -276,7 +276,7 @@ public class ColumnBuilder {
      *
      * @return The length.
      */
-    public Integer getLength() {
+    public int getLength() {
         return length;
     }
 
@@ -314,7 +314,7 @@ public class ColumnBuilder {
      * @return The length converted to String or a empty String if the length is null.
      */
     public String lengthToString() {
-        return length != null ? String.format("(%d)", length) : "";
+        return length > 0 ? String.format("(%d)", length) : "";
     }
 
     /**

@@ -1,10 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -531,6 +528,63 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(this));
         return getTableByName(table.getName());
+    }
+
+    private static Map<Object, DataType> typesByObject = new HashMap<>();
+
+    static {
+        typesByObject.put(String.class, DefaultDataTypes.VARCHAR);
+        typesByObject.put(int.class, DefaultDataTypes.INTEGER);
+    }
+
+    public <T> TableType createIfNotExists(Class<T> clazz) throws SQLException {
+        String tableName = clazz.getSimpleName();
+
+        if (clazz.isAnnotationPresent(Name.class))
+            tableName = clazz.getAnnotation(Name.class).value();
+
+        TableBuilder tableBuilder = new TableBuilder(tableName);
+
+        Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
+            field.setAccessible(true);
+
+            DataType dataType = typesByObject.get(field.getType());
+
+            int length = -1;
+
+            if (field.isAnnotationPresent(Length.class)) {
+                length = field.getAnnotation(Length.class).value();
+            }
+
+            if (field.isAnnotationPresent(Id.class)) {
+                dataType = DefaultDataTypes.PRIMARY_KEY;
+            }
+
+            List<Attribute> attributes = new ArrayList<>();
+            Arrays.stream(field.getDeclaredAnnotations()).forEach(annotation -> {
+                if (annotation.annotationType().isMemberClass() && annotation.annotationType().getDeclaringClass() == DefaultAttributes.class) {
+                    attributes.add(DefaultAttributes.getAttribute(annotation.annotationType()));
+                }
+            });
+
+            try {
+                String columnName = field.getName();
+
+                if (field.isAnnotationPresent(Name.class))
+                    columnName = field.getAnnotation(Name.class).value();
+
+                Object defaultValue = null;
+                if (!field.getType().isPrimitive() || field.isAnnotationPresent(DefaultValue.class))
+                    defaultValue = field.get(clazz.newInstance());
+
+                tableBuilder.withColumn(
+                        new ColumnBuilder(columnName, dataType, length, attributes.toArray(new Attribute[]{}))
+                                .withDefaultValue(defaultValue));
+            } catch (SQLException | InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        return createIfNotExists(tableBuilder);
     }
 
     /**
