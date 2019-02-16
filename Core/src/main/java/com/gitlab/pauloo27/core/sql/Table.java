@@ -84,45 +84,40 @@ public class Table {
         return new UpdateResult(statement);
     }
 
-    /*
+    /**
      * Inserts values into the table.
      *
-     * @param insert The Insert statement.
-     * @return The update result.
-     * @throws SQLException Problems to execute the statement.
+     * @param columnsName The ordered columns name separated by ", ".
+     * @param values      The values to insert.
+     * @return The insert statement.
      */
     public Insert insert(String columnsName, Object... values) {
         return new Insert(sql, this, columnsName, values);
     }
 
-    /*
+    /**
      * Selects values from the table.
      *
-     * @param select The select statement.
-     * @return The query result.
-     * @throws SQLException Problems to execute the statement.
+     * @param columnsName The columns to select name.
+     * @return The select statement.
      */
     public Select select(String columnsName) {
         return new Select(sql, this, columnsName);
     }
 
-    /*
+    /**
      * Updates table's values.
      *
-     * @param update The update statement.
-     * @return The update result.
-     * @throws SQLException Problems to execute the statement.
+     * @return The update statement.
      */
     public Update update() {
         return new Update(sql, this);
     }
 
-    /*
+    /**
      * Deletes table's values.
      *
-     * @param delete The delete statement.
-     * @return The update result.
-     * @throws SQLException Problems to execute the statement.
+     * @return The delete statement.
      */
     public Delete delete() {
         return new Delete(sql, this);

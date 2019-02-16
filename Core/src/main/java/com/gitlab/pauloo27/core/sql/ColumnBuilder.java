@@ -249,7 +249,7 @@ public class ColumnBuilder {
      * Sets the default column value.
      *
      * @param defaultValue The default column's value.
-     * @param asString     Case the default value is a String and this paramater true, put the value between
+     * @param asString     Case the default value is a String and this parameter true, put the value between
      *                     {@code '} (e.g. {@code 'hello'}), otherwise as plain text.
      * @return The current object instance.
      */
@@ -355,18 +355,38 @@ public class ColumnBuilder {
         ).replaceAll("\\s+", " ").trim();
     }
 
+    /**
+     * Gets the attribute list.
+     *
+     * @return The attribute list.
+     */
     public List<Attribute> getAttributes() {
         return attributes;
     }
 
+    /**
+     * Gets the attribute name list.
+     *
+     * @return The attribute name list.
+     */
     public List<String> getAttributeNames() {
         return attributeNames;
     }
 
+    /**
+     * Gets the default value.
+     *
+     * @return The default value.
+     */
     public Object getDefaultValue() {
         return defaultValue;
     }
 
+    /**
+     * Gets the data type.
+     *
+     * @return The data type.
+     */
     public String getDataTypeName() {
         return dataTypeName;
     }

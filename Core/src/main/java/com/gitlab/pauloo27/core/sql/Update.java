@@ -23,6 +23,12 @@ public class Update extends UpdateStatementBase<Update> {
      */
     private List<Map.Entry<String, Object>> sets = new ArrayList<>();
 
+    /**
+     * Builds a update statement.
+     *
+     * @param sql   The EzSQL connection.
+     * @param table The table.
+     */
     public Update(EzSQL sql, Table table) {
         super(sql, table);
     }

@@ -10,7 +10,12 @@ import java.sql.SQLException;
  * @since 0.1.0
  */
 public class Delete extends UpdateStatementBase<Delete> {
-
+    /**
+     * Builds a delete statement.
+     *
+     * @param sql   The EzSQL connection.
+     * @param table The table.
+     */
     public Delete(EzSQL sql, Table table) {
         super(sql, table);
     }

@@ -24,7 +24,6 @@ public class UpdateResult extends Result {
      * @param statement The statement.
      * @throws SQLException Problems to execute the statement.
      */
-
     public UpdateResult(PreparedStatement statement) throws SQLException {
         super(statement);
         this.result = this.getStatement().executeUpdate();
@@ -35,7 +34,6 @@ public class UpdateResult extends Result {
      *
      * @return The updated rows.
      */
-
     public int getUpdatedRows() {
         return result;
     }

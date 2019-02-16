@@ -15,14 +15,16 @@ import java.util.Arrays;
 public class Select extends StatementBase<Select, QueryResult> {
 
     /**
-     * The columns' name to select.
+     * The columns' to select name.
      */
     private String columnNames;
 
     /**
-     * Sets the columns to select.
+     * Builds a select statement.
      *
-     * @param columnsName The columns name.
+     * @param sql         The EzSQL connection.
+     * @param table       The table.
+     * @param columnsName The columns to select name.
      */
     public Select(EzSQL sql, Table table, String columnsName) {
         super(sql, table);

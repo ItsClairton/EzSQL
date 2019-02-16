@@ -38,13 +38,13 @@ public class PostgreSQLTable extends Table {
         return false;
     }
 
-    /*
-     * Inserts values into the table and returns one or more values.
+    /**
+     * Inserts values into the table.
      *
-     * @param insert      The Insert statement.
-     * @param columnNames The returning columns' names separated by ", ".
-     * @return The returning values.
-     * @throws SQLException Problems to execute the statement.
+     * @param columnNames   The ordered columns name separated by ", ".
+     * @param returnColumns The columns to return.
+     * @param values        The values to insert.
+     * @return The insert statement.
      */
     public InsertReturning insertReturning(String columnNames, String returnColumns, Object... values) {
         return new InsertReturning(sql, this, columnNames, returnColumns, values);

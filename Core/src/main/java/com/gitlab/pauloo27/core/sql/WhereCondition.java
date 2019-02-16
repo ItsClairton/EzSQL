@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * The where conditions builder.
  *
+ * @param <Statement> The current statement class.
  * @author Paulo
  * @version 1.0
  * @since 0.2.0
@@ -427,14 +428,14 @@ public class WhereCondition<Statement extends StatementBase> {
             CLOSE(")");
 
             /**
-             * The type coverted to String.
+             * The type converted to String.
              */
             private String string;
 
             /**
              * Builds the parentheses type.
              *
-             * @param string The prentheses converted to String.
+             * @param string The parentheses converted to String.
              */
             ParenthesesType(String string) {
                 this.string = string;

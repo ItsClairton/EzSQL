@@ -27,8 +27,10 @@ public class Insert extends UpdateStatementBase<Insert> {
     private List<Object> objectList;
 
     /**
-     * Inserts data in the database.
+     * Builds a insert statement.
      *
+     * @param sql         The EzSQL connection.
+     * @param table       The table.
      * @param columnsName The ordered columns name separated by ", ".
      * @param values      The values to insert.
      */

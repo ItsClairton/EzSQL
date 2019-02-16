@@ -1,7 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import com.google.common.base.Preconditions;
-
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Collection;
@@ -371,7 +369,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param statement The SQL statement.
      * @param values    The array os values.
-     * @return The builded PreparedStatement.
+     * @return The built PreparedStatement.
      * @throws SQLException Error to create the statement.
      */
     public PreparedStatement prepareStatement(String statement, Object... values) throws SQLException {

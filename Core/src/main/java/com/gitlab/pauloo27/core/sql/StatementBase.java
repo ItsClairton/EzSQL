@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 /**
  * The statement base.
  *
+ * @param <ResultType> The statement result class.
+ * @param <Statement>  The current statement class.
  * @author Paulo
  * @version 2.0
  * @since 0.1.0
@@ -37,9 +39,21 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      */
     protected int limit;
 
+    /**
+     * The EzSQL connection.
+     */
     protected EzSQL sql;
+    /**
+     * The table to run the statement.
+     */
     protected Table table;
 
+    /**
+     * Builds a statement.
+     *
+     * @param sql   The EzSQL connection.
+     * @param table The table.
+     */
     public StatementBase(EzSQL sql, Table table) {
         this.sql = sql;
         this.table = table;
@@ -71,6 +85,11 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
         return sb.trim().replaceAll("\\s+", " ");
     }
 
+    /**
+     * Executes the statement.
+     *
+     * @return The statement result.
+     */
     public ResultType execute() {
         Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
         try {
@@ -81,6 +100,12 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
         return null;
     }
 
+    /**
+     * Builds the statement result.
+     *
+     * @return The statement result.
+     * @throws SQLException Problems to run statement.
+     */
     protected abstract ResultType getResultType() throws SQLException;
 
     /**
@@ -96,6 +121,11 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
         return (Statement) this;
     }
 
+    /**
+     * Closes parentheses ")" in the statement.
+     *
+     * @return The current object instance.
+     */
     public Statement closeParentheses() {
         this.whereConditions.closeParentheses();
         return (Statement) this;
