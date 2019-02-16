@@ -47,7 +47,7 @@ public class Table {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
         // TODO Change to EzTable#count when it's implemented
         try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM information_schema.tables where table_name = ?;", getName()).executeQuery()) {
-            if(result.next())
+            if (result.next())
                 return result.getInt(1) == 1;
         }
         return false;
@@ -84,104 +84,48 @@ public class Table {
         return new UpdateResult(statement);
     }
 
-    /**
+    /*
      * Inserts values into the table.
      *
      * @param insert The Insert statement.
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public UpdateResult insert(Insert insert) throws SQLException {
-        if (!sql.isConnected()) throw new SQLException("Not connected.");
-        // No EzStatement? Yeah, Insert haven't WHERE
-        return new UpdateResult(sql.build(insert, this));
+    public Insert insert(String columnsName, Object... values) {
+        return new Insert(sql, this, columnsName, values);
     }
 
-    /**
-     * Inserts values into the table and then close.
-     *
-     * @param insert The Insert statement.
-     * @throws SQLException Problems to execute the statement.
-     */
-    public void insertAndClose(Insert insert) throws SQLException {
-        if (!sql.isConnected()) throw new SQLException("Not connected.");
-        sql.executeAndClose(sql.build(insert, this));
-    }
-
-    /**
+    /*
      * Selects values from the table.
      *
      * @param select The select statement.
      * @return The query result.
      * @throws SQLException Problems to execute the statement.
      */
-    public QueryResult select(StatementBase select) throws SQLException {
-        // EzStatement to avoid type cast on the call.
-        if (!(select instanceof Select)) throw new IllegalArgumentException("The parameter should to be EzSelect");
-        return this.select((Select) select);
+    public Select select(String columnsName) {
+        return new Select(sql, this, columnsName);
     }
 
-    /**
-     * Selects values from the table.
-     *
-     * @param select The select statement.
-     * @return The query result.
-     * @throws SQLException Problems to execute the statement.
-     */
-
-    public QueryResult select(Select select) throws SQLException {
-        return new QueryResult(sql.build(select, this));
-    }
-
-    /**
-     * Updates the table's values.
-     *
-     * @param update The update statement.
-     * @return The update result.
-     * @throws SQLException Problems to execute the statement.
-     */
-    public UpdateResult update(StatementBase update) throws SQLException {
-        if (!(update instanceof Update)) throw new IllegalArgumentException("The parameter should be EzUpdate");
-        return this.update((Update) update);
-    }
-
-    /**
+    /*
      * Updates table's values.
      *
      * @param update The update statement.
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-
-    public UpdateResult update(Update update) throws SQLException {
-        if (!sql.isConnected()) throw new SQLException("Not connected.");
-        return new UpdateResult(sql.build(update, this));
+    public Update update() {
+        return new Update(sql, this);
     }
 
-    /**
+    /*
      * Deletes table's values.
      *
      * @param delete The delete statement.
      * @return The update result.
      * @throws SQLException Problems to execute the statement.
      */
-    public UpdateResult delete(StatementBase delete) throws SQLException {
-        // EzStatement to avoid type cast on the call.
-        if (!(delete instanceof Delete)) throw new IllegalArgumentException("The parameter should be EzDelete");
-        return this.delete((Delete) delete);
-    }
-
-    /**
-     * Deletes table's values.
-     *
-     * @param delete The delete statement.
-     * @return The update result.
-     * @throws SQLException Problems to execute the statement.
-     */
-
-    public UpdateResult delete(Delete delete) throws SQLException {
-        if (!sql.isConnected()) throw new SQLException("Not connected.");
-        return new UpdateResult(sql.build(delete, this));
+    public Delete delete() {
+        return new Delete(sql, this);
     }
 
 }

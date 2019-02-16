@@ -59,26 +59,31 @@ public class Tester {
                                 .withLength(30)
                                 .withDefaultValue("No e-mail")));
         // inserts data
-        table.insert(new Insert("name, age, phone, email",
+        table.insert(
+                "name, age, phone, email",
                 "Paulo' or 1=1", 12, 666, "sql_injection@test.com",
                 "John Doe", 21, 123, "john_doe@sample.com",
-                "Mark", 92, 911, "mark@sample.com")).close();
+                "Mark", 92, 911, "mark@sample.com").executeAndClose();
+
         // inserts more data
-        table.insert(new Insert("name, age, phone", "Doe John", 18, 321)).close();
+        table.insert("name, age, phone", "Doe John", 18, 321).executeAndClose();
+
         // reads data
         reads(table, "0c1d8224e6ba56271a3694bd2882af7a657203064440ac5eb4c22f5ba306b0ac");
         System.out.println("=======");
         // updates
-        table.update(new Update().set("name", "John").where().equals("name", "Doe John")).close();
+        table.update().set("name", "John").where().equals("name", "Doe John").executeAndClose();
         // reads again
         reads(table, "32ebd11565862dce4b4ce285003e356d0afb34bcb7297af79cd8067205b819a8");
         System.out.println("=======");
         // reads where the age is at least 18
-        try (QueryResult result = table.select(new Select("name")
+
+        try (QueryResult result = table.select("name")
                 .orderBy("name", StatementBase.OrderByType.ASC)
                 .where()
                 .atLeast("age", 18)
-                .limit(10))) {
+                .limit(10).execute()) {
+
             ResultSet rs = result.getResultSet();
             List<String> names = new ArrayList<>();
             while (rs.next()) {
@@ -91,30 +96,30 @@ public class Tester {
         }
         System.out.println("=======");
         // reads where the age is at least 18 and less than 60
-        try (QueryResult result = table.select(new Select("name")
+        try (QueryResult result = table.select("name")
                 .orderBy("name", StatementBase.OrderByType.ASC)
                 .where()
                 .atLeast("age", 18)
                 .and()
                 .lessThan("age", 60)
-                .limit(3))) {
+                .limit(3).execute()) {
             // I think it's too short to use a hash
             Assert.assertEquals("John, John Doe", String.join(", ", getNames(result.getResultSet())));
         }
         System.out.println("=======");
         // reads where age is less than 18
-        try (QueryResult result = table.select(new Select("name")
+        try (QueryResult result = table.select("name")
                 .orderBy("name", StatementBase.OrderByType.ASC)
                 .where()
                 .lessThan("age", 18)
-                .limit(3))) {
+                .limit(3).execute()) {
             ResultSet rs = result.getResultSet();
             // I think it's too short to use a hash
             Assert.assertEquals("Paulo' or 1=1", String.join(", ", getNames(result.getResultSet())));
         }
         System.out.println("=======");
         // deletes
-        table.delete(new Delete().where().equals("name", "John Doe"));
+        table.delete().where().equals("name", "John Doe").executeAndClose();
         // reads again
         reads(table, "95a5947b39c17fb00ff326642402549f4e1fb2e25db69ba9a8fb7275039a350a");
         // Now, test join:
@@ -124,9 +129,9 @@ public class Tester {
     }
 
     private static void reads(Table table, String expectedHash) throws SQLException {
-        try (QueryResult result = table.select(new Select("name, phone, email, age")
+        try (QueryResult result = table.select("name, phone, email, age")
                 .orderBy("name", StatementBase.OrderByType.ASC)
-                .limit(10))) {
+                .limit(10).execute()) {
             ResultSet rs = result.getResultSet();
             // String to hash
             StringBuilder sb = new StringBuilder();
@@ -186,14 +191,16 @@ public class Tester {
         );
 
         // TODO insert
-        try (QueryResult result = requests.select(
-                new Select("requests.id, clients.name client, employees.name employee")
-                        .join(
-                                new StatementBase.Join("clients", "requests.client",
-                                        "clients.id", StatementBase.Join.JoinType.INNER))
-                        .join(new StatementBase.Join("employees", "requests.employee",
-                                "employees.id", StatementBase.Join.JoinType.INNER))
-                        .where().notNull("requests.client"))) {
+        try (QueryResult result = requests.select("requests.id, clients.name client, employees.name employee")
+                .join(
+                        new StatementBase.Join("clients", "requests.client",
+                                "clients.id", StatementBase.Join.JoinType.INNER)
+                )
+                .join(
+                        new StatementBase.Join("employees", "requests.employee",
+                                "employees.id", StatementBase.Join.JoinType.INNER)
+                )
+                .where().notNull("requests.client").execute()) {
             ResultSet rs = result.getResultSet();
             while (rs.next()) {
                 System.out.printf("%d | %s | %s%n", rs.getInt("id"), rs.getString("employee"), rs.getString("client"));

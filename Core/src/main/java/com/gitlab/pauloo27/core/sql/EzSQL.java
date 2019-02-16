@@ -341,24 +341,6 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
     }
 
     /**
-     * Builds a insert returning statement.
-     *
-     * @param insert      The insert statement.
-     * @param columnsName The returning columns' names separated by ", ".
-     * @param table       The table.
-     * @return The current object instance.
-     * @throws SQLException Problems to prepare the statement.
-     */
-    public PreparedStatement build(Insert insert, String columnsName, TableType table) throws SQLException {
-        Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
-        PreparedStatement statement = this.getConnection().prepareStatement(
-                String.format("INSERT INTO %s (%s) VALUES %s RETURNING %s;", table.getName(), insert.getColumnsName(), insert.valuesToString(), columnsName));
-
-        setValuesObjects(statement, new AtomicInteger(), insert.getValues());
-        return statement;
-    }
-
-    /**
      * Builds a update statement.
      *
      * @param update The update statement.

@@ -2,6 +2,7 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Arrays;
  * @version 2.0
  * @since 0.1.0
  */
-public class Select extends StatementBase {
+public class Select extends StatementBase<Select, QueryResult> {
 
     /**
      * The columns' name to select.
@@ -23,7 +24,8 @@ public class Select extends StatementBase {
      *
      * @param columnsName The columns name.
      */
-    public Select(String columnsName) {
+    public Select(EzSQL sql, Table table, String columnsName) {
+        super(sql, table);
         Preconditions.checkNotNull(columnsName, "Columns cannot be null");
         Preconditions.checkArgument(!columnsName.isEmpty(), "Columns cannot be null");
         Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
@@ -38,6 +40,11 @@ public class Select extends StatementBase {
 
     public String getColumnNames() {
         return columnNames;
+    }
+
+    @Override
+    protected QueryResult getResultType() throws SQLException {
+        return new QueryResult(sql.build(this, table));
     }
 
     /**

@@ -2,6 +2,7 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
+import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +16,16 @@ import java.util.stream.Collectors;
  * @version 2.0
  * @since 0.1.0
  */
-public class Update extends StatementBase {
+public class Update extends UpdateStatementBase<Update> {
 
     /**
      * The list of map (column's name, value) of values to set.
      */
     private List<Map.Entry<String, Object>> sets = new ArrayList<>();
+
+    public Update(EzSQL sql, Table table) {
+        super(sql, table);
+    }
 
     /**
      * Sets the values to sets.
@@ -42,6 +47,21 @@ public class Update extends StatementBase {
      */
     public String setsToString() {
         return String.format("SET %s", this.getSets().stream().map(set -> String.format("%s = ?", set.getKey())).collect(Collectors.joining(", ")));
+    }
+
+    public UpdateResult execute() {
+        Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
+        try {
+            return new UpdateResult(sql.build(this, table));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    protected UpdateResult getResultType() throws SQLException {
+        return new UpdateResult(sql.build(this, table));
     }
 
     /**

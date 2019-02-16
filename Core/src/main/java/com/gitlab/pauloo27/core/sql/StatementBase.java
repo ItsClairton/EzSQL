@@ -2,6 +2,7 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
+import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  * @version 2.0
  * @since 0.1.0
  */
-public abstract class StatementBase {
+public abstract class StatementBase<Statement extends StatementBase, ResultType extends Result> {
 
     /**
      * List of Join statements.
@@ -25,7 +26,7 @@ public abstract class StatementBase {
     /**
      * List of Where conditions.
      */
-    protected WhereCondition whereConditions = new WhereCondition(this);
+    protected WhereCondition<Statement> whereConditions;
 
     /**
      * The order's type and the column name.
@@ -34,7 +35,16 @@ public abstract class StatementBase {
     /**
      * The statement's limit.
      */
-    protected Integer limit;
+    protected int limit;
+
+    protected EzSQL sql;
+    protected Table table;
+
+    public StatementBase(EzSQL sql, Table table) {
+        this.sql = sql;
+        this.table = table;
+        whereConditions = new WhereCondition<>((Statement) this);
+    }
 
     /**
      * Converts and format arrays to String.
@@ -61,6 +71,18 @@ public abstract class StatementBase {
         return sb.trim().replaceAll("\\s+", " ");
     }
 
+    public ResultType execute() {
+        Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
+        try {
+            return getResultType();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    protected abstract ResultType getResultType() throws SQLException;
+
     /**
      * Sets the statement's order.
      *
@@ -68,15 +90,15 @@ public abstract class StatementBase {
      * @param orderBy    The order type.
      * @return The current object instance.
      */
-    public StatementBase orderBy(String columnName, OrderByType orderBy) {
+    public Statement orderBy(String columnName, OrderByType orderBy) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.orderBy = new AbstractMap.SimpleEntry<>(orderBy, columnName);
-        return this;
+        return (Statement) this;
     }
 
-    public StatementBase closeParentheses() {
+    public Statement closeParentheses() {
         this.whereConditions.closeParentheses();
-        return this;
+        return (Statement) this;
     }
 
     /**
@@ -84,7 +106,7 @@ public abstract class StatementBase {
      *
      * @return The current object instance.
      */
-    public WhereCondition where() {
+    public WhereCondition<Statement> where() {
         Preconditions.checkArgument(whereConditions.getWhereStatements().isEmpty(), "A where statement already created. Use and() and or() to add another statement");
         return whereConditions;
     }
@@ -94,7 +116,7 @@ public abstract class StatementBase {
      *
      * @return The current object instance.
      */
-    public WhereCondition and() {
+    public WhereCondition<Statement> and() {
         Preconditions.checkNotNull(whereConditions, "A where statement not created. Use where() to create one");
         whereConditions.separate(WhereCondition.Where.WhereSeparator.AND);
         return whereConditions;
@@ -105,7 +127,7 @@ public abstract class StatementBase {
      *
      * @return The current object instance.
      */
-    public WhereCondition or() {
+    public WhereCondition<Statement> or() {
         Preconditions.checkNotNull(whereConditions, "A where statement not created. Use where() to create one");
         whereConditions.separate(WhereCondition.Where.WhereSeparator.OR);
         return whereConditions;
@@ -118,9 +140,9 @@ public abstract class StatementBase {
      * @return The current object instance.
      */
 
-    public StatementBase join(Join join) {
+    public Statement join(Join join) {
         this.joinList.add(join);
-        return this;
+        return (Statement) this;
     }
 
     /**
@@ -129,7 +151,7 @@ public abstract class StatementBase {
      * @return The statements' Where Conditions.
      */
 
-    public WhereCondition getWhereConditions() {
+    public WhereCondition<Statement> getWhereConditions() {
         return whereConditions;
     }
 
@@ -139,7 +161,7 @@ public abstract class StatementBase {
      * @return The statement's limit.
      */
 
-    public Integer getLimit() {
+    public int getLimit() {
         return limit;
     }
 
@@ -149,9 +171,9 @@ public abstract class StatementBase {
      * @param limit The statement's limit.
      * @return The current object instance.
      */
-    public StatementBase limit(Integer limit) {
+    public Statement limit(int limit) {
         this.limit = limit;
-        return this;
+        return (Statement) this;
     }
 
     /**
@@ -205,7 +227,7 @@ public abstract class StatementBase {
      */
 
     public String limitToString() {
-        return (this.getLimit() != null ? "LIMIT " + this.getLimit() : "").trim();
+        return (this.getLimit() > 0 ? "LIMIT " + this.getLimit() : "").trim();
     }
 
     /**
@@ -234,7 +256,6 @@ public abstract class StatementBase {
         /**
          * Decreasing order.
          */
-
         DESC
     }
 

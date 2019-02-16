@@ -25,7 +25,11 @@ public class Tests {
         PostgreSQLTable table = sql.getTable("friends");
 
         int id;
-        try (QueryResult result = table.insertReturning(new Insert("name, age, phone", "PSQL", 22, 999), "id")) {
+        try (QueryResult result = table
+                .insertReturning("name, age, phone",
+                        "id",
+                        "PSQL", 22, 999).executeReturning()) {
+
             ResultSet rs = result.getResultSet();
             if (rs.next()) {
                 id = rs.getInt("id");
@@ -36,6 +40,6 @@ public class Tests {
                 throw new NullPointerException("Returning id cannot be null");
             }
         }
-        table.delete(new Delete().where().equals("id", id));
+        table.delete().where().equals("id", id).executeAndClose();
     }
 }

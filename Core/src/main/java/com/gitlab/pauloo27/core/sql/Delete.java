@@ -1,5 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
+import java.sql.SQLException;
+
 /**
  * The delete statement.
  *
@@ -7,7 +9,11 @@ package com.gitlab.pauloo27.core.sql;
  * @version 2.0
  * @since 0.1.0
  */
-public class Delete extends StatementBase {
+public class Delete extends UpdateStatementBase<Delete> {
+
+    public Delete(EzSQL sql, Table table) {
+        super(sql, table);
+    }
 
     /**
      * Converts the statement to SQL.
@@ -20,5 +26,10 @@ public class Delete extends StatementBase {
     @Override
     public String toString() {
         return String.format("DELETE FROM ${table} %s;", super.toString());
+    }
+
+    @Override
+    protected UpdateResult getResultType() throws SQLException {
+        return new UpdateResult(sql.build(this, table));
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @since 0.2.0
  */
-public class WhereCondition {
+public class WhereCondition<Statement extends StatementBase> {
 
     /**
      * The where statements.
@@ -22,7 +22,7 @@ public class WhereCondition {
     /**
      * The base statement.
      */
-    private StatementBase statement;
+    private Statement statement;
     /**
      * The previous separator.
      */
@@ -33,7 +33,7 @@ public class WhereCondition {
      *
      * @param statement The base statement.
      */
-    WhereCondition(StatementBase statement) {
+    WhereCondition(Statement statement) {
         this.statement = statement;
     }
 
@@ -82,7 +82,7 @@ public class WhereCondition {
      * @param value      The expected value.
      * @return The current object instance.
      */
-    public StatementBase equals(String columnName, Object value) {
+    public Statement equals(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.EQUALS), previousSeparator));
         previousSeparator = null;
@@ -97,7 +97,7 @@ public class WhereCondition {
      * @return The current object instance.
      */
 
-    public StatementBase different(String columnName, Object value) {
+    public Statement different(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.DIFFERENT), previousSeparator));
         previousSeparator = null;
@@ -111,7 +111,7 @@ public class WhereCondition {
      * @return The current object instance.
      */
 
-    public StatementBase notNull(String columnName) {
+    public Statement notNull(String columnName) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName), previousSeparator));
         previousSeparator = null;
@@ -126,7 +126,7 @@ public class WhereCondition {
      * @return The current object instance.
      */
 
-    public StatementBase atLeast(String columnName, Object value) {
+    public Statement atLeast(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_LEAST), previousSeparator));
         previousSeparator = null;
@@ -141,7 +141,7 @@ public class WhereCondition {
      * @return The current object instance.
      */
 
-    public StatementBase atMost(String columnName, Object value) {
+    public Statement atMost(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_MOST), previousSeparator));
         previousSeparator = null;
@@ -156,7 +156,7 @@ public class WhereCondition {
      * @return The current object instance.
      */
 
-    public StatementBase lessThan(String columnName, Object value) {
+    public Statement lessThan(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.LESS_THAN), previousSeparator));
         previousSeparator = null;
@@ -171,7 +171,7 @@ public class WhereCondition {
      * @return The current object instance.
      */
 
-    public StatementBase moreThan(String columnName, Object value) {
+    public Statement moreThan(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.MORE_THAN), previousSeparator));
         previousSeparator = null;

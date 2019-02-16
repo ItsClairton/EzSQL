@@ -38,7 +38,7 @@ public class PostgreSQLTable extends Table {
         return false;
     }
 
-    /**
+    /*
      * Inserts values into the table and returns one or more values.
      *
      * @param insert      The Insert statement.
@@ -46,10 +46,8 @@ public class PostgreSQLTable extends Table {
      * @return The returning values.
      * @throws SQLException Problems to execute the statement.
      */
-    public QueryResult insertReturning(Insert insert, String columnNames) throws SQLException {
-        if (!sql.isConnected()) throw new SQLException("Not connected.");
-        // No EzStatement? Yeah, Insert haven't WHERE
-        return new QueryResult(sql.build(insert, columnNames, this));
+    public InsertReturning insertReturning(String columnNames, String returnColumns, Object... values) {
+        return new InsertReturning(sql, this, columnNames, returnColumns, values);
     }
 
 
