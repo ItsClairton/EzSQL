@@ -530,6 +530,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return getTableByName(table.getName());
     }
 
+    /**
+     * The Data Type by the Object.
+     */
     private static Map<Object, DataType> typesByObject = new HashMap<>();
 
     static {
@@ -537,6 +540,14 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         typesByObject.put(int.class, DefaultDataTypes.INTEGER);
     }
 
+    /**
+     * Creates a table if not exists using a object.
+     *
+     * @param clazz The object to build.
+     * @param <T>   The object type.
+     * @return The table.
+     * @throws SQLException Problems to execute the statement.
+     */
     public <T> TableType createIfNotExists(Class<T> clazz) throws SQLException {
         String tableName = clazz.getSimpleName();
 

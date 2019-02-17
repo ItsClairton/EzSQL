@@ -13,8 +13,17 @@ import java.util.*;
  */
 public class DefaultAttributes {
 
+    /**
+     * The attribute object by the annotation.
+     */
     private static Map<Object, Attribute> attributeByAnnotation = new HashMap<>();
 
+    /**
+     * Gets the attribute by the annotation.
+     *
+     * @param object The attribute by the annotation.
+     * @return The attribute by the annotation.
+     */
     public static Attribute getAttribute(Object object) {
         if (attributeByAnnotation.isEmpty()) {
             attributeByAnnotation.put(Unique.class, DefaultAttributes.UNIQUE);
@@ -36,6 +45,9 @@ public class DefaultAttributes {
      */
     public final static Attribute UNIQUE = new Attribute("UNIQUE");
 
+    /**
+     * Marks an UNIQUE value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Unique {
     }
@@ -45,6 +57,9 @@ public class DefaultAttributes {
      */
     public final static Attribute NOT_NULL = new Attribute("NOT NULL");
 
+    /**
+     * Marks a NOT NULL value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface NotNull {
     }
@@ -54,6 +69,9 @@ public class DefaultAttributes {
      */
     public final static Attribute NULL = new Attribute("NULL");
 
+    /**
+     * Marks a NULL value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Null {
     }
@@ -63,6 +81,9 @@ public class DefaultAttributes {
      */
     public final static Attribute UNSIGNED = new Attribute("UNSIGNED");
 
+    /**
+     * Marks a UNSIGNED value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Unsigned {
     }
@@ -72,6 +93,9 @@ public class DefaultAttributes {
      */
     public final static Attribute ZEROFILL = new Attribute("ZEROFILL");
 
+    /**
+     * Marks a ZERO FILLED value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Zerofill {
     }
@@ -81,6 +105,9 @@ public class DefaultAttributes {
      */
     public final static Attribute PRIMARY_KEY = new Attribute("PRIMARY KEY");
 
+    /**
+     * Marks a PRIMARY KEY value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface PrimaryKey {
     }
@@ -90,6 +117,9 @@ public class DefaultAttributes {
      */
     public final static Attribute AUTO_INCREMENT = new Attribute("AUTO_INCREMENT");
 
+    /**
+     * Marks a NULL value.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface AutoIncrement {
     }

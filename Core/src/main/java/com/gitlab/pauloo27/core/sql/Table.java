@@ -45,11 +45,12 @@ public class Table {
      * Checks if the table exists.
      *
      * @return If the table exists.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        // TODO Change to EzTable#count when it's implemented
+        // TODO Change to Table#count when it's implemented
         try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM information_schema.tables where table_name = ?;", getName()).executeQuery()) {
             if (result.next())
                 return result.getInt(1) == 1;
@@ -80,6 +81,7 @@ public class Table {
      * Drops the table.
      *
      * @return The update result.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public UpdateResult drop() throws SQLException {
@@ -93,12 +95,21 @@ public class Table {
      *
      * @param columnsName The ordered columns name separated by ", ".
      * @param values      The values to insert.
+     *
      * @return The insert statement.
      */
     public Insert insert(String columnsName, Object... values) {
         return new Insert(sql, this, columnsName, values);
     }
 
+    /**
+     * Inserts values into the table.
+     *
+     * @param <T>    The object type to be inserted.
+     * @param object The object to the inserted.
+     *
+     * @return The insert statement.
+     */
     public <T> Insert insert(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
 
@@ -136,9 +147,10 @@ public class Table {
     }
 
     /**
-     * Selects values from the table.
+     * Selects the values from the table.
      *
      * @param columnsName The columns to select name.
+     *
      * @return The select statement.
      */
     public Select select(String columnsName) {
@@ -146,9 +158,10 @@ public class Table {
     }
 
     /**
-     * Selects alues from the table. Is the same that use {@code #select("*")}.
+     * Selects the values from the table. Is the same that use {@code #select("*")}.
      *
      * @return The select statement.
+     *
      * @see #select(String) to specify the columns to select.
      */
     public Select select() {
@@ -156,7 +169,7 @@ public class Table {
     }
 
     /**
-     * Updates table's values.
+     * Updates the table's values.
      *
      * @return The update statement.
      */
@@ -164,6 +177,14 @@ public class Table {
         return new Update(sql, this);
     }
 
+    /**
+     * Updates the table's values using an object.
+     *
+     * @param <T>    The object type to be updated.
+     * @param object The object to be updated.
+     *
+     * @return The update statement.
+     */
     public <T> Update update(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
 
@@ -207,7 +228,7 @@ public class Table {
     }
 
     /**
-     * Deletes table's values.
+     * Deletes the table's values.
      *
      * @return The delete statement.
      */
@@ -215,6 +236,14 @@ public class Table {
         return new Delete(sql, this);
     }
 
+    /**
+     * Deletes the table's values using a object.
+     *
+     * @param <T>    The object type to be deleted.
+     * @param object The object to the deleted.
+     *
+     * @return The delete statement.
+     */
     public <T> Delete delete(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
 
