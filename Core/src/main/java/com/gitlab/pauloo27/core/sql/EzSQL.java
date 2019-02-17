@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @param <DatabaseType> The Database class.
  * @param <TableType>    The Table class.
+ *
  * @author Paulo
  * @version 3.0
  * @since 0.1.0
@@ -39,7 +40,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
     /**
      * The SQL port.
      */
-    protected Integer port;
+    protected int port = -1;
     /**
      * If true, the database will be created if not exists.
      */
@@ -56,10 +57,11 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
     }
 
     /**
-     * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection.
-     * Uses a regex that checks if the string is only of alphabetical characters ({@code \w*}).
+     * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection. Uses a
+     * regex that checks if the string is only of alphabetical characters ({@code \w*}).
      *
      * @param name The string to check.
+     *
      * @return If the name contains only alphabetical characters and a dot or it's a asterisk.
      */
     public static boolean checkEntryName(String name) {
@@ -82,6 +84,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param address The server's address.
      * @param port    The server's port. If the port is less than 0 the default port will be used.
+     *
      * @return The current object instance.
      */
     public EzSQL<DatabaseType, TableType> withAddress(String address, int port) {
@@ -95,6 +98,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * the type) will be used. To use another port see {@link #withAddress(String, int)}.
      *
      * @param address The server's address.
+     *
      * @return The current object instance.
      */
     public EzSQL<DatabaseType, TableType> withAddress(String address) {
@@ -107,6 +111,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param username The user's name.
      * @param password The user's password.
+     *
      * @return The current object instance.
      */
     public EzSQL<DatabaseType, TableType> withLogin(String username, String password) {
@@ -119,6 +124,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Sets the server login information. To also sets the password {@link #withLogin(String, String)}
      *
      * @param username The user's name.
+     *
      * @return The current object instance.
      */
     public EzSQL<DatabaseType, TableType> withLogin(String username) {
@@ -132,6 +138,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * #withDefaultDatabase(String, boolean)}.
      *
      * @param defaultDatabase The default database name.
+     *
      * @return The current object instance.
      */
 
@@ -146,6 +153,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param defaultDatabase   The default database name.
      * @param createIfNotExists If true, the database will be created if not exists. Doesn't work with Postgresql.
+     *
      * @return The current object instance.
      */
     public EzSQL<DatabaseType, TableType> withDefaultDatabase(String defaultDatabase, boolean createIfNotExists) {
@@ -158,6 +166,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Sets a custom JDBC driver. If it's null (and it's by default) the default driver for the SQL Type will be used.
      *
      * @param customDriverClass The custom driver class.
+     *
      * @return The current object instance.
      */
     public EzSQL<DatabaseType, TableType> withCustomDriver(String customDriverClass) {
@@ -194,7 +203,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * @return The server's port.
      */
     public int getPort() {
-        return port == null || port < 0 ? getDefaultPort() : port;
+        return port < 0 ? getDefaultPort() : port;
     }
 
     /**
@@ -209,6 +218,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * file (META-INF.services/java.sql.Driver) is in the jar.
      *
      * @return The current object instance.
+     *
      * @throws ClassNotFoundException Invalid driver class.
      */
     public EzSQL<DatabaseType, TableType> registerDriver() throws ClassNotFoundException {
@@ -220,14 +230,16 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Connects to the SQL.
      *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to connect.
      */
     public EzSQL<DatabaseType, TableType> connect() throws SQLException {
         if (!this.readyToConnect()) throw new SQLException("Not ready to connect");
+
         if (defaultDatabase != null && !checkEntryName(defaultDatabase))
             throw new SQLException(defaultDatabase + " is not a valid name");
 
-        String url = this.getURLBase() + this.address + ":" + this.getPort();
+        String url = String.format("%s%s:%d", this.getURLBase(), this.address, this.getPort());
 
         if (this.defaultDatabase != null && !this.createDefaultDatabaseIfNotExists)
             url += "/" + this.defaultDatabase;
@@ -247,6 +259,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Gets the current database. Return null if the type is SQLite.
      *
      * @return The current database. If the SQL is SQLite return null.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public DatabaseType getCurrentDatabase() throws SQLException {
@@ -258,7 +271,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Changes the selected database.
      *
      * @param database The database to selected.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public EzSQL<DatabaseType, TableType> changeDatabase(DatabaseType database) throws SQLException {
@@ -271,13 +286,13 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Executes a PreparedStatement and close.
      *
      * @param statement The statement.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public void executeAndClose(PreparedStatement statement) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         statement.execute();
         statement.close();
-
     }
 
     /**
@@ -285,7 +300,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param select The select statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
     public PreparedStatement build(Select select, TableType table) throws SQLException {
@@ -305,6 +322,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Builds a data type.
      *
      * @param dataType The data type object to build.
+     *
      * @return The data type converted to SQL.
      */
     public String build(DataType dataType) {
@@ -315,6 +333,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Builds a data attribute.
      *
      * @param attribute The data attribute object to build.
+     *
      * @return The data attribute converted to SQL.
      */
     public String build(Attribute attribute) {
@@ -326,12 +345,15 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param insert The insert statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
     public PreparedStatement build(Insert insert, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
-                String.format("INSERT INTO %s (%s) VALUES %s;", table.getName(), insert.getColumnsName(), insert.valuesToString()));
+                String.format("INSERT INTO %s (%s) VALUES %s;",
+                        table.getName(), insert.getColumnsName(), insert.valuesToString()));
 
         setValuesObjects(statement, new AtomicInteger(), insert.getValues());
         return statement;
@@ -342,7 +364,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param update The update statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
     public PreparedStatement build(Update update, TableType table) throws SQLException {
@@ -368,7 +392,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param statement The SQL statement.
      * @param values    The array os values.
+     *
      * @return The built PreparedStatement.
+     *
      * @throws SQLException Error to create the statement.
      */
     public PreparedStatement prepareStatement(String statement, Object... values) throws SQLException {
@@ -383,6 +409,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param statement    The Statement.
      * @param unsafeValues The array of values.
+     *
      * @throws SQLException Error to create or run the statement.
      */
     public void executeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
@@ -456,7 +483,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param delete The delete statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
     public PreparedStatement build(Delete delete, TableType table) throws SQLException {
@@ -501,6 +530,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Gets an instance of {@link Table} using the table name.
      *
      * @param name The table's name.
+     *
      * @return The table.
      */
     public TableType getTable(String name) {
@@ -511,6 +541,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Gets an instance of {@link Database} using the database name.
      *
      * @param name The database's name.
+     *
      * @return The database.
      */
     public DatabaseType getDatabase(String name) {
@@ -521,7 +552,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Creates a table if not exists.
      *
      * @param table The table's builder.
+     *
      * @return The table.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public TableType createIfNotExists(TableBuilder table) throws SQLException {
@@ -545,7 +578,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @param clazz The object to build.
      * @param <T>   The object type.
+     *
      * @return The table.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public <T> TableType createIfNotExists(Class<T> clazz) throws SQLException {
@@ -602,7 +637,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Creates a database if not exists.
      *
      * @param database The database's builder.
+     *
      * @return The database.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public DatabaseType createIfNotExists(DatabaseBuilder database) throws SQLException {
@@ -615,6 +652,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Gets a database by its name.
      *
      * @param name The database name.
+     *
      * @return The database object.
      */
     protected abstract DatabaseType getDatabaseByName(String name);
@@ -623,6 +661,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Gets a table by its name.
      *
      * @param name The table name.
+     *
      * @return The table object.
      */
     protected abstract TableType getTableByName(String name);
@@ -631,7 +670,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Creates a table.
      *
      * @param table The table's builder.
+     *
      * @return The table.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public TableType create(TableBuilder table) throws SQLException {
@@ -644,7 +685,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * Creates a database.
      *
      * @param database The database's name.
+     *
      * @return The database.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public DatabaseType create(DatabaseBuilder database) throws SQLException {
