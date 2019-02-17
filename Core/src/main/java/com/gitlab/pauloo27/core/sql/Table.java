@@ -112,15 +112,25 @@ public class Table {
      */
     public <T> Insert insert(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
-
         StringBuilder sb = new StringBuilder();
         List<Object> values = new ArrayList<>();
+
+        prepareObjectToInsert(object, clazz, sb, values);
+
+        return new Insert(sql, this, sb.toString(), values.toArray());
+    }
+
+    private <T> void prepareObjectToInsert(T object, Class<T> clazz, StringBuilder columns, List<Object> values) {
+        // only append the columns name if the StringBuilder is empty
+        // if it's not empty, the columns are already in the StringBuilder
+        boolean appendColumn = columns.length() == 0;
 
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
             field.setAccessible(true);
 
-            if (sb.length() != 0)
-                sb.append(", ");
+
+            if (columns.length() != 0 && appendColumn)
+                columns.append(", ");
 
             if (field.isAnnotationPresent(Id.class))
                 return;
@@ -135,12 +145,23 @@ public class Table {
                 if (field.isAnnotationPresent(Name.class))
                     name = field.getAnnotation(Name.class).value();
 
-                sb.append(name);
+                if (appendColumn)
+                    columns.append(name);
 
                 values.add(value);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+        });
+
+    }
+
+    public <T> Insert insertAll(T... objects) {
+        StringBuilder sb = new StringBuilder();
+        List<Object> values = new ArrayList<>();
+        Arrays.stream(objects).forEach(object -> {
+            Class<T> clazz = (Class<T>) object.getClass();
+            prepareObjectToInsert(object, clazz, sb, values);
         });
 
         return new Insert(sql, this, sb.toString(), values.toArray());
@@ -194,7 +215,7 @@ public class Table {
 
         try {
             String idColumn = idField.getName();
-            int id = idField.getInt(object);
+            int id = (int) idField.get(object);
 
             Preconditions.checkNotNull(idField);
 
@@ -223,7 +244,6 @@ public class Table {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -245,15 +265,12 @@ public class Table {
      * @return The delete statement.
      */
     public <T> Delete delete(T object) {
-        Class<T> clazz = (Class<T>) object.getClass();
 
-        Field idField = Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst().orElse(null);
+        Field idField = getIdField(object.getClass());
 
         try {
             String idColumn = idField.getName();
-            int id = idField.getInt(object);
+            int id = (int) idField.get(object);
 
             Preconditions.checkNotNull(idField);
 
@@ -262,6 +279,33 @@ public class Table {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private <T> Field getIdField(Class<T> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .findFirst().orElse(null);
+    }
+
+    public <T> Delete deleteAll(T... objects) {
+        Delete deleteStatement = new Delete(sql, this);
+        Arrays.stream(objects).forEach(object -> {
+            try {
+                Field idField = getIdField(object.getClass());
+                String idColumn = idField.getName();
+                int id = (int) idField.get(object);
+
+                Preconditions.checkNotNull(idField);
+
+                if (deleteStatement.getWhereConditions().getWhereStatements().isEmpty())
+                    deleteStatement.where().equals(idColumn, id);
+                else
+                    deleteStatement.or().equals(idColumn, id);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        return deleteStatement;
     }
 
 }
