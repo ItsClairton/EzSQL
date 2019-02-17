@@ -28,8 +28,8 @@ public class ColumnBuilder {
      */
     private List<Attribute> attributes = new ArrayList<>();
     /**
-     * The column's attributes. An ArrayList of String. If an attribute is not in {@link Attribute}, this store an
-     * array of raw attribute names.
+     * The column's attributes. An ArrayList of String. If an attribute is not in {@link Attribute}, this store an array
+     * of raw attribute names.
      */
     private List<String> attributeNames = new ArrayList<>();
     /**
@@ -41,8 +41,7 @@ public class ColumnBuilder {
      */
     private Object defaultValue;
     /**
-     * The columns data type raw name. If the data type is not in {@link DataType}, this store the raw data type
-     * name.
+     * The columns data type raw name. If the data type is not in {@link DataType}, this store the raw data type name.
      */
     private String dataTypeName;
 
@@ -52,6 +51,7 @@ public class ColumnBuilder {
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
+     *
      * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder(String name, DataType dataType, Attribute... attributes) throws SQLException {
@@ -77,6 +77,7 @@ public class ColumnBuilder {
      *
      * @param name     The column's name.
      * @param dataType The column's data type.
+     *
      * @see #ColumnBuilder(String, String) Builds using a String as data type.
      */
     public ColumnBuilder(String name, DataType dataType) {
@@ -103,6 +104,7 @@ public class ColumnBuilder {
      * @param dataType   The column's data type.
      * @param length     The column's length.
      * @param attributes The column's attributes.
+     *
      * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) throws SQLException {
@@ -132,6 +134,7 @@ public class ColumnBuilder {
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      * @param attributes   The column's attributes.
+     *
      * @throws SQLException If the attribute are not valid.
      */
     @Deprecated
@@ -185,6 +188,7 @@ public class ColumnBuilder {
      * @param dataTypeName The column's data type.
      * @param length       The column's length.
      * @param attributes   The column's attributes.
+     *
      * @throws SQLException If the attribute are not valid.
      */
     @Deprecated
@@ -213,7 +217,9 @@ public class ColumnBuilder {
      * Adds attributes to the column. If the attribute isn't in the Enum, use {@link #withAttributes(String...)}
      *
      * @param attributes Array of attributes.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException If the attribute are not valid.
      */
     public ColumnBuilder withAttributes(Attribute... attributes) throws SQLException {
@@ -235,6 +241,7 @@ public class ColumnBuilder {
      * Adds attributes to the column.
      *
      * @param attributes Array of attributes.
+     *
      * @return The current object instance.
      */
     @Deprecated
@@ -247,6 +254,7 @@ public class ColumnBuilder {
      * Sets the length of the column. Eg: {@code VARCHAR(20)} - the length is "20".
      *
      * @param length The column's value.
+     *
      * @return The current object instance.
      */
     public ColumnBuilder withLength(int length) {
@@ -258,8 +266,9 @@ public class ColumnBuilder {
      * Sets the default column value.
      *
      * @param defaultValue The default column's value.
-     * @param asString     Case the default value is a String and this parameter true, put the value between
-     *                     {@code '} (e.g. {@code 'hello'}), otherwise as plain text.
+     * @param asString     Case the default value is a String and this parameter true, put the value between {@code '}
+     *                     (e.g. {@code 'hello'}), otherwise as plain text.
+     *
      * @return The current object instance.
      */
     public ColumnBuilder withDefaultValue(Object defaultValue, boolean asString) {
@@ -273,6 +282,7 @@ public class ColumnBuilder {
      * text use {@link #withDefaultValue(Object, boolean)}.
      *
      * @param defaultValue The default column's value.
+     *
      * @return The current object instance.
      */
     public ColumnBuilder withDefaultValue(Object defaultValue) {
@@ -311,6 +321,7 @@ public class ColumnBuilder {
      * Gets the column data type name. Return {@link #dataType} if not null and otherwise {@link #dataTypeName}.
      *
      * @param sql The current EzSQL connection.
+     *
      * @return The data type converted to String.
      */
     public String dataTypeToString(EzSQL sql) {
@@ -330,6 +341,7 @@ public class ColumnBuilder {
      * Gets the column attributes converted to string. Join the {@link #attributes} and the {@link #attributeNames}
      *
      * @param sql The current EzSQL connection.
+     *
      * @return The attributes converted to String.
      */
     public String attributesToString(EzSQL sql) {
@@ -351,6 +363,7 @@ public class ColumnBuilder {
      * Converts the column to SQL.
      *
      * @param sql The current EzSQL connection.
+     *
      * @return The column converted to SQL query.
      */
     public String toSQL(EzSQL sql) {

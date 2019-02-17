@@ -56,6 +56,7 @@ public class TableBuilder {
      * Adds one or more columns to the table.
      *
      * @param columns The columns.
+     *
      * @return The current object instance.
      */
     public TableBuilder withColumn(ColumnBuilder... columns) {
@@ -67,6 +68,7 @@ public class TableBuilder {
      * Gets the table converted to SQL.
      *
      * @param sql The current EzSQL connection.
+     *
      * @return The table converted to SQL query.
      */
     public String toSQL(EzSQL sql) {

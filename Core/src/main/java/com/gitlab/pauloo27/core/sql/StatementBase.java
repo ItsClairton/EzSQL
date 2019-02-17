@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  *
  * @param <ResultType> The statement result class.
  * @param <Statement>  The current statement class.
+ *
  * @author Paulo
  * @version 2.0
  * @since 0.1.0
@@ -64,7 +65,9 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      * Converts and format arrays to String.
      *
      * @param strings Array of Strings.
+     *
      * @return The formatted String.
+     *
      * @deprecated Use {@link String#join(CharSequence, CharSequence...)} instead.
      */
     @Deprecated
@@ -76,6 +79,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      * Converts the statement to SQL.
      *
      * @return The base statement converted to SQL.
+     *
      * @deprecated Use a `build()` method of EzSQL to build the subclasses of EzStatement.
      */
     @Override
@@ -104,6 +108,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      * Builds the statement result.
      *
      * @return The statement result.
+     *
      * @throws SQLException Problems to run statement.
      */
     protected abstract ResultType getResultType() throws SQLException;
@@ -113,6 +118,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @param columnName The column's name.
      * @param orderBy    The order type.
+     *
      * @return The current object instance.
      */
     public Statement orderBy(String columnName, OrderByType orderBy) {
@@ -167,6 +173,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      * Adds a Join statement.
      *
      * @param join The join.
+     *
      * @return The current object instance.
      */
 
@@ -199,6 +206,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      * Sets the statement's limit.
      *
      * @param limit The statement's limit.
+     *
      * @return The current object instance.
      */
     public Statement limit(int limit) {

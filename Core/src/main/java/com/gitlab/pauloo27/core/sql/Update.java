@@ -38,6 +38,7 @@ public class Update extends UpdateStatementBase<Update> {
      *
      * @param columnName The column' name.
      * @param value      The new value.
+     *
      * @return The current object instance.
      */
     public Update set(String columnName, Object value) {
@@ -74,6 +75,7 @@ public class Update extends UpdateStatementBase<Update> {
      * Gets the statement converted to SQL.
      *
      * @return The class converted to SQL.
+     *
      * @deprecated Use {{@link EzSQL#build(Update, Table)} instead.
      */
     @SuppressWarnings("deprecation")

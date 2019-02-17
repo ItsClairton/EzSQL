@@ -24,6 +24,7 @@ public class Delete extends UpdateStatementBase<Delete> {
      * Converts the statement to SQL.
      *
      * @return The class converted to SQL.
+     *
      * @deprecated Use {{@link EzSQL#build(Delete, Table)}} instead.
      */
     @SuppressWarnings("deprecation")

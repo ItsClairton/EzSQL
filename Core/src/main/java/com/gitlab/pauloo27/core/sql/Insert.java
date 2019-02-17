@@ -47,8 +47,8 @@ public class Insert extends UpdateStatementBase<Insert> {
                     values.length, columnsName.split(",").length);
         else
             Preconditions.checkArgument(values.length == columnsCount,
-                    "The value's size (%d) is not compatible with the columns count (%d).",
-                    values.length, columnsName.split(",").length);
+                    String.format("The value's size (%d) is not compatible with the columns count (%d).",
+                            values.length, columnsName.split(",").length));
 
         this.columnsName = columnsName;
         this.objectList = Arrays.asList(values);
@@ -106,6 +106,7 @@ public class Insert extends UpdateStatementBase<Insert> {
      * Gets the statement converted to SQL.
      *
      * @return The class converted to SQL.
+     *
      * @deprecated Use {@link EzSQL#build(Insert, Table)} instead.
      */
     @SuppressWarnings("deprecation")

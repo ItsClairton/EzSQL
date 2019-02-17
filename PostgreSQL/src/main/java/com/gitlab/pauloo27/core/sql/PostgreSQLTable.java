@@ -25,6 +25,7 @@ public class PostgreSQLTable extends Table {
      * Checks if the table exists.
      *
      * @return If the table exists.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     @Override
@@ -44,6 +45,7 @@ public class PostgreSQLTable extends Table {
      * @param columnNames   The ordered columns name separated by ", ".
      * @param returnColumns The columns to return.
      * @param values        The values to insert.
+     *
      * @return The insert statement.
      */
     public InsertReturning insertReturning(String columnNames, String returnColumns, Object... values) {

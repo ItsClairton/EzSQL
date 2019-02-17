@@ -82,7 +82,9 @@ public class EzPostgreSQL extends EzSQL<PostgreSQLDatabase, PostgreSQLTable> {
      * @param insert      The insert statement.
      * @param columnsName The returning columns' names separated by ", ".
      * @param table       The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
     public PreparedStatement build(Insert insert, String columnsName, PostgreSQLTable table) throws SQLException {

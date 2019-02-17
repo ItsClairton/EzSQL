@@ -20,13 +20,13 @@ import java.util.List;
 public class Table {
 
     /**
-     * The table's name.
-     */
-    private String name;
-    /**
      * The SQL where the table is.
      */
     protected EzSQL<Database, Table> sql;
+    /**
+     * The table's name.
+     */
+    private String name;
 
     /**
      * Gets a table from the SQL.
@@ -105,8 +105,8 @@ public class Table {
     /**
      * Inserts values into the table.
      *
-     * @param <T>    The object type to be inserted.
-     * @param object The object to the inserted.
+     * @param <T>    The object type to insert.
+     * @param object The object to insert.
      *
      * @return The insert statement.
      */
@@ -120,6 +120,15 @@ public class Table {
         return new Insert(sql, this, sb.toString(), values.toArray());
     }
 
+    /**
+     * Prepares the object to be inserted.
+     *
+     * @param clazz   The object class
+     * @param object  The object to the inserted.
+     * @param columns The columns name.
+     * @param values  The values list.
+     * @param <T>     The object type to insert.
+     */
     private <T> void prepareObjectToInsert(T object, Class<T> clazz, StringBuilder columns, List<Object> values) {
         // only append the columns name if the StringBuilder is empty
         // if it's not empty, the columns are already in the StringBuilder
@@ -156,6 +165,14 @@ public class Table {
 
     }
 
+    /**
+     * Inserts multiples objects in the same query.
+     *
+     * @param objects The objects to insert.
+     * @param <T>     The object type to insert.
+     *
+     * @return The insert statement.
+     */
     public <T> Insert insertAll(T... objects) {
         StringBuilder sb = new StringBuilder();
         List<Object> values = new ArrayList<>();
@@ -201,8 +218,8 @@ public class Table {
     /**
      * Updates the table's values using an object.
      *
-     * @param <T>    The object type to be updated.
-     * @param object The object to be updated.
+     * @param <T>    The object type to update.
+     * @param object The object to update.
      *
      * @return The update statement.
      */
@@ -247,6 +264,8 @@ public class Table {
         return null;
     }
 
+    // TODO Update all using 1 query
+
     /**
      * Deletes the table's values.
      *
@@ -259,8 +278,8 @@ public class Table {
     /**
      * Deletes the table's values using a object.
      *
-     * @param <T>    The object type to be deleted.
-     * @param object The object to the deleted.
+     * @param <T>    The object type to delete.
+     * @param object The object to delete.
      *
      * @return The delete statement.
      */
@@ -281,12 +300,28 @@ public class Table {
         return null;
     }
 
+    /**
+     * Gets the Field with the {@link Id} annotation.
+     *
+     * @param clazz The class to find the field.
+     * @param <T>   The class type.
+     *
+     * @return The Field with the {@link Id} annotation.
+     */
     private <T> Field getIdField(Class<T> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst().orElse(null);
     }
 
+    /**
+     * Deletes multiples objects in the same query.
+     *
+     * @param objects The objects to delete.
+     * @param <T>     The object to delete type.
+     *
+     * @return The insert statement.
+     */
     public <T> Delete deleteAll(T... objects) {
         Delete deleteStatement = new Delete(sql, this);
         Arrays.stream(objects).forEach(object -> {

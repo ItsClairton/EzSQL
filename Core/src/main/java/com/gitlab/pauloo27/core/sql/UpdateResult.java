@@ -22,6 +22,7 @@ public class UpdateResult extends Result {
      * to closes automatically.
      *
      * @param statement The statement.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public UpdateResult(PreparedStatement statement) throws SQLException {

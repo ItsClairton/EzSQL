@@ -9,6 +9,7 @@ import java.util.List;
  * The where conditions builder.
  *
  * @param <Statement> The current statement class.
+ *
  * @author Paulo
  * @version 1.0
  * @since 0.2.0
@@ -81,6 +82,7 @@ public class WhereCondition<Statement extends StatementBase> {
      *
      * @param columnName The column name.
      * @param value      The expected value.
+     *
      * @return The current object instance.
      */
     public Statement equals(String columnName, Object value) {
@@ -95,6 +97,7 @@ public class WhereCondition<Statement extends StatementBase> {
      *
      * @param columnName The column name.
      * @param value      The not expected value.
+     *
      * @return The current object instance.
      */
 
@@ -109,6 +112,7 @@ public class WhereCondition<Statement extends StatementBase> {
      * Adds a Where Not Null condition.
      *
      * @param columnName The column name.
+     *
      * @return The current object instance.
      */
 
@@ -124,6 +128,7 @@ public class WhereCondition<Statement extends StatementBase> {
      *
      * @param columnName The column name.
      * @param value      The at least value.
+     *
      * @return The current object instance.
      */
 
@@ -139,6 +144,7 @@ public class WhereCondition<Statement extends StatementBase> {
      *
      * @param columnName The column name.
      * @param value      The at most value.
+     *
      * @return The current object instance.
      */
 
@@ -154,6 +160,7 @@ public class WhereCondition<Statement extends StatementBase> {
      *
      * @param columnName The column name.
      * @param value      The less than value.
+     *
      * @return The current object instance.
      */
 
@@ -169,6 +176,7 @@ public class WhereCondition<Statement extends StatementBase> {
      *
      * @param columnName The column name.
      * @param value      The at most value.
+     *
      * @return The current object instance.
      */
 

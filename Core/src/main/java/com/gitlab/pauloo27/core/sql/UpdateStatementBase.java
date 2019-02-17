@@ -6,6 +6,7 @@ import java.sql.SQLException;
  * A abstract update statement.
  *
  * @param <Statement> The current statement class.
+ *
  * @author Paulo
  * @version 2.0
  * @since 0.1.0
@@ -23,6 +24,7 @@ public abstract class UpdateStatementBase<Statement extends UpdateStatementBase>
 
     /**
      * Execute and close the statement.
+     *
      * @throws SQLException Problems to run statement.
      */
     public void executeAndClose() throws SQLException {

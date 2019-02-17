@@ -45,6 +45,7 @@ public class EzSQLite extends EzSQL<SQLiteDatabase, SQLiteTable> {
      * Gets the current database. Return null if the type is SQLite.
      *
      * @return NullPointerException, SQLite have just one database per file.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     @Override

@@ -15,13 +15,13 @@ import java.sql.SQLException;
 public class Database {
 
     /**
-     * The database's name.
-     */
-    private String name;
-    /**
      * The SQL where the database is.
      */
     protected EzSQL sql;
+    /**
+     * The database's name.
+     */
+    private String name;
 
     /**
      * Gets a database of the SQL.
@@ -48,6 +48,7 @@ public class Database {
      * Checks if the database exists. If the SQL is SQLite returns null, SQLite has no databases.
      *
      * @return If the database exists.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public boolean exists() throws SQLException {

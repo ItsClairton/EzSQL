@@ -25,6 +25,7 @@ public class PostgreSQLDatabase extends Database {
      * Checks if the database exists. If the SQL is SQLite returns null, SQLite has no databases.
      *
      * @return If the database exists.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     @Override

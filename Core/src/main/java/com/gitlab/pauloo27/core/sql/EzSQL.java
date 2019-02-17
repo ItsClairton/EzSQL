@@ -18,6 +18,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class EzSQL<DatabaseType extends Database, TableType extends Table> {
 
     /**
+     * The Data Type by the Object.
+     */
+    private static Map<Object, DataType> typesByObject = new HashMap<>();
+
+    static {
+        typesByObject.put(String.class, DefaultDataTypes.VARCHAR);
+        typesByObject.put(int.class, DefaultDataTypes.INTEGER);
+    }
+
+    /**
      * The SQL connection.
      */
     protected Connection connection;
@@ -561,16 +571,6 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(this));
         return getTableByName(table.getName());
-    }
-
-    /**
-     * The Data Type by the Object.
-     */
-    private static Map<Object, DataType> typesByObject = new HashMap<>();
-
-    static {
-        typesByObject.put(String.class, DefaultDataTypes.VARCHAR);
-        typesByObject.put(int.class, DefaultDataTypes.INTEGER);
     }
 
     /**

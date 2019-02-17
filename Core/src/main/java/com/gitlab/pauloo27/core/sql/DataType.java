@@ -68,6 +68,7 @@ public class DataType {
      * Checks if the data type has a custom name.
      *
      * @return If the data type has a custom name.
+     *
      * @see #getCustomName() if you want to know more about the custom name.
      */
     public boolean hasCustomName() {
@@ -109,6 +110,7 @@ public class DataType {
      * Checks if the {@link #validAttributes} contains the attribute parameter.
      *
      * @param attribute The attribute to check.
+     *
      * @return If the {@link #validAttributes} list contains the attribute.
      */
     public boolean isValid(Attribute attribute) {

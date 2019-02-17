@@ -53,6 +53,7 @@ public class Select extends StatementBase<Select, QueryResult> {
      * Gets the statement converted to SQL.
      *
      * @return The class converted to SQL.
+     *
      * @deprecated Use {@link EzSQL#build(Select, Table)} instead.
      */
     @SuppressWarnings("deprecation")
