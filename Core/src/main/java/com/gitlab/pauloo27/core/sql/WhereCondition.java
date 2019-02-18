@@ -1,5 +1,6 @@
 package com.gitlab.pauloo27.core.sql;
 
+import com.gitlab.pauloo27.core.sql.WhereCondition.Where.WhereType;
 import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
@@ -97,10 +98,23 @@ public class WhereCondition<Statement extends StatementBase> {
      * @param value      The not expected value.
      * @return The current object instance.
      */
-
     public Statement different(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.DIFFERENT), previousSeparator));
+        previousSeparator = null;
+        return statement;
+    }
+
+    /**
+     * Adds a Where Like condition.
+     *
+     * @param columnName The column name.
+     * @param pattern    The pattern of check if like.
+     * @return The current object instance.
+     */
+    public Statement like(String columnName, String pattern) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
+        this.statements.add(new WhereStatement(new Where(columnName, pattern, WhereType.LIKE), previousSeparator));
         previousSeparator = null;
         return statement;
     }
@@ -111,7 +125,6 @@ public class WhereCondition<Statement extends StatementBase> {
      * @param columnName The column name.
      * @return The current object instance.
      */
-
     public Statement notNull(String columnName) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName), previousSeparator));
@@ -126,7 +139,6 @@ public class WhereCondition<Statement extends StatementBase> {
      * @param value      The at least value.
      * @return The current object instance.
      */
-
     public Statement atLeast(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_LEAST), previousSeparator));
@@ -141,7 +153,6 @@ public class WhereCondition<Statement extends StatementBase> {
      * @param value      The at most value.
      * @return The current object instance.
      */
-
     public Statement atMost(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.AT_MOST), previousSeparator));
@@ -156,7 +167,6 @@ public class WhereCondition<Statement extends StatementBase> {
      * @param value      The less than value.
      * @return The current object instance.
      */
-
     public Statement lessThan(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.LESS_THAN), previousSeparator));
@@ -171,7 +181,6 @@ public class WhereCondition<Statement extends StatementBase> {
      * @param value      The at most value.
      * @return The current object instance.
      */
-
     public Statement moreThan(String columnName, Object value) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.statements.add(new WhereStatement(new Where(columnName, value, Where.WhereType.MORE_THAN), previousSeparator));
@@ -232,6 +241,7 @@ public class WhereCondition<Statement extends StatementBase> {
      * Where Conditions builder.
      */
     public static class Where {
+
         /**
          * The where type.
          */
@@ -284,7 +294,6 @@ public class WhereCondition<Statement extends StatementBase> {
          *
          * @return The column's name.
          */
-
         public String getColumnName() {
             return columnName;
         }
@@ -294,7 +303,6 @@ public class WhereCondition<Statement extends StatementBase> {
          *
          * @return The value.
          */
-
         public Object getValue() {
             return value;
         }
@@ -329,6 +337,10 @@ public class WhereCondition<Statement extends StatementBase> {
              * {@code != ?}.
              */
             DIFFERENT("!= ?"),
+            /**
+             * {@code LIKE}.
+             */
+            LIKE("LIKE"),
             /**
              * {@code < ?}.
              */
@@ -376,10 +388,12 @@ public class WhereCondition<Statement extends StatementBase> {
      * Adds parentheses to statement.
      */
     public static class Parentheses implements WhereStatementBase {
+
         /**
          * The parentheses type (OPEN or CLOSE).
          */
         private ParenthesesType type;
+
         /**
          * The where condition separator, used if there's another where after this one.
          */
