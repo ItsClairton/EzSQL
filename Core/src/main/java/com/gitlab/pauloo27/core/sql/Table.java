@@ -215,7 +215,7 @@ public class Table {
 
         try {
             String idColumn = idField.getName();
-            int id = (int) idField.get(object);
+            int id = idField.getInt(object);
 
             Preconditions.checkNotNull(idField);
 
@@ -270,7 +270,7 @@ public class Table {
 
         try {
             String idColumn = idField.getName();
-            int id = (int) idField.get(object);
+            int id = idField.getInt(object);
 
             Preconditions.checkNotNull(idField);
 
@@ -293,7 +293,7 @@ public class Table {
             try {
                 Field idField = getIdField(object.getClass());
                 String idColumn = idField.getName();
-                int id = (int) idField.get(object);
+                int id = idField.getInt(object);
 
                 Preconditions.checkNotNull(idField);
 
