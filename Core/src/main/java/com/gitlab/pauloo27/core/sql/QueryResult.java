@@ -1,5 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,6 +60,7 @@ public class QueryResult extends Result {
      * @throws SQLException           Error to process the ResultSet.
      * @see #toList(Class) to builds the entire ResultSet.
      */
+    @CheckReturnValue
     public <T> T to(Class<T> clazz) throws IllegalAccessException, InstantiationException, SQLException {
         T row = clazz.newInstance();
 
@@ -82,6 +85,7 @@ public class QueryResult extends Result {
      * @throws SQLException           Error to process the ResultSet.
      * @see #to(Class) to builds the first ResultSet item.
      */
+    @CheckReturnValue
     public <T> List<T> toList(Class<T> clazz) throws SQLException, IllegalAccessException, InstantiationException {
         List<T> list = new ArrayList<>();
         while (result.next()) {

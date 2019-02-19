@@ -1,6 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 
 import java.sql.SQLException;
 import java.util.AbstractMap;
@@ -133,6 +134,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
+    @CheckReturnValue
     public Statement orderBy(String columnName, OrderByType orderBy) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
         this.orderBy = new AbstractMap.SimpleEntry<>(orderBy, columnName);
@@ -144,6 +146,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
+    @CheckReturnValue
     public Statement closeParentheses() {
         this.whereConditions.closeParentheses();
         return (Statement) this;
@@ -154,6 +157,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
+    @CheckReturnValue
     public WhereCondition<Statement> where() {
         Preconditions.checkArgument(whereConditions.getWhereStatements().isEmpty(), "A where statement already created. Use and() and or() to add another statement");
         return whereConditions;
@@ -164,6 +168,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
+    @CheckReturnValue
     public WhereCondition<Statement> and() {
         Preconditions.checkNotNull(whereConditions, "A where statement not created. Use where() to create one");
         whereConditions.separate(WhereCondition.Where.WhereSeparator.AND);
@@ -175,6 +180,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
+    @CheckReturnValue
     public WhereCondition<Statement> or() {
         Preconditions.checkNotNull(whereConditions, "A where statement not created. Use where() to create one");
         whereConditions.separate(WhereCondition.Where.WhereSeparator.OR);
@@ -188,7 +194,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
-
+    @CheckReturnValue
     public Statement join(Join join) {
         this.joinList.add(join);
         return (Statement) this;
@@ -221,6 +227,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The current object instance.
      */
+    @CheckReturnValue
     public Statement limit(int limit) {
         this.limit = limit;
         return (Statement) this;
@@ -285,7 +292,6 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return Join statements converted to SQL.
      */
-
     public String joinToString() {
         if (joinList.size() == 0)
             return "";

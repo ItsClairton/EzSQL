@@ -1,6 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -75,6 +76,7 @@ public class Table {
      *
      * @throws SQLException Problems to execute the statement.
      */
+    @CheckReturnValue
     public int truncateReturningUpdatedLines() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         return sql.prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())).executeUpdate();
@@ -105,6 +107,7 @@ public class Table {
      *
      * @throws SQLException Problems to execute the statement.
      */
+    @CheckReturnValue
     public int dropReturningUpdatedLines() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
         return sql.prepareStatement(String.format("DROP TABLE %s;", this.getName())).executeUpdate();
@@ -130,6 +133,7 @@ public class Table {
      *
      * @return The insert statement.
      */
+    @CheckReturnValue
     public <T> Insert insert(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
         StringBuilder sb = new StringBuilder();
@@ -193,6 +197,7 @@ public class Table {
      *
      * @return The insert statement.
      */
+    @CheckReturnValue
     public <T> Insert insertAll(T... objects) {
         StringBuilder sb = new StringBuilder();
         List<Object> values = new ArrayList<>();
@@ -211,6 +216,7 @@ public class Table {
      *
      * @return The select statement.
      */
+    @CheckReturnValue
     public Select select(String columnsName) {
         return new Select(sql, this, columnsName);
     }
@@ -222,6 +228,7 @@ public class Table {
      *
      * @see #select(String) to specify the columns to select.
      */
+    @CheckReturnValue
     public Select select() {
         return this.select("*");
     }
@@ -231,6 +238,7 @@ public class Table {
      *
      * @return The update statement.
      */
+    @CheckReturnValue
     public Update update() {
         return new Update(sql, this);
     }
@@ -243,6 +251,7 @@ public class Table {
      *
      * @return The update statement.
      */
+    @CheckReturnValue
     public <T> Update update(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
 
@@ -294,6 +303,7 @@ public class Table {
      *
      * @return The delete statement.
      */
+    @CheckReturnValue
     public Delete delete() {
         return new Delete(sql, this);
     }
@@ -306,6 +316,7 @@ public class Table {
      *
      * @return The delete statement.
      */
+    @CheckReturnValue
     public <T> Delete delete(T object) {
 
         Field idField = getIdField(object.getClass());
@@ -345,6 +356,7 @@ public class Table {
      *
      * @return The insert statement.
      */
+    @CheckReturnValue
     public <T> Delete deleteAll(T... objects) {
         Delete deleteStatement = new Delete(sql, this);
         Arrays.stream(objects).forEach(object -> {
