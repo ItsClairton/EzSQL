@@ -7,7 +7,9 @@ import java.sql.SQLException;
 public class Tests {
 
     @Test
-    public void testWithMariaDB() throws SQLException, ClassNotFoundException {
-        Tester.testWith(new EzMariaDB().withAddress(Tester.MARIADB_HOST, Tester.MARIADB_PORT).withLogin("ezsql", "1234"));
+    public void testWithMariaDB() throws SQLException, ClassNotFoundException, IllegalAccessException, InterruptedException, InstantiationException {
+        Tester.testWith(new EzMariaDB()
+                .withAddress(Tester.MARIADB_HOST, Tester.MARIADB_PORT)
+                .withLogin("ezsql", "1234"));
     }
 }

@@ -2,13 +2,9 @@ package com.gitlab.pauloo27.core.sql;
 
 import org.junit.Assert;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 public class Tester {
 
@@ -38,189 +34,183 @@ public class Tester {
         }
     }
 
-    public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException {
-        // connects
-        sql.registerDriver();
-        sql.withDefaultDatabase("ezsql", true).connect();
-        // drops the table if exists
-        if (sql.getTable("friends").exists()) sql.getTable("friends").drop();
-        // creates table
-        Table table = sql.createIfNotExists(
-                new TableBuilder("friends")
-                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR)
-                                .withLength(30)
-                                .withAttributes(DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE))
-                        .withColumn(new ColumnBuilder("age", DefaultDataTypes.INTEGER)
-                                .withAttributes(DefaultAttributes.NOT_NULL))
-                        .withColumn(new ColumnBuilder("phone", DefaultDataTypes.INTEGER)
-                                .withAttributes(DefaultAttributes.UNIQUE, DefaultAttributes.NOT_NULL))
-                        .withColumn(new ColumnBuilder("email", DefaultDataTypes.VARCHAR)
-                                .withLength(30)
-                                .withDefaultValue("No e-mail")));
-        // inserts data
-        table.insert(
+    public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException, InterruptedException {
+        // Connecting...
+        sql.withDefaultDatabase("ezsql")
+                .withLogin("ezsql", "1234")
+                .registerDriver()
+                .connect();
+
+        testTableWithBuilders(sql);
+
+        sql.getTable("friends").truncate();
+
+        testTableWithObject(sql);
+
+    }
+
+    private static void testTableWithObject(EzSQL sql) throws SQLException, InstantiationException, IllegalAccessException, InterruptedException {
+        System.out.println("Testing with Objects");
+        Table friends = sql.getTable("friends");
+
+        if (friends.exists())
+            friends.drop();
+
+        friends = sql.createIfNotExists(Friend.class);
+
+        long start = new Date().getTime();
+
+        insertDataWithObject(friends);
+
+        checkDataWithObject(friends);
+
+        updateWithObject(friends);
+
+        deleteWithObject(friends);
+
+        printStatus(start);
+    }
+
+    private static Friend john;
+    private static Friend mary;
+
+    private static void insertDataWithObject(Table friends) throws SQLException {
+        john = new Friend("John Doe", 21, "321", "johndoe@example.com");
+        mary = new Friend("Mary Doe", 21, "221", "marydoe@example.com");
+
+        friends.insertAll(john, mary).executeAndClose();
+    }
+
+    private static void checkDataWithObject(Table friends) throws IllegalAccessException, SQLException, InstantiationException {
+        john = friends.select().where().equals("id", 1).execute().to(Friend.class);
+        mary = friends.select().where().equals("id", 2).execute().to(Friend.class);
+
+        Assert.assertEquals(1, john.id);
+        Assert.assertEquals("johndoe@example.com", john.email);
+
+        Assert.assertEquals(2, mary.id);
+        Assert.assertEquals("marydoe@example.com", mary.email);
+
+        friends.select().execute().toList(Friend.class)
+                .forEach(friend ->
+                        Assert.assertEquals(
+                                String.format("%s@example.com", friend.username.toLowerCase().replace(" ", "")),
+                                friend.email
+                        ));
+    }
+
+    private static void updateWithObject(Table friends) throws SQLException, InstantiationException, IllegalAccessException, InterruptedException {
+        mary.phone = "222";
+        friends.update(mary).executeAndClose();
+
+        mary = friends.select().where().equals("id", 2).execute().to(Friend.class);
+
+        Assert.assertEquals("222", mary.phone);
+    }
+
+    private static void deleteWithObject(Table friends) throws SQLException, InstantiationException, IllegalAccessException {
+        friends.delete(mary).executeAndClose();
+
+        Assert.assertEquals(1, friends.select().execute().toList(Friend.class).size());
+    }
+
+    private static void testTableWithBuilders(EzSQL sql) throws SQLException {
+        System.out.println("Testing with Builders");
+        Table friends = sql.getTable("friends");
+
+        if (friends.exists())
+            friends.drop().close();
+
+        friends = sql.createIfNotExists(new TableBuilder("friends")
+                .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
+                .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 32, DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE))
+                .withColumn(new ColumnBuilder("phone", DefaultDataTypes.VARCHAR, 32, DefaultAttributes.UNIQUE))
+                .withColumn(new ColumnBuilder("age", DefaultDataTypes.INTEGER, DefaultAttributes.NOT_NULL))
+                .withColumn(new ColumnBuilder("email", DefaultDataTypes.VARCHAR, 64, DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE)
+                        .withDefaultValue("No e-mail")
+                ));
+
+        long start = new Date().getTime();
+
+        insertDataWithBuilder(friends);
+
+        checkDataWithBuilder(friends);
+
+        updateDataAndCheckWithBuilder(friends);
+
+        deleteDataAndCheckWithBuilder(friends);
+
+        printStatus(start);
+
+    }
+
+    private static void insertDataWithBuilder(Table friends) throws SQLException {
+        friends.insert(
                 "name, age, phone, email",
-                "Paulo' or 1=1", 12, 666, "sql_injection@test.com",
-                "John Doe", 21, 123, "john_doe@sample.com",
-                "Mark", 92, 911, "mark@sample.com").executeAndClose();
-
-        // inserts more data
-        table.insert("name, age, phone", "Doe John", 18, 321).executeAndClose();
-
-        // reads data
-        reads(table, "0c1d8224e6ba56271a3694bd2882af7a657203064440ac5eb4c22f5ba306b0ac");
-        System.out.println("=======");
-        // updates
-        table.update().set("name", "John").where().equals("name", "Doe John").executeAndClose();
-        // reads again
-        reads(table, "32ebd11565862dce4b4ce285003e356d0afb34bcb7297af79cd8067205b819a8");
-        System.out.println("=======");
-        // reads where the age is at least 18
-
-        try (QueryResult result = table.select("name")
-                .orderBy("name", StatementBase.OrderByType.ASC)
-                .where()
-                .atLeast("age", 18)
-                .limit(10).execute()) {
-
-            ResultSet rs = result.getResultSet();
-            List<String> names = new ArrayList<>();
-            while (rs.next()) {
-                String name = rs.getString("name");
-                names.add(name);
-                System.out.printf("%s's age is at least 18%n", name);
-            }
-            // I think it's too short to use a hash
-            Assert.assertEquals("John, John Doe, Mark", String.join(", ", names));
-        }
-        System.out.println("=======");
-        // reads where the age is at least 18 and less than 60
-        try (QueryResult result = table.select("name")
-                .orderBy("name", StatementBase.OrderByType.ASC)
-                .where()
-                .atLeast("age", 18)
-                .and()
-                .lessThan("age", 60)
-                .limit(3).execute()) {
-            // I think it's too short to use a hash
-            Assert.assertEquals("John, John Doe", String.join(", ", getNames(result.getResultSet())));
-        }
-        System.out.println("=======");
-        // reads where age is less than 18
-        try (QueryResult result = table.select("name")
-                .orderBy("name", StatementBase.OrderByType.ASC)
-                .where()
-                .lessThan("age", 18)
-                .limit(3).execute()) {
-            ResultSet rs = result.getResultSet();
-            // I think it's too short to use a hash
-            Assert.assertEquals("Paulo' or 1=1", String.join(", ", getNames(result.getResultSet())));
-        }
-        System.out.println("=======");
-        // deletes
-        table.delete().where().equals("name", "John Doe").executeAndClose();
-        // reads again
-        reads(table, "95a5947b39c17fb00ff326642402549f4e1fb2e25db69ba9a8fb7275039a350a");
-        // Now, test join:
-        //testJoin(sql);
-        sql.disconnect();
-//        System.out.printf("Test %s ended%n", sql.getType().name());
+                "John Doe", 21, "321", "johndoe@example.com",
+                "Mary Doe", 21, "221", "marydoe@example.com"
+        ).executeAndClose();
     }
 
-    private static void reads(Table table, String expectedHash) throws SQLException {
-        try (QueryResult result = table.select("name, phone, email, age")
-                .orderBy("name", StatementBase.OrderByType.ASC)
-                .limit(10).execute()) {
-            ResultSet rs = result.getResultSet();
-            // String to hash
-            StringBuilder sb = new StringBuilder();
-            checkAndPrintResult(rs, sb);
-            Assert.assertEquals(expectedHash, hash(sb.toString()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static List<String> getNames(ResultSet rs) throws SQLException {
-        List<String> names = new ArrayList<>();
-        while (rs.next()) {
-            String name = rs.getString("name");
-            names.add(name);
-            System.out.printf("%s's age is at least 18 and less than 60%n", name);
-        }
-        return names;
-    }
-
-    private static void checkAndPrintResult(ResultSet rs, StringBuilder sb) throws SQLException {
-        while (rs.next()) {
-            String name = rs.getString("name");
-            int phone = rs.getInt("phone");
-            String email = rs.getString("email");
-            int age = rs.getInt("age");
-
-            // Append to String to hash
-            sb.append(name);
-            sb.append(phone);
-            sb.append(email);
-            sb.append(age);
-
-            System.out.printf("%s -> %d | %s | %d years old%n", name, phone, email, age);
-        }
-    }
-
-    public static void testJoin(EzSQL sql) throws SQLException {
-        Table clients = sql.createIfNotExists(
-                new TableBuilder("clients")
-                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 64))
-                        .withColumn(new ColumnBuilder("phone", DefaultDataTypes.VARCHAR, 64))
-        );
-        Table employees = sql.createIfNotExists(
-                new TableBuilder("employees")
-                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 64))
-                        .withColumn(new ColumnBuilder("phone", DefaultDataTypes.VARCHAR, 64))
-        );
-        Table requests = sql.createIfNotExists(
-                new TableBuilder("requests")
-                        .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
-                        .withColumn(new ColumnBuilder("employee", DefaultDataTypes.INTEGER))
-                        .withColumn(new ColumnBuilder("client", DefaultDataTypes.INTEGER))
-                        .withColumn(new ColumnBuilder("createIn", DefaultDataTypes.TIMESTAMP))
-        );
-
-        // TODO insert
-        try (QueryResult result = requests.select("requests.id, clients.name client, employees.name employee")
-                .join(
-                        new StatementBase.Join("clients", "requests.client",
-                                "clients.id", StatementBase.Join.JoinType.INNER)
-                )
-                .join(
-                        new StatementBase.Join("employees", "requests.employee",
-                                "employees.id", StatementBase.Join.JoinType.INNER)
-                )
-                .where().notNull("requests.client").execute()) {
-            ResultSet rs = result.getResultSet();
-            while (rs.next()) {
-                System.out.printf("%d | %s | %s%n", rs.getInt("id"), rs.getString("employee"), rs.getString("client"));
+    private static void checkDataWithBuilder(Table friends) throws SQLException {
+        // select using where
+        try (ResultSet result = friends.select().where().equals("name", "John Doe")
+                .execute().getResultSet()) {
+            if (result.next()) {
+                Assert.assertEquals(1, result.getInt("id"));
+                Assert.assertEquals("johndoe@example.com", result.getString("email"));
+            } else {
+                throw new NullPointerException("Result set is empty");
             }
         }
-        clients.drop();
-        employees.drop();
-        requests.drop();
+
+        // select everything
+        try (ResultSet result = friends.select()
+                .execute().getResultSet()) {
+            Assert.assertEquals(2, checkDataWithBuilder(result));
+        }
     }
 
-    // TODO Use a external dependency
-    public static String hash(String text) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(text.getBytes(StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder();
-        byte[] bytes = md.digest();
-        for (byte b : bytes) {
-            sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+    private static void updateDataAndCheckWithBuilder(Table friends) throws SQLException {
+        friends.update().set("phone", "222").where().equals("id", 2).executeAndClose();
+
+        // check the updated value
+        try (ResultSet result = friends.select().where().equals("id", 2)
+                .execute().getResultSet()) {
+            if (result.next()) {
+                Assert.assertEquals("222", result.getString("phone"));
+            } else {
+                throw new NullPointerException("Result set is empty");
+            }
         }
-        return sb.toString();
+    }
+
+    private static void deleteDataAndCheckWithBuilder(Table friends) throws SQLException {
+        friends.delete().where().equals("id", 2).executeAndClose();
+
+        // select everything
+        try (ResultSet result = friends.select()
+                .execute().getResultSet()) {
+            Assert.assertEquals(1, checkDataWithBuilder(result));
+        }
+    }
+
+    private static int checkDataWithBuilder(ResultSet result) throws SQLException {
+        int id = 0;
+        while (result.next()) {
+            Assert.assertEquals(++id, result.getInt("id"));
+            String name = result.getString("name");
+            Assert.assertEquals(String.format("%s@example.com", name.toLowerCase().replace(" ", "")), result.getString("email"));
+        }
+        return id;
+    }
+
+    public static void printStatus(long start) {
+        long end = new Date().getTime();
+
+        System.out.printf("Start > %d%n", start);
+        System.out.printf("End > %d%n", end);
+        System.out.printf("Time > %d%n", end - start);
     }
 
 }
