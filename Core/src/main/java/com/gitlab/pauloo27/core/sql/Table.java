@@ -3,7 +3,6 @@ package com.gitlab.pauloo27.core.sql;
 import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -59,13 +58,26 @@ public class Table {
     }
 
     /**
-     * Truncates the table.
+     * Truncates the table and closes the statement.
      *
      * @throws SQLException Problems to execute the statement.
+     * @see #truncateReturningUpdatedLines() to get the updated lines.
      */
     public void truncate() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
         sql.executeAndClose(sql.prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())));
+    }
+
+    /**
+     * Truncates the table and returns the updated lines.
+     *
+     * @return The updated lines.
+     *
+     * @throws SQLException Problems to execute the statement.
+     */
+    public int truncateReturningUpdatedLines() throws SQLException {
+        if (!sql.isConnected()) throw new SQLException("Not connected.");
+        return sql.prepareStatement(String.format("TRUNCATE TABLE %s;", this.getName())).executeUpdate();
     }
 
     /**
@@ -78,16 +90,24 @@ public class Table {
     }
 
     /**
-     * Drops the table.
+     * Drops the table and closes the statement.
      *
-     * @return The update result.
+     * @throws SQLException Problems to execute the statement.
+     * @see #dropReturningUpdatedLines() to get the updated lines.
+     */
+    public void drop() throws SQLException {
+        if (!this.sql.isConnected()) throw new SQLException("Not connected.");
+        sql.executeAndClose(sql.prepareStatement(String.format("DROP TABLE %s;", this.getName())));
+    }
+
+    /**
+     * Drops the table and returns the updated lines.
      *
      * @throws SQLException Problems to execute the statement.
      */
-    public UpdateResult drop() throws SQLException {
+    public int dropReturningUpdatedLines() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        PreparedStatement statement = sql.getConnection().prepareStatement(String.format("DROP TABLE %s;", this.getName()));
-        return new UpdateResult(statement);
+        return sql.prepareStatement(String.format("DROP TABLE %s;", this.getName())).executeUpdate();
     }
 
     /**
