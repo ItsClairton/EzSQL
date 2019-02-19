@@ -105,6 +105,8 @@ public class Table {
     /**
      * Drops the table and returns the updated lines.
      *
+     * @return The updated lines.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     @CheckReturnValue

@@ -93,6 +93,8 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
     /**
      * Executes the statement with a exception handler.
      *
+     * @param handler The exception handler.
+     *
      * @return The statement result.
      */
     public ResultType execute(ExceptionHandler handler) {
