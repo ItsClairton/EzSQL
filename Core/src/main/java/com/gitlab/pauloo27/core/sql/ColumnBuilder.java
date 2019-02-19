@@ -368,7 +368,7 @@ public class ColumnBuilder {
      */
     public String toSQL(EzSQL sql) {
         // name data_type len? attributes? ('DEFAULT' default_value)?
-        return String.format("%s %s %s %s %s",
+        return String.format("%s %s%s %s %s",
                 this.name,
                 dataTypeToString(sql),
                 lengthToString(),

@@ -388,8 +388,8 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
                         update.whereToString(),
                         update.orderByToString(),
                         update.limitToString()
-                ).trim().replaceAll("\\s+", " "));
-
+                ).trim().replaceAll("\\s+", " ")
+        );
         AtomicInteger i = new AtomicInteger();
         setSetObjects(statement, i, update.getSets());
         setWhereObjects(statement, i, update.getWhereConditions().getWhereStatements());

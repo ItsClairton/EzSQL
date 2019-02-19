@@ -230,9 +230,12 @@ public class Table {
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst().orElse(null);
 
+        Preconditions.checkNotNull(idField);
+
         try {
             String idColumn = idField.getName();
             int id = idField.getInt(object);
+            Preconditions.checkState(id != 0, "Invalid id (0).");
 
             Preconditions.checkNotNull(idField);
 

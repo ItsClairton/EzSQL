@@ -32,4 +32,9 @@ public class Attribute {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return toSQL();
+    }
+
 }

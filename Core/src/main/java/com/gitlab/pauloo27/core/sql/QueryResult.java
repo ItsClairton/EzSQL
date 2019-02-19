@@ -80,10 +80,11 @@ public class QueryResult extends Result {
      * @throws SQLException           Error to process the ResultSet.
      * @see #to(Class) to builds the first ResultSet item.
      */
-    public <T> List<T> toList(Class clazz) throws SQLException, IllegalAccessException, InstantiationException {
-        List list = new ArrayList();
+    public <T> List<T> toList(Class<T> clazz) throws SQLException, IllegalAccessException, InstantiationException {
+        List<T> list = new ArrayList<>();
         while (result.next()) {
-            list.add(createObject(clazz.newInstance()));
+            T object = createObject(clazz.newInstance());
+            list.add(object);
         }
         return list;
     }
