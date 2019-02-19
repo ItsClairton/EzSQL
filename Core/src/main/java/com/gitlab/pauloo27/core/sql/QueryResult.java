@@ -64,7 +64,9 @@ public class QueryResult extends Result {
         if (!result.next())
             return null;
 
-        return createObject(row);
+        T object = createObject(row);
+        result.close();
+        return object;
     }
 
     /**
@@ -86,6 +88,7 @@ public class QueryResult extends Result {
             T object = createObject(clazz.newInstance());
             list.add(object);
         }
+        result.close();
         return list;
     }
 

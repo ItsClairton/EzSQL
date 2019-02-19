@@ -15,7 +15,7 @@ public abstract class Result implements AutoCloseable {
     /**
      * The statement to execute.
      */
-    private PreparedStatement statement;
+    protected PreparedStatement statement;
 
     /**
      * Create a result and close the statement.

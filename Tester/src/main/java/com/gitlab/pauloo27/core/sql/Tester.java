@@ -119,7 +119,7 @@ public class Tester {
         Table friends = sql.getTable("friends");
 
         if (friends.exists())
-            friends.drop().close();
+            friends.drop();
 
         friends = sql.createIfNotExists(new TableBuilder("friends")
                 .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
