@@ -90,18 +90,30 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
     }
 
     /**
+     * Executes the statement with a exception handler.
+     *
+     * @return The statement result.
+     */
+    public ResultType execute(ExceptionHandler handler) {
+        Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
+        try {
+            return getResultType();
+        } catch (SQLException e) {
+            if (handler == null)
+                e.printStackTrace();
+            else
+                handler.onException(e);
+        }
+        return null;
+    }
+
+    /**
      * Executes the statement.
      *
      * @return The statement result.
      */
     public ResultType execute() {
-        Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
-        try {
-            return getResultType();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return execute(null);
     }
 
     /**
