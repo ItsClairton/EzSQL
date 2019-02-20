@@ -20,11 +20,24 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
     /**
      * The Data Type by the Object.
      */
-    private static Map<Object, DataType> typesByObject = new HashMap<>();
+    private Map<Class<? extends Object>, DataType> typesByClass = new HashMap<Class<? extends Object>, DataType>();
 
-    static {
-        typesByObject.put(String.class, DefaultDataTypes.VARCHAR);
-        typesByObject.put(int.class, DefaultDataTypes.INTEGER);
+    private Map<Class, DataSerializer> typeSerializer = new HashMap<>();
+
+    {
+        registerDataType(String.class, DefaultDataTypes.VARCHAR);
+
+        registerDataType(byte.class, DefaultDataTypes.TINYINT);
+        registerDataType(short.class, DefaultDataTypes.SMALLINT);
+        registerDataType(int.class, DefaultDataTypes.INTEGER);
+        registerDataType(long.class, DefaultDataTypes.BIGINT);
+
+        registerDataType(float.class, DefaultDataTypes.FLOAT);
+        registerDataType(double.class, DefaultDataTypes.DOUBLE);
+
+        registerDataType(boolean.class, DefaultDataTypes.BOOLEAN);
+
+        registerDataType(char.class, DefaultDataTypes.CHAR);
     }
 
     /**
@@ -573,6 +586,70 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return getTableByName(table.getName());
     }
 
+    private static DataType UNHANDLED_SERIALIZER = new DataType(
+            "VARCHAR",
+            DefaultAttributes.getDefaultAttributes(),
+            null,
+            "UNHANDLED_SERIALIZER"
+    );
+
+    private static DataType ENUM_NAME = new DataType(
+            "VARCHAR",
+            DefaultAttributes.getDefaultAttributes(),
+            null,
+            "ENUM_NAME"
+    );
+
+    public EzSQL<? extends Database, ? extends Table> registerDataType(Class clazz, DataType dataType) {
+        typesByClass.put(clazz, dataType);
+        return this;
+    }
+
+    public <T> EzSQL<? extends Database, ? extends Table> registerSerializer(Class<T> clazz, DataSerializer<T> serializer) {
+        typeSerializer.put(clazz, serializer);
+        return this;
+    }
+
+    private static DataSerializer DEFAULT_DATA_SERIALIZER = new DataSerializer<>(
+            object -> {
+                if (object.getClass().isEnum()) {
+                    return ((Enum) object).name();
+                }
+
+                return object;
+            },
+
+            (clazz, object) -> {
+                if (clazz.isEnum())
+                    return Arrays.stream(clazz.getEnumConstants())
+                            .filter(member -> ((Enum) member).name().equals(object))
+                            .findFirst()
+                            .orElse(null);
+
+                return object;
+            }
+    );
+
+    public DataType getDateTypeByClass(Class clazz) {
+        if (!typesByClass.containsKey(clazz)) {
+            if (clazz.isEnum()) {
+                return ENUM_NAME;
+            }
+
+            return UNHANDLED_SERIALIZER;
+        }
+
+        return typesByClass.get(clazz);
+    }
+
+
+    public DataSerializer getSerializerByClass(Class clazz) {
+        if (!typeSerializer.containsKey(clazz))
+            return DEFAULT_DATA_SERIALIZER;
+
+        return typeSerializer.get(clazz);
+    }
+
     /**
      * Creates a table if not exists using a object.
      *
@@ -594,9 +671,12 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
             field.setAccessible(true);
 
-            DataType dataType = typesByObject.get(field.getType());
+            DataType dataType = getDateTypeByClass(field.getType());
 
             int length = -1;
+
+            if (dataType == UNHANDLED_SERIALIZER)
+                length = 64;
 
             if (field.isAnnotationPresent(Length.class)) {
                 length = field.getAnnotation(Length.class).value();
@@ -620,8 +700,10 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
                     columnName = field.getAnnotation(Name.class).value();
 
                 Object defaultValue = null;
-                if (!field.getType().isPrimitive() || field.isAnnotationPresent(DefaultValue.class))
-                    defaultValue = field.get(clazz.newInstance());
+                if (!field.getType().isPrimitive() || field.isAnnotationPresent(DefaultValue.class)) {
+                    Object value = field.get(clazz.newInstance());
+                    defaultValue = value == null ? null : getSerializerByClass(field.getType()).getSerializer().apply(value);
+                }
 
                 tableBuilder.withColumn(
                         new ColumnBuilder(columnName, dataType, length, attributes.toArray(new Attribute[]{}))

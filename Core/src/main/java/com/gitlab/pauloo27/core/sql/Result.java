@@ -17,12 +17,15 @@ public abstract class Result implements AutoCloseable {
      */
     protected PreparedStatement statement;
 
+    protected EzSQL sql;
+
     /**
      * Create a result and close the statement.
      *
      * @param statement The statement.
      */
-    public Result(PreparedStatement statement) {
+    public Result(EzSQL sql, PreparedStatement statement) {
+        this.sql = sql;
         this.statement = statement;
     }
 

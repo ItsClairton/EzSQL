@@ -99,7 +99,7 @@ public class Insert extends UpdateStatementBase<Insert> {
 
     @Override
     protected UpdateResult getResultType() throws SQLException {
-        return new UpdateResult(sql.build(this, table));
+        return new UpdateResult(sql, sql.build(this, table));
     }
 
     /**

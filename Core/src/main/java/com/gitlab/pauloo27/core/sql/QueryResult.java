@@ -27,13 +27,14 @@ public class QueryResult extends Result {
      * Executes a query and save the result set. Use {@link #close()} to close the statement, use try-with-resources to
      * closes automatically.
      *
+     * @param sql       The EzSQL connection.
      * @param statement The statement.
      *
      * @throws SQLException Problems to execute the statement.
      */
 
-    public QueryResult(PreparedStatement statement) throws SQLException {
-        super(statement);
+    public QueryResult(EzSQL sql, PreparedStatement statement) throws SQLException {
+        super(sql, statement);
         this.result = this.getStatement().executeQuery();
     }
 
@@ -160,7 +161,10 @@ public class QueryResult extends Result {
                         int columnIndex = result.findColumn(name);
                         field.setAccessible(true);
 
-                        field.set(object, result.getObject(columnIndex));
+                        Object value = result.getObject(columnIndex);
+
+                        if (value != null)
+                            field.set(object, sql.getSerializerByClass(field.getType()).getDeserializer().apply(field.getType(), value));
                     } catch (SQLException | IllegalAccessException e) {
                         e.printStackTrace();
                     }

@@ -54,7 +54,7 @@ public class Database {
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
         try (PreparedStatement statement = sql.getConnection().prepareStatement(String.format("SHOW DATABASES LIKE '%s';", this.getName()))) {
-            QueryResult result = new QueryResult(statement);
+            QueryResult result = new QueryResult(sql, statement);
             return result.getResultSet().next();
         }
     }

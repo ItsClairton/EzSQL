@@ -163,7 +163,6 @@ public class Table {
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
             field.setAccessible(true);
 
-
             if (columns.length() != 0 && appendColumn)
                 columns.append(", ");
 
@@ -183,7 +182,7 @@ public class Table {
                 if (appendColumn)
                     columns.append(name);
 
-                values.add(value);
+                values.add(sql.getSerializerByClass(clazz).getSerializer().apply(value));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -288,7 +287,7 @@ public class Table {
                             e.printStackTrace();
                         }
 
-                        update.set(name, value);
+                        update.set(name, sql.getSerializerByClass(clazz).getSerializer().apply(value));
                     });
 
             return update;

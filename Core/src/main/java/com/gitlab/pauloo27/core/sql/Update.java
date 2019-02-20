@@ -59,7 +59,7 @@ public class Update extends UpdateStatementBase<Update> {
     public UpdateResult execute() {
         Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
         try {
-            return new UpdateResult(sql.build(this, table));
+            return new UpdateResult(sql, sql.build(this, table));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -68,7 +68,7 @@ public class Update extends UpdateStatementBase<Update> {
 
     @Override
     protected UpdateResult getResultType() throws SQLException {
-        return new UpdateResult(sql.build(this, table));
+        return new UpdateResult(sql, sql.build(this, table));
     }
 
     /**

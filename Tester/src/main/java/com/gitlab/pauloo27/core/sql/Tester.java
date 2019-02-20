@@ -75,16 +75,19 @@ public class Tester {
     private static Friend mary;
 
     private static void insertDataWithObject(Table friends) {
-        john = new Friend("John Doe", 21, "321", "johndoe@example.com");
-        mary = new Friend("Mary Doe", 21, "221", "marydoe@example.com");
+        john = new Friend("John Doe", 21, "321", "johndoe@example.com", Friend.FriendType.IRL);
+        mary = new Friend("Mary Doe", 21, "221", "marydoe@example.com", Friend.FriendType.WEB_FRIEND);
 
         friends.insertAll(john, mary).executeAndClose();
 
         // Handle Exception (should print "Duplicate Key" error)
-        friends.insert(
-                friends.select().where()
-                        .equals("id", 1).execute()
-                        .to(Friend.class))
+        Friend test = friends.select().where()
+                .equals("id", 1).execute()
+                .to(Friend.class);
+
+        System.out.println(test);
+
+        friends.insert(test)
                 .executeAndClose(e -> System.out.println(e.getMessage()));
     }
 
@@ -135,7 +138,10 @@ public class Tester {
                 .withColumn(new ColumnBuilder("age", DefaultDataTypes.INTEGER, DefaultAttributes.NOT_NULL))
                 .withColumn(new ColumnBuilder("email", DefaultDataTypes.VARCHAR, 64, DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE)
                         .withDefaultValue("No e-mail")
-                ));
+                ).withColumn(new ColumnBuilder("type", DefaultDataTypes.VARCHAR, 10, DefaultAttributes.NOT_NULL)
+                        .withDefaultValue(Friend.FriendType.IRL.name())
+                )
+        );
 
         long start = new Date().getTime();
 
@@ -153,9 +159,9 @@ public class Tester {
 
     private static void insertDataWithBuilder(Table friends) {
         friends.insert(
-                "name, age, phone, email",
-                "John Doe", 21, "321", "johndoe@example.com",
-                "Mary Doe", 21, "221", "marydoe@example.com"
+                "name, age, phone, email, type",
+                "John Doe", 21, "321", "johndoe@example.com", Friend.FriendType.IRL.name(),
+                "Mary Doe", 21, "221", "marydoe@example.com", Friend.FriendType.WEB_FRIEND.name()
         ).executeAndClose();
     }
 

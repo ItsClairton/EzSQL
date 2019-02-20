@@ -46,7 +46,7 @@ public class Select extends StatementBase<Select, QueryResult> {
 
     @Override
     protected QueryResult getResultType() throws SQLException {
-        return new QueryResult(sql.build(this, table));
+        return new QueryResult(sql, sql.build(this, table));
     }
 
     /**

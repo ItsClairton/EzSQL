@@ -40,7 +40,7 @@ public class InsertReturning extends Insert {
     public QueryResult executeReturning() {
         Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
         try {
-            return new QueryResult(((EzPostgreSQL) sql).build(this, returningColumns, (PostgreSQLTable) table));
+            return new QueryResult(sql, ((EzPostgreSQL) sql).build(this, returningColumns, (PostgreSQLTable) table));
         } catch (SQLException e) {
             e.printStackTrace();
         }

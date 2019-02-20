@@ -23,11 +23,15 @@ public class Friend {
     @DefaultAttributes.Unique
     String email = "No e-mail";
 
-    public Friend(String username, int age, String phone, String email) {
+    @Length(10)
+    FriendType type = FriendType.IRL;
+
+    public Friend(String username, int age, String phone, String email, FriendType type) {
         this.username = username;
         this.age = age;
         this.phone = phone;
         this.email = email;
+        this.type = type;
     }
 
     public Friend() {
@@ -36,6 +40,11 @@ public class Friend {
 
     @Override
     public String toString() {
-        return String.format("{id: %d, name: %s, age: %d, phone: %s, email: %s}", id, username, age, phone, email);
+        return String.format("{id: %d, name: %s, age: %d, phone: %s, email: %s, type: %s}", id, username, age, phone, email, type.name());
+    }
+
+    public enum FriendType {
+        IRL,
+        WEB_FRIEND
     }
 }

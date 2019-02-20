@@ -21,12 +21,13 @@ public class UpdateResult extends Result {
      * Executes a update and save the updated rows. Use {@link #close()} to close the statement, use try-with-resources
      * to closes automatically.
      *
+     * @param sql       The EzSQL connection.
      * @param statement The statement.
      *
      * @throws SQLException Problems to execute the statement.
      */
-    public UpdateResult(PreparedStatement statement) throws SQLException {
-        super(statement);
+    public UpdateResult(EzSQL sql, PreparedStatement statement) throws SQLException {
+        super(sql, statement);
         this.result = this.getStatement().executeUpdate();
     }
 
