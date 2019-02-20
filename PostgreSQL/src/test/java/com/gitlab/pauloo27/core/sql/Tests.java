@@ -8,12 +8,12 @@ import java.sql.SQLException;
 
 public class Tests {
 
-    public void testWithPostgreSQL() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, InterruptedException {
+    public void testWithPostgreSQL() throws SQLException, ClassNotFoundException {
         Tester.testWith(new EzPostgreSQL().withAddress(Tester.PSQL_HOST, Tester.PSQL_PORT).withLogin("ezsql", "1234"));
     }
 
     @Test
-    public void testInsertReturning() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException, InterruptedException {
+    public void testInsertReturning() throws SQLException, ClassNotFoundException {
         testWithPostgreSQL();
 
         EzPostgreSQL sql = (EzPostgreSQL) new EzPostgreSQL()
@@ -22,23 +22,24 @@ public class Tests {
                 .withDefaultDatabase("ezsql")
                 .connect();
 
-        PostgreSQLTable table = sql.getTable("friends");
+        PostgreSQLTable friends = sql.getTable("friends");
 
         int id;
-        try (QueryResult result = table
-                .insertReturning("name, age, phone",
-                        "id",
-                        "PSQL", 22, 999).executeReturning()) {
+        try (QueryResult result = friends.insertReturning(
+                "name, age, phone",
+                "id",
+                "PSQL", 22, 999
+        ).executeReturning()) {
 
             ResultSet rs = result.getResultSet();
             if (rs.next()) {
                 id = rs.getInt("id");
-                Assert.assertEquals(3, id);
+                Assert.assertEquals(4, id);
             } else {
                 throw new NullPointerException("Returning id cannot be null");
             }
         }
-        table.delete().where().equals("id", id).executeAndClose();
+        friends.delete().where().equals("id", id).executeAndClose();
         System.out.println("\n\n\n");
     }
 }

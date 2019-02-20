@@ -34,7 +34,7 @@ public class Tester {
         }
     }
 
-    public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException, InterruptedException {
+    public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException {
         // Connecting...
         sql.withDefaultDatabase("ezsql")
                 .withLogin("ezsql", "1234")
@@ -49,7 +49,7 @@ public class Tester {
 
     }
 
-    private static void testTableWithObject(EzSQL sql) throws SQLException, InstantiationException, IllegalAccessException, InterruptedException {
+    private static void testTableWithObject(EzSQL sql) throws SQLException {
         System.out.println("Testing with Objects");
         Table friends = sql.getTable("friends");
 
@@ -74,14 +74,21 @@ public class Tester {
     private static Friend john;
     private static Friend mary;
 
-    private static void insertDataWithObject(Table friends) throws SQLException {
+    private static void insertDataWithObject(Table friends) {
         john = new Friend("John Doe", 21, "321", "johndoe@example.com");
         mary = new Friend("Mary Doe", 21, "221", "marydoe@example.com");
 
         friends.insertAll(john, mary).executeAndClose();
+
+        // Handle Exception (should print "Duplicate Key" error)
+        friends.insert(
+                friends.select().where()
+                        .equals("id", 1).execute()
+                        .to(Friend.class))
+                .executeAndClose(e -> System.out.println(e.getMessage()));
     }
 
-    private static void checkDataWithObject(Table friends) throws IllegalAccessException, SQLException, InstantiationException {
+    private static void checkDataWithObject(Table friends) {
         john = friends.select().where().equals("id", 1).execute().to(Friend.class);
         mary = friends.select().where().equals("id", 2).execute().to(Friend.class);
 
@@ -99,7 +106,7 @@ public class Tester {
                         ));
     }
 
-    private static void updateWithObject(Table friends) throws SQLException, InstantiationException, IllegalAccessException, InterruptedException {
+    private static void updateWithObject(Table friends) {
         mary.phone = "222";
         friends.update(mary).executeAndClose();
 
@@ -108,7 +115,7 @@ public class Tester {
         Assert.assertEquals("222", mary.phone);
     }
 
-    private static void deleteWithObject(Table friends) throws SQLException, InstantiationException, IllegalAccessException {
+    private static void deleteWithObject(Table friends) {
         friends.delete(mary).executeAndClose();
 
         Assert.assertEquals(1, friends.select().execute().toList(Friend.class).size());
@@ -144,7 +151,7 @@ public class Tester {
 
     }
 
-    private static void insertDataWithBuilder(Table friends) throws SQLException {
+    private static void insertDataWithBuilder(Table friends) {
         friends.insert(
                 "name, age, phone, email",
                 "John Doe", 21, "321", "johndoe@example.com",

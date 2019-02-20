@@ -24,10 +24,26 @@ public abstract class UpdateStatementBase<Statement extends UpdateStatementBase>
 
     /**
      * Execute and close the statement.
-     *
-     * @throws SQLException Problems to run statement.
      */
-    public void executeAndClose() throws SQLException {
-        this.execute().close();
+    public void executeAndClose() {
+        executeAndClose(null);
     }
+
+    /**
+     * Execute and close the statement.
+     *
+     * @param handler The exception handler.
+     */
+    public void executeAndClose(ExceptionHandler handler) {
+        try (Result result = this.execute(handler)) {
+            if (result != null)
+                result.close();
+        } catch (SQLException e) {
+            if (handler == null)
+                e.printStackTrace();
+            else
+                handler.onException(e);
+        }
+    }
+
 }

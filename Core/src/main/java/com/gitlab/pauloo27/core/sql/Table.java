@@ -128,7 +128,7 @@ public class Table {
     }
 
     /**
-     * Inserts values into the table.
+     * Inserts values into the table using an object.
      *
      * @param <T>    The object type to insert.
      * @param object The object to insert.
@@ -192,7 +192,7 @@ public class Table {
     }
 
     /**
-     * Inserts multiples objects in the same query.
+     * Inserts multiples objects in the same query using objects.
      *
      * @param objects The objects to insert.
      * @param <T>     The object type to insert.
@@ -311,7 +311,7 @@ public class Table {
     }
 
     /**
-     * Deletes the table's values using a object.
+     * Deletes the table's values using an object.
      *
      * @param <T>    The object type to delete.
      * @param object The object to delete.
@@ -351,7 +351,7 @@ public class Table {
     }
 
     /**
-     * Deletes multiples objects in the same query.
+     * Deletes multiples objects in the same query using objects.
      *
      * @param objects The objects to delete.
      * @param <T>     The object to delete type.

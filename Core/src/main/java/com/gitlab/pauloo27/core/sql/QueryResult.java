@@ -50,26 +50,79 @@ public class QueryResult extends Result {
      * Builds an object from the ResultSet. If the ResultSet is empty, returns null. If the ResultSet contains more than
      * one value, returns only the first one.
      *
+     * @param clazz   The object type to build from the ResultSet.
+     * @param handler The exception handler.
+     * @param <T>     The object type to build from the ResultSet.
+     *
+     * @return The built object.
+     *
+     * @see #toList(Class) to builds the entire ResultSet.
+     */
+    @CheckReturnValue
+    public <T> T to(Class<T> clazz, ExceptionHandler handler) {
+        try {
+            T row = clazz.newInstance();
+
+            if (!result.next())
+                return null;
+
+            T object = createObject(row);
+            result.close();
+            return object;
+        } catch (Exception e) {
+            if (handler == null)
+                e.printStackTrace();
+            else
+                handler.onException(e);
+            return null;
+        }
+    }
+
+    /**
+     * Builds an object from the ResultSet. If the ResultSet is empty, returns null. If the ResultSet contains more than
+     * one value, returns only the first one.
+     *
      * @param clazz The object type to build from the ResultSet.
      * @param <T>   The object type to build from the ResultSet.
      *
      * @return The built object.
      *
-     * @throws IllegalAccessException Error to build the object.
-     * @throws InstantiationException Error to build the object.
-     * @throws SQLException           Error to process the ResultSet.
      * @see #toList(Class) to builds the entire ResultSet.
      */
     @CheckReturnValue
-    public <T> T to(Class<T> clazz) throws IllegalAccessException, InstantiationException, SQLException {
-        T row = clazz.newInstance();
+    public <T> T to(Class<T> clazz) {
+        return to(clazz, null);
+    }
 
-        if (!result.next())
+    /**
+     * Builds the entire ResultSet to an object list.
+     *
+     * @param clazz   The object type to build from the ResultSet.
+     * @param handler The exception handler.
+     * @param <T>     The object type to build from the ResultSet.
+     *
+     * @return The built object list.
+     *
+     * @see #to(Class) to builds the first ResultSet item.
+     */
+    @CheckReturnValue
+    public <T> List<T> toList(Class<T> clazz, ExceptionHandler handler) {
+        try {
+
+            List<T> list = new ArrayList<>();
+            while (result.next()) {
+                T object = createObject(clazz.newInstance());
+                list.add(object);
+            }
+            result.close();
+            return list;
+        } catch (Exception e) {
+            if (handler == null)
+                e.printStackTrace();
+            else
+                handler.onException(e);
             return null;
-
-        T object = createObject(row);
-        result.close();
-        return object;
+        }
     }
 
     /**
@@ -80,20 +133,11 @@ public class QueryResult extends Result {
      *
      * @return The built object list.
      *
-     * @throws IllegalAccessException Error to build the object.
-     * @throws InstantiationException Error to build the object.
-     * @throws SQLException           Error to process the ResultSet.
      * @see #to(Class) to builds the first ResultSet item.
      */
     @CheckReturnValue
-    public <T> List<T> toList(Class<T> clazz) throws SQLException, IllegalAccessException, InstantiationException {
-        List<T> list = new ArrayList<>();
-        while (result.next()) {
-            T object = createObject(clazz.newInstance());
-            list.add(object);
-        }
-        result.close();
-        return list;
+    public <T> List<T> toList(Class<T> clazz) {
+        return toList(clazz, null);
     }
 
     /**
