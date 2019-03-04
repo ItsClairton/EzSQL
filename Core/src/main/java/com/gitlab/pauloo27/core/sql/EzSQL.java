@@ -1,6 +1,7 @@
 package com.gitlab.pauloo27.core.sql;
 
 import java.sql.*;
+import java.util.Date;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,6 +39,8 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         registerDataType(boolean.class, DefaultDataTypes.BOOLEAN);
 
         registerDataType(char.class, DefaultDataTypes.CHAR);
+
+        registerDataType(Date.class, DefaultDataTypes.DATE);
     }
 
     /**
@@ -612,6 +615,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
 
     private static DataSerializer DEFAULT_DATA_SERIALIZER = new DataSerializer<>(
             object -> {
+                if (object == null)
+                    return null;
+
                 if (object.getClass().isEnum()) {
                     return ((Enum) object).name();
                 }
@@ -661,28 +667,28 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * @throws SQLException Problems to execute the statement.
      */
     public <T> TableType createIfNotExists(Class<T> clazz) throws SQLException {
-        String tableName = clazz.getSimpleName();
-
-        if (clazz.isAnnotationPresent(Name.class))
-            tableName = clazz.getAnnotation(Name.class).value();
+        String tableName = ReflectionUtils.getName(clazz);
 
         TableBuilder tableBuilder = new TableBuilder(tableName);
 
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
             field.setAccessible(true);
 
+            if (ReflectionUtils.isIgnored(field))
+                return;
+
             DataType dataType = getDateTypeByClass(field.getType());
 
             int length = -1;
 
-            if (dataType == UNHANDLED_SERIALIZER)
+            if (dataType == UNHANDLED_SERIALIZER || dataType == ENUM_NAME)
                 length = 64;
 
-            if (field.isAnnotationPresent(Length.class)) {
-                length = field.getAnnotation(Length.class).value();
+            if (ReflectionUtils.hasLength(field)) {
+                length = ReflectionUtils.getLength(field);
             }
 
-            if (field.isAnnotationPresent(Id.class)) {
+            if (ReflectionUtils.isId(field)) {
                 dataType = DefaultDataTypes.PRIMARY_KEY;
             }
 
@@ -694,10 +700,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
             });
 
             try {
-                String columnName = field.getName();
-
-                if (field.isAnnotationPresent(Name.class))
-                    columnName = field.getAnnotation(Name.class).value();
+                String columnName = ReflectionUtils.getName(field);
 
                 Object defaultValue = null;
                 if (!field.getType().isPrimitive() || field.isAnnotationPresent(DefaultValue.class)) {

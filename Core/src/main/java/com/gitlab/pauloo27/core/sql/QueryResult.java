@@ -152,14 +152,15 @@ public class QueryResult extends Result {
     private <T> T createObject(T object) {
         Arrays.stream(object.getClass().getDeclaredFields())
                 .forEach(field -> {
-                    String name = field.getName();
+                    field.setAccessible(true);
 
-                    if (field.isAnnotationPresent(Name.class))
-                        name = field.getAnnotation(Name.class).value();
+                    if (ReflectionUtils.isIgnored(field))
+                        return;
+
+                    String name = ReflectionUtils.getName(field);
 
                     try {
                         int columnIndex = result.findColumn(name);
-                        field.setAccessible(true);
 
                         Object value = result.getObject(columnIndex);
 

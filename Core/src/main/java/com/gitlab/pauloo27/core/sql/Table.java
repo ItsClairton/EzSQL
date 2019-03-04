@@ -163,21 +163,22 @@ public class Table {
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
             field.setAccessible(true);
 
-            if (columns.length() != 0 && appendColumn)
-                columns.append(", ");
+            if (ReflectionUtils.isIgnored(field))
+                return;
 
-            if (field.isAnnotationPresent(Id.class))
+            if (ReflectionUtils.isId(field))
                 return;
 
             try {
-                String name = field.getName();
+                String name = ReflectionUtils.getName(field);
                 Object value = field.get(object);
 
                 if (value == null)
                     return;
 
-                if (field.isAnnotationPresent(Name.class))
-                    name = field.getAnnotation(Name.class).value();
+                if (columns.length() != 0 && appendColumn)
+                    columns.append(", ");
+
 
                 if (appendColumn)
                     columns.append(name);
@@ -262,6 +263,8 @@ public class Table {
 
         Preconditions.checkNotNull(idField);
 
+        idField.setAccessible(true);
+
         try {
             String idColumn = idField.getName();
             int id = idField.getInt(object);
@@ -271,24 +274,24 @@ public class Table {
 
             Update update = new Update(sql, this).where().equals(idColumn, id);
 
-            Arrays.stream(clazz.getDeclaredFields()).filter(field -> !field.getName().equals(idColumn))
-                    .forEach(field -> {
-                        field.setAccessible(true);
+            Arrays.stream(clazz.getDeclaredFields())
+                    .filter(field -> !field.getName().equals(idColumn)).forEach(field -> {
+                field.setAccessible(true);
 
-                        String name = field.getName();
+                if (ReflectionUtils.isIgnored(field))
+                    return;
 
-                        if (field.isAnnotationPresent(Name.class))
-                            name = field.getAnnotation(Name.class).value();
+                String name = ReflectionUtils.getName(field);
 
-                        Object value = null;
-                        try {
-                            value = field.get(object);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
+                Object value = null;
+                try {
+                    value = field.get(object);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
-                        update.set(name, sql.getSerializerByClass(clazz).getSerializer().apply(value));
-                    });
+                update.set(name, sql.getSerializerByClass(field.getType()).getSerializer().apply(value));
+            });
 
             return update;
         } catch (IllegalAccessException e) {
@@ -355,7 +358,7 @@ public class Table {
      * @param objects The objects to delete.
      * @param <T>     The object to delete type.
      *
-     * @return The insert statement.
+     * @return The delete statement.
      */
     @CheckReturnValue
     public <T> Delete deleteAll(T... objects) {
