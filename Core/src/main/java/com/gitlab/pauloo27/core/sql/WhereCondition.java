@@ -137,7 +137,22 @@ public class WhereCondition<Statement extends StatementBase> {
     @CheckReturnValue
     public Statement notNull(String columnName) {
         Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
-        this.statements.add(new WhereStatement(new Where(columnName), previousSeparator));
+        this.statements.add(new WhereStatement(new Where(columnName, WhereType.NOT_NULL), previousSeparator));
+        previousSeparator = null;
+        return statement;
+    }
+
+    /**
+     * Adds a Where Null condition.
+     *
+     * @param columnName The column name.
+     *
+     * @return The current object instance.
+     */
+    @CheckReturnValue
+    public Statement isNull(String columnName) {
+        Preconditions.checkArgument(EzSQL.checkEntryName(columnName), columnName + " is not a valid name");
+        this.statements.add(new WhereStatement(new Where(columnName, WhereType.NULL), previousSeparator));
         previousSeparator = null;
         return statement;
     }
@@ -293,8 +308,10 @@ public class WhereCondition<Statement extends StatementBase> {
          *
          * @param columnName The column name.
          */
-        public Where(String columnName) {
-            this.type = WhereType.NOT_NULL;
+        public Where(String columnName, WhereType whereType) {
+            Preconditions.checkArgument(whereType == WhereType.NOT_NULL || whereType == WhereType.NULL,
+                    "The where type should be NOT NULL or NULL");
+            this.type = whereType;
             this.columnName = columnName;
         }
 
@@ -347,6 +364,10 @@ public class WhereCondition<Statement extends StatementBase> {
              * {@code = ?}.
              */
             EQUALS("= ?"),
+            /**
+             * {@code IS NULL}.
+             */
+            NULL("IS NULL"),
             /**
              * {@code IS NOT NULL}.
              */

@@ -457,7 +457,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
                 return;
 
             WhereCondition.Where where = ((WhereCondition.WhereStatement) statementBase).getWhere();
-            if (where.getType() == WhereCondition.Where.WhereType.NOT_NULL)
+            if (where.getType() == WhereCondition.Where.WhereType.NOT_NULL || where.getType() == WhereCondition.Where.WhereType.NULL)
                 return;
             try {
                 // Note that the setObject function starts with 1
