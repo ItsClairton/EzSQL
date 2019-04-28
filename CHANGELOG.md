@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `WhereStatement#like()`.  
 - Exception Handler.  
 - `Table#dropReturningUpdatedLines()` and `Table#truncateReturningUpdatedLines()`.  
-- Annotations in the incomplete statements.  
+- Warning annotations in the incomplete statements.  
+- 
 
 ### Removed
 - The `Ez` classes prefix.  
@@ -29,7 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `SELECT *` queries.  
 
 ### Deprecated
-- All the `ColumnBuilder()` constructors that use `String` as parameter.  
+- All the `ColumnBuilder()` constructors that have the Attribute and the Data Type as a String.  
 
 ### Security
 - Add column and table name checker to avoid SQL Injection.  
