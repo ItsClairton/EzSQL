@@ -10,5 +10,10 @@ package com.gitlab.pauloo27.core.sql;
 @FunctionalInterface
 public interface ExceptionHandler {
 
+    /**
+     * Handles an exception.
+     *
+     * @param e The exception.
+     */
     void onException(Exception e);
 }

@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 
-@SuppressWarnings("Duplicates")
 public class Tests {
 
     @Test

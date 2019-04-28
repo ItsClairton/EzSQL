@@ -21,8 +21,11 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
     /**
      * The Data Type by the Object.
      */
-    private Map<Class<? extends Object>, DataType> typesByClass = new HashMap<Class<? extends Object>, DataType>();
+    private Map<Class<?>, DataType> typesByClass = new HashMap<>();
 
+    /**
+     * A map of the serializers.
+     */
     private Map<Class, DataSerializer> typeSerializer = new HashMap<>();
 
     {
@@ -589,13 +592,19 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return getTableByName(table.getName());
     }
 
-    private static DataType UNHANDLED_SERIALIZER = new DataType(
+    /**
+     * The default Data Type.
+     */
+    private static DataType DEFAULT_DATATYPE = new DataType(
             "VARCHAR",
             DefaultAttributes.getDefaultAttributes(),
             null,
-            "UNHANDLED_SERIALIZER"
+            "DEFAULT_DATATYPE"
     );
 
+    /**
+     * The default enum serializer.
+     */
     private static DataType ENUM_NAME = new DataType(
             "VARCHAR",
             DefaultAttributes.getDefaultAttributes(),
@@ -603,16 +612,36 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
             "ENUM_NAME"
     );
 
+    /**
+     * Register a new data type.
+     *
+     * @param clazz    The class type.
+     * @param dataType The data type.
+     *
+     * @return The current object instance.
+     */
     public EzSQL<? extends Database, ? extends Table> registerDataType(Class clazz, DataType dataType) {
         typesByClass.put(clazz, dataType);
         return this;
     }
 
+    /**
+     * Register a new serializer.
+     *
+     * @param clazz      The class type.
+     * @param serializer The serializer.
+     * @param <T>        The serializer class type.
+     *
+     * @return The current object instance.
+     */
     public <T> EzSQL<? extends Database, ? extends Table> registerSerializer(Class<T> clazz, DataSerializer<T> serializer) {
         typeSerializer.put(clazz, serializer);
         return this;
     }
 
+    /**
+     * The default data serializer.
+     */
     private static DataSerializer DEFAULT_DATA_SERIALIZER = new DataSerializer<>(
             object -> {
                 if (object == null)
@@ -636,19 +665,32 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
             }
     );
 
+    /**
+     * Gets the data type by the class. The default data type is {@link #DEFAULT_DATATYPE}.
+     *
+     * @param clazz The class
+     *
+     * @return The data type.
+     */
     public DataType getDateTypeByClass(Class clazz) {
         if (!typesByClass.containsKey(clazz)) {
             if (clazz.isEnum()) {
                 return ENUM_NAME;
             }
 
-            return UNHANDLED_SERIALIZER;
+            return DEFAULT_DATATYPE;
         }
 
         return typesByClass.get(clazz);
     }
 
-
+    /**
+     * Gets the serializer by the class. The default data type is {@link #DEFAULT_DATA_SERIALIZER}.
+     *
+     * @param clazz The class
+     *
+     * @return The serializer.
+     */
     public DataSerializer getSerializerByClass(Class clazz) {
         if (!typeSerializer.containsKey(clazz))
             return DEFAULT_DATA_SERIALIZER;
@@ -681,7 +723,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
 
             int length = -1;
 
-            if (dataType == UNHANDLED_SERIALIZER || dataType == ENUM_NAME)
+            if (dataType == DEFAULT_DATATYPE || dataType == ENUM_NAME)
                 length = 64;
 
             if (ReflectionUtils.hasLength(field)) {

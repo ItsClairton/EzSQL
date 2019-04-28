@@ -199,8 +199,9 @@ public class Table {
      *
      * @return The insert statement.
      */
+    @SafeVarargs
     @CheckReturnValue
-    public <T> Insert insertAll(T... objects) {
+    public final <T> Insert insertAll(T... objects) {
         StringBuilder sb = new StringBuilder();
         List<Object> values = new ArrayList<>();
         Arrays.stream(objects).forEach(object -> {
