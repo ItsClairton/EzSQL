@@ -1,76 +1,96 @@
 package com.gitlab.pauloo27.core.sql;
 
-import com.google.common.base.Preconditions;
-
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <h1>The main EzSQL class with the builds and main functions. Where the magic happens.</h1>
  * <p>EzSQL is simple way to connect and use SQL, without writing queries, just with code.</p>
  *
+ * @param <DatabaseType> The Database class.
+ * @param <TableType>    The Table class.
+ *
  * @author Paulo
- * @version 1.0
+ * @version 3.0
  * @since 0.1.0
  */
-public class EzSQL {
+public abstract class EzSQL<DatabaseType extends Database, TableType extends Table> {
 
     /**
-     * The SQL type.
+     * The Data Type by the Object.
      */
-    private final EzSQLType type;
-    /**
-     * The SQL connection.
-     */
-    private Connection connection;
-    /**
-     * The SQL address.
-     */
-    private String address = "localhost";
-    /**
-     * The SQL default database.
-     */
-    private String defaultDatabase;
-    /**
-     * The SQL user name.
-     */
-    private String username;
-    /**
-     * The SQL password.
-     */
-    private String password;
-    /**
-     * The SQL port.
-     */
-    private Integer port;
-    /**
-     * If true, the database will be created if not exists.
-     */
-    private boolean createDefaultDatabaseIfNotExists = false;
-    /**
-     * A custom JDBC driver.
-     */
-    private String customDriverClass;
+    private Map<Class<?>, DataType> typesByClass = new HashMap<>();
 
     /**
-     * Builds the EzSQL.
-     *
-     * @param type The SQL's type.
+     * A map of the serializers.
      */
-    public EzSQL(EzSQLType type) {
-        Preconditions.checkNotNull(type, "Type cannot be null");
-        this.type = type;
+    private Map<Class, DataSerializer> typeSerializer = new HashMap<>();
+
+    {
+        registerDataType(String.class, DefaultDataTypes.VARCHAR);
+
+        registerDataType(byte.class, DefaultDataTypes.TINYINT);
+        registerDataType(short.class, DefaultDataTypes.SMALLINT);
+        registerDataType(int.class, DefaultDataTypes.INTEGER);
+        registerDataType(long.class, DefaultDataTypes.BIGINT);
+
+        registerDataType(float.class, DefaultDataTypes.FLOAT);
+        registerDataType(double.class, DefaultDataTypes.DOUBLE);
+
+        registerDataType(boolean.class, DefaultDataTypes.BOOLEAN);
+
+        registerDataType(char.class, DefaultDataTypes.CHAR);
+
+        registerDataType(Date.class, DefaultDataTypes.DATE);
     }
 
     /**
-     * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection.
-     * Uses a regex that checks if the string is only of alphabetical characters ({@code \w*}).
+     * The SQL connection.
+     */
+    protected Connection connection;
+    /**
+     * The SQL address.
+     */
+    protected String address = "localhost";
+    /**
+     * The SQL default database.
+     */
+    protected String defaultDatabase;
+    /**
+     * The SQL user name.
+     */
+    protected String username;
+    /**
+     * The SQL password.
+     */
+    protected String password;
+    /**
+     * The SQL port.
+     */
+    protected int port = -1;
+    /**
+     * If true, the database will be created if not exists.
+     */
+    protected boolean createDefaultDatabaseIfNotExists = false;
+    /**
+     * A custom JDBC driver.
+     */
+    protected String customDriverClass;
+
+    /**
+     * Builds the EzSQL.
+     */
+    public EzSQL() {
+    }
+
+    /**
+     * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection. Uses a
+     * regex that checks if the string is only of alphabetical characters ({@code \w*}).
      *
      * @param name The string to check.
+     *
      * @return If the name contains only alphabetical characters and a dot or it's a asterisk.
      */
     public static boolean checkEntryName(String name) {
@@ -88,25 +108,15 @@ public class EzSQL {
     }
 
     /**
-     * Sets the SQL Type to SQLITE.
-     *
-     * @param filePath The SQLIte file path.
-     * @return The current object instance.
-     */
-    public EzSQL asSQLite(String filePath) {
-        this.address = filePath;
-        return this;
-    }
-
-    /**
      * Sets the address and the port used to connect. The default address value is "localhost" and the default port
-     * value will get from the {@link EzSQLType#getPort()}.
+     * value will get from the {@link #getDefaultPort()} ()}.
      *
      * @param address The server's address.
      * @param port    The server's port. If the port is less than 0 the default port will be used.
+     *
      * @return The current object instance.
      */
-    public EzSQL withAddress(String address, int port) {
+    public EzSQL<DatabaseType, TableType> withAddress(String address, int port) {
         this.address = address;
         this.port = port;
         return this;
@@ -117,9 +127,10 @@ public class EzSQL {
      * the type) will be used. To use another port see {@link #withAddress(String, int)}.
      *
      * @param address The server's address.
+     *
      * @return The current object instance.
      */
-    public EzSQL withAddress(String address) {
+    public EzSQL<DatabaseType, TableType> withAddress(String address) {
         this.address = address;
         return this;
     }
@@ -129,9 +140,10 @@ public class EzSQL {
      *
      * @param username The user's name.
      * @param password The user's password.
+     *
      * @return The current object instance.
      */
-    public EzSQL withLogin(String username, String password) {
+    public EzSQL<DatabaseType, TableType> withLogin(String username, String password) {
         this.username = username;
         this.password = password;
         return this;
@@ -141,9 +153,10 @@ public class EzSQL {
      * Sets the server login information. To also sets the password {@link #withLogin(String, String)}
      *
      * @param username The user's name.
+     *
      * @return The current object instance.
      */
-    public EzSQL withLogin(String username) {
+    public EzSQL<DatabaseType, TableType> withLogin(String username) {
         this.username = username;
         return this;
     }
@@ -154,10 +167,11 @@ public class EzSQL {
      * #withDefaultDatabase(String, boolean)}.
      *
      * @param defaultDatabase The default database name.
+     *
      * @return The current object instance.
      */
 
-    public EzSQL withDefaultDatabase(String defaultDatabase) {
+    public EzSQL<DatabaseType, TableType> withDefaultDatabase(String defaultDatabase) {
         this.defaultDatabase = defaultDatabase;
         return this;
     }
@@ -168,9 +182,10 @@ public class EzSQL {
      *
      * @param defaultDatabase   The default database name.
      * @param createIfNotExists If true, the database will be created if not exists. Doesn't work with Postgresql.
+     *
      * @return The current object instance.
      */
-    public EzSQL withDefaultDatabase(String defaultDatabase, boolean createIfNotExists) {
+    public EzSQL<DatabaseType, TableType> withDefaultDatabase(String defaultDatabase, boolean createIfNotExists) {
         this.defaultDatabase = defaultDatabase;
         this.createDefaultDatabaseIfNotExists = createIfNotExists;
         return this;
@@ -180,9 +195,10 @@ public class EzSQL {
      * Sets a custom JDBC driver. If it's null (and it's by default) the default driver for the SQL Type will be used.
      *
      * @param customDriverClass The custom driver class.
+     *
      * @return The current object instance.
      */
-    public EzSQL withCustomDriver(String customDriverClass) {
+    public EzSQL<DatabaseType, TableType> withCustomDriver(String customDriverClass) {
         this.customDriverClass = customDriverClass;
         return this;
     }
@@ -193,8 +209,22 @@ public class EzSQL {
      * @return If the address is not null.
      */
     public boolean readyToConnect() {
-        return (this.address != null) && !(isType(EzSQLType.POSTGRESQL) && defaultDatabase == null);
+        return (this.address != null);
     }
+
+    /**
+     * Gets the default SQL server's port.
+     *
+     * @return The default SQL server's port.
+     */
+    public abstract int getDefaultPort();
+
+    /**
+     * Gets the URL Base.
+     *
+     * @return The URL Base.
+     */
+    public abstract String getURLBase();
 
     /**
      * Gets the SQL server's port.
@@ -202,19 +232,26 @@ public class EzSQL {
      * @return The server's port.
      */
     public int getPort() {
-        if (type == EzSQLType.SQLITE) throw new NullPointerException("SQLite have not port");
-        return port == null || port < 0 ? this.type.getPort() : port;
+        return port < 0 ? getDefaultPort() : port;
     }
+
+    /**
+     * Gets the SQL driver class path.
+     *
+     * @return The SQL driver class path.
+     */
+    public abstract String getDriverClass();
 
     /**
      * Register the SQL Driver. In JDBC's versions equals or newer than 4.0 (Java 7) is not necessary if the services
      * file (META-INF.services/java.sql.Driver) is in the jar.
      *
      * @return The current object instance.
+     *
      * @throws ClassNotFoundException Invalid driver class.
      */
-    public EzSQL registerDriver() throws ClassNotFoundException {
-        Class.forName(customDriverClass == null ? this.type.getDriverClass() : customDriverClass);
+    public EzSQL<DatabaseType, TableType> registerDriver() throws ClassNotFoundException {
+        Class.forName(customDriverClass == null ? this.getDriverClass() : customDriverClass);
         return this;
     }
 
@@ -222,64 +259,53 @@ public class EzSQL {
      * Connects to the SQL.
      *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to connect.
      */
-    public EzSQL connect() throws SQLException {
+    public EzSQL<DatabaseType, TableType> connect() throws SQLException {
         if (!this.readyToConnect()) throw new SQLException("Not ready to connect");
+
         if (defaultDatabase != null && !checkEntryName(defaultDatabase))
             throw new SQLException(defaultDatabase + " is not a valid name");
-        if (this.type.isServer()) {
-            String url = this.type.getURLBase() + this.address + ":" + this.getPort();
 
-            if (this.defaultDatabase != null && (!this.createDefaultDatabaseIfNotExists || isType(EzSQLType.POSTGRESQL))) {
-                url += "/" + this.defaultDatabase;
-            }
+        String url = String.format("%s%s:%d", this.getURLBase(), this.address, this.getPort());
 
-            if (this.username == null) {
-                this.connection = DriverManager.getConnection(url);
-            } else {
-                this.connection = DriverManager.getConnection(url, username, password);
-            }
+        if (this.defaultDatabase != null && !this.createDefaultDatabaseIfNotExists)
+            url += "/" + this.defaultDatabase;
 
-            if (createDefaultDatabaseIfNotExists && this.type != EzSQLType.POSTGRESQL)
-                this.changeDatabase(this.createIfNotExists(new EzDatabaseBuilder(this.defaultDatabase)));
-        } else {
-            this.connection = DriverManager.getConnection(type.getURLBase() + address);
-        }
+        if (this.username == null)
+            this.connection = DriverManager.getConnection(url);
+        else
+            this.connection = DriverManager.getConnection(url, username, password);
+
+        if (this.createDefaultDatabaseIfNotExists)
+            this.changeDatabase(this.createIfNotExists(new DatabaseBuilder(this.defaultDatabase)));
+
         return this;
-
-    }
-
-    /**
-     * Checks if the type of the SQL is the same of the parameter type.
-     *
-     * @param type The type to compare.
-     * @return If the type of the SQL is the same of the parameter type.
-     */
-    public boolean isType(EzSQLType type) {
-        return this.type == type;
     }
 
     /**
      * Gets the current database. Return null if the type is SQLite.
      *
      * @return The current database. If the SQL is SQLite return null.
+     *
      * @throws SQLException Problems to execute the statement.
      */
-    public EzDatabase getCurrentDatabase() throws SQLException {
+    public DatabaseType getCurrentDatabase() throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        if (this.getType() == EzSQLType.SQLITE) return null; // SQLite have just one database per file.
-        return new EzDatabase(this, this.getConnection().getCatalog());
+        return getDatabaseByName(this.getConnection().getCatalog());
     }
 
     /**
      * Changes the selected database.
      *
      * @param database The database to selected.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to execute the statement.
      */
-    public EzSQL changeDatabase(EzDatabase database) throws SQLException {
+    public EzSQL<DatabaseType, TableType> changeDatabase(DatabaseType database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("USE %s", database.getName());
         return this;
@@ -289,13 +315,13 @@ public class EzSQL {
      * Executes a PreparedStatement and close.
      *
      * @param statement The statement.
+     *
      * @throws SQLException Problems to execute the statement.
      */
     public void executeAndClose(PreparedStatement statement) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         statement.execute();
         statement.close();
-
     }
 
     /**
@@ -303,10 +329,12 @@ public class EzSQL {
      *
      * @param select The select statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzSelect select, EzTable table) throws SQLException {
+    public PreparedStatement build(Select select, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("SELECT %s FROM %s;", String.join(", ", select.getColumnNames()), (table.getName() + " " +
                         select.joinToString() + " " +
@@ -320,34 +348,41 @@ public class EzSQL {
     }
 
     /**
+     * Builds a data type.
+     *
+     * @param dataType The data type object to build.
+     *
+     * @return The data type converted to SQL.
+     */
+    public String build(DataType dataType) {
+        return dataType.toSQL();
+    }
+
+    /**
+     * Builds a data attribute.
+     *
+     * @param attribute The data attribute object to build.
+     *
+     * @return The data attribute converted to SQL.
+     */
+    public String build(Attribute attribute) {
+        return attribute.toSQL();
+    }
+
+    /**
      * Builds a insert statement.
      *
      * @param insert The insert statement.
      * @param table  The table.
-     * @return The current object instance.
-     * @throws SQLException Problems to prepare the statement.
-     */
-    public PreparedStatement build(EzInsert insert, EzTable table) throws SQLException {
-        PreparedStatement statement = this.getConnection().prepareStatement(
-                String.format("INSERT INTO %s (%s) VALUES %s;", table.getName(), insert.getColumnsName(), insert.valuesToString()));
-
-        setValuesObjects(statement, new AtomicInteger(), insert.getValues());
-        return statement;
-    }
-
-    /**
-     * Builds a insert returning statement.
      *
-     * @param insert      The insert statement.
-     * @param columnsName The returning columns' names separated by ", ".
-     * @param table       The table.
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzInsert insert, String columnsName, EzTable table) throws SQLException {
-        Preconditions.checkArgument(Arrays.stream(columnsName.split(", ")).allMatch(EzSQL::checkEntryName), columnsName + " is not a valid name");
+    public PreparedStatement build(Insert insert, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
-                String.format("INSERT INTO %s (%s) VALUES %s RETURNING %s;", table.getName(), insert.getColumnsName(), insert.valuesToString(), columnsName));
+                String.format("INSERT INTO %s (%s) VALUES %s;",
+                        table.getName(), insert.getColumnsName(), insert.valuesToString()));
 
         setValuesObjects(statement, new AtomicInteger(), insert.getValues());
         return statement;
@@ -358,10 +393,12 @@ public class EzSQL {
      *
      * @param update The update statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzUpdate update, EzTable table) throws SQLException {
+    public PreparedStatement build(Update update, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("UPDATE %s %s %s %s %s %s;",
                         table.getName(),
@@ -370,8 +407,8 @@ public class EzSQL {
                         update.whereToString(),
                         update.orderByToString(),
                         update.limitToString()
-                ).trim().replaceAll("\\s+", " "));
-
+                ).trim().replaceAll("\\s+", " ")
+        );
         AtomicInteger i = new AtomicInteger();
         setSetObjects(statement, i, update.getSets());
         setWhereObjects(statement, i, update.getWhereConditions().getWhereStatements());
@@ -384,7 +421,9 @@ public class EzSQL {
      *
      * @param statement The SQL statement.
      * @param values    The array os values.
-     * @return The builded PreparedStatement.
+     *
+     * @return The built PreparedStatement.
+     *
      * @throws SQLException Error to create the statement.
      */
     public PreparedStatement prepareStatement(String statement, Object... values) throws SQLException {
@@ -399,6 +438,7 @@ public class EzSQL {
      *
      * @param statement    The Statement.
      * @param unsafeValues The array of values.
+     *
      * @throws SQLException Error to create or run the statement.
      */
     public void executeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
@@ -414,13 +454,13 @@ public class EzSQL {
      * @param i          A atomic int of the index of the first '?'.
      * @param statements The list of the where conditions.
      */
-    public void setWhereObjects(PreparedStatement statement, AtomicInteger i, Collection<EzWhereCondition.WhereStatementBase> statements) {
+    public void setWhereObjects(PreparedStatement statement, AtomicInteger i, Collection<WhereCondition.WhereStatementBase> statements) {
         statements.forEach(statementBase -> {
-            if (statementBase instanceof EzWhereCondition.Parentheses)
+            if (statementBase instanceof WhereCondition.Parentheses)
                 return;
 
-            EzWhereCondition.Where where = ((EzWhereCondition.WhereStatement) statementBase).getWhere();
-            if (where.getType() == EzWhereCondition.Where.WhereType.NOT_NULL)
+            WhereCondition.Where where = ((WhereCondition.WhereStatement) statementBase).getWhere();
+            if (where.getType() == WhereCondition.Where.WhereType.NOT_NULL || where.getType() == WhereCondition.Where.WhereType.NULL)
                 return;
             try {
                 // Note that the setObject function starts with 1
@@ -472,10 +512,12 @@ public class EzSQL {
      *
      * @param delete The delete statement.
      * @param table  The table.
+     *
      * @return The current object instance.
+     *
      * @throws SQLException Problems to prepare the statement.
      */
-    public PreparedStatement build(EzDelete delete, EzTable table) throws SQLException {
+    public PreparedStatement build(Delete delete, TableType table) throws SQLException {
         PreparedStatement statement = this.getConnection().prepareStatement(
                 String.format("DELETE FROM %s %s %s %s %s;",
                         table.getName(),
@@ -487,15 +529,6 @@ public class EzSQL {
         );
         setWhereObjects(statement, new AtomicInteger(), delete.getWhereConditions().getWhereStatements());
         return statement;
-    }
-
-    /**
-     * Gets the SQL type.
-     *
-     * @return The SQL type.
-     */
-    public EzSQLType getType() {
-        return type;
     }
 
     /**
@@ -523,75 +556,271 @@ public class EzSQL {
     }
 
     /**
-     * Gets an instance of {@link EzTable} using the table name.
+     * Gets an instance of {@link Table} using the table name.
      *
      * @param name The table's name.
+     *
      * @return The table.
      */
-    public EzTable getTable(String name) {
-        return new EzTable(this, name);
+    public TableType getTable(String name) {
+        return getTableByName(name);
     }
 
     /**
-     * Gets an instance of {@link EzDatabase} using the database name.
+     * Gets an instance of {@link Database} using the database name.
      *
      * @param name The database's name.
+     *
      * @return The database.
      */
-    public EzDatabase getDatabase(String name) {
-        return new EzDatabase(this, name);
+    public DatabaseType getDatabase(String name) {
+        return getDatabaseByName(name);
     }
 
     /**
      * Creates a table if not exists.
      *
      * @param table The table's builder.
+     *
      * @return The table.
+     *
      * @throws SQLException Problems to execute the statement.
      */
-    public EzTable createIfNotExists(EzTableBuilder table) throws SQLException {
+    public TableType createIfNotExists(TableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(type));
-        return new EzTable(this, table.getName());
+        this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(this));
+        return getTableByName(table.getName());
+    }
+
+    /**
+     * The default Data Type.
+     */
+    private static DataType DEFAULT_DATATYPE = new DataType(
+            "VARCHAR",
+            DefaultAttributes.getDefaultAttributes(),
+            null,
+            "DEFAULT_DATATYPE"
+    );
+
+    /**
+     * The default enum serializer.
+     */
+    private static DataType ENUM_NAME = new DataType(
+            "VARCHAR",
+            DefaultAttributes.getDefaultAttributes(),
+            null,
+            "ENUM_NAME"
+    );
+
+    /**
+     * Register a new data type.
+     *
+     * @param clazz    The class type.
+     * @param dataType The data type.
+     *
+     * @return The current object instance.
+     */
+    public EzSQL<? extends Database, ? extends Table> registerDataType(Class clazz, DataType dataType) {
+        typesByClass.put(clazz, dataType);
+        return this;
+    }
+
+    /**
+     * Register a new serializer.
+     *
+     * @param clazz      The class type.
+     * @param serializer The serializer.
+     * @param <T>        The serializer class type.
+     *
+     * @return The current object instance.
+     */
+    public <T> EzSQL<? extends Database, ? extends Table> registerSerializer(Class<T> clazz, DataSerializer<T> serializer) {
+        typeSerializer.put(clazz, serializer);
+        return this;
+    }
+
+    /**
+     * The default data serializer.
+     */
+    private static DataSerializer DEFAULT_DATA_SERIALIZER = new DataSerializer<>(
+            object -> {
+                if (object == null)
+                    return null;
+
+                if (object.getClass().isEnum()) {
+                    return ((Enum) object).name();
+                }
+
+                return object;
+            },
+
+            (clazz, object) -> {
+                if (clazz.isEnum())
+                    return Arrays.stream(clazz.getEnumConstants())
+                            .filter(member -> ((Enum) member).name().equals(object))
+                            .findFirst()
+                            .orElse(null);
+
+                return object;
+            }
+    );
+
+    /**
+     * Gets the data type by the class. The default data type is {@link #DEFAULT_DATATYPE}.
+     *
+     * @param clazz The class
+     *
+     * @return The data type.
+     */
+    public DataType getDateTypeByClass(Class clazz) {
+        if (!typesByClass.containsKey(clazz)) {
+            if (clazz.isEnum()) {
+                return ENUM_NAME;
+            }
+
+            return DEFAULT_DATATYPE;
+        }
+
+        return typesByClass.get(clazz);
+    }
+
+    /**
+     * Gets the serializer by the class. The default data type is {@link #DEFAULT_DATA_SERIALIZER}.
+     *
+     * @param clazz The class
+     *
+     * @return The serializer.
+     */
+    public DataSerializer getSerializerByClass(Class clazz) {
+        if (!typeSerializer.containsKey(clazz))
+            return DEFAULT_DATA_SERIALIZER;
+
+        return typeSerializer.get(clazz);
+    }
+
+    /**
+     * Creates a table if not exists using a object.
+     *
+     * @param clazz The object to build.
+     * @param <T>   The object type.
+     *
+     * @return The table.
+     *
+     * @throws SQLException Problems to execute the statement.
+     */
+    public <T> TableType createIfNotExists(Class<T> clazz) throws SQLException {
+        String tableName = ReflectionUtils.getName(clazz);
+
+        TableBuilder tableBuilder = new TableBuilder(tableName);
+
+        Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
+            field.setAccessible(true);
+
+            if (ReflectionUtils.isIgnored(field))
+                return;
+
+            DataType dataType = getDateTypeByClass(field.getType());
+
+            int length = -1;
+
+            if (dataType == DEFAULT_DATATYPE || dataType == ENUM_NAME)
+                length = 64;
+
+            if (ReflectionUtils.hasLength(field)) {
+                length = ReflectionUtils.getLength(field);
+            }
+
+            if (ReflectionUtils.isId(field)) {
+                dataType = DefaultDataTypes.PRIMARY_KEY;
+            }
+
+            List<Attribute> attributes = new ArrayList<>();
+            Arrays.stream(field.getDeclaredAnnotations()).forEach(annotation -> {
+                if (annotation.annotationType().isMemberClass() && annotation.annotationType().getDeclaringClass() == DefaultAttributes.class) {
+                    attributes.add(DefaultAttributes.getAttribute(annotation.annotationType()));
+                }
+            });
+
+            try {
+                String columnName = ReflectionUtils.getName(field);
+
+                Object defaultValue = null;
+                if (!field.getType().isPrimitive() || field.isAnnotationPresent(DefaultValue.class)) {
+                    Object value = field.get(clazz.newInstance());
+                    defaultValue = value == null ? null : getSerializerByClass(field.getType()).getSerializer().apply(value);
+                }
+
+                tableBuilder.withColumn(
+                        new ColumnBuilder(columnName, dataType, length, attributes.toArray(new Attribute[]{}))
+                                .withDefaultValue(defaultValue));
+            } catch (SQLException | InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        return createIfNotExists(tableBuilder);
     }
 
     /**
      * Creates a database if not exists.
      *
      * @param database The database's builder.
+     *
      * @return The database.
+     *
      * @throws SQLException Problems to execute the statement.
      */
-    public EzDatabase createIfNotExists(EzDatabaseBuilder database) throws SQLException {
+    public DatabaseType createIfNotExists(DatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE DATABASE IF NOT EXISTS %s", database.getName());
-        return new EzDatabase(this, database.getName());
+        return getDatabaseByName(database.getName());
     }
+
+    /**
+     * Gets a database by its name.
+     *
+     * @param name The database name.
+     *
+     * @return The database object.
+     */
+    protected abstract DatabaseType getDatabaseByName(String name);
+
+    /**
+     * Gets a table by its name.
+     *
+     * @param name The table name.
+     *
+     * @return The table object.
+     */
+    protected abstract TableType getTableByName(String name);
 
     /**
      * Creates a table.
      *
      * @param table The table's builder.
+     *
      * @return The table.
+     *
      * @throws SQLException Problems to execute the statement.
      */
-    public EzTable create(EzTableBuilder table) throws SQLException {
+    public TableType create(TableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("CREATE TABLE %s (%s);", table.getName(), table.toSQL(type));
-        return new EzTable(this, table.getName());
+        this.executeStatementAndClose("CREATE TABLE %s (%s);", table.getName(), table.toSQL(this));
+        return getTableByName(table.getName());
     }
 
     /**
      * Creates a database.
      *
      * @param database The database's name.
+     *
      * @return The database.
+     *
      * @throws SQLException Problems to execute the statement.
      */
-    public EzDatabase create(EzDatabaseBuilder database) throws SQLException {
+    public DatabaseType create(DatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
         this.executeStatementAndClose("CREATE DATABASE %s", database.getName());
-        return new EzDatabase(this, database.getName());
+        return getDatabaseByName(database.getName());
     }
 
     /**

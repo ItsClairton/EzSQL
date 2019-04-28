@@ -1,4 +1,0 @@
-# Drivers
-org.postgresql.Driver
-org.sqlite.JDBC
-org.mariadb.jdbc.Driver

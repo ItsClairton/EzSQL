@@ -20,6 +20,12 @@
             <version>21.0</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Annotations -->
+        <dependency>
+            <groupId>findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

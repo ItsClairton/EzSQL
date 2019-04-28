@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - ????-??-??
+
+### Added
+- `QueryResult#to()` and `QueryResult#toList()`.  
+- `Table#insert(Object)`, `Table#update(Object)` and `Table#delete(Object)`.  
+- `Table#insertAll(Object)`, `Table#deleteAll(Object)` and `Table#insertAll(Object)`.  
+- `WhereStatement#like()`.  
+- Exception Handler.  
+- `Table#dropReturningUpdatedLines()` and `Table#truncateReturningUpdatedLines()`.  
+- Annotations in the incomplete statements.  
+
+### Removed
+- The `Ez` classes prefix.  
+
+### Changed
+- The project structure. Now the SQL have their implementation in the module.  
+- The `DataType` and `Attribute` structure.  
+- The statements structure now, it's verbose less.  
+- Change port type to the primitive `int`.  
+- The unit tests.
+
+### Fixed
+- `SELECT *` queries.  
+
+### Deprecated
+- All the `ColumnBuilder()` constructors that use `String` as parameter.  
+
+### Security
+- Add column and table name checker to avoid SQL Injection.  
+
 ## [0.3.0] - 2018-12-15
 
 ### Added
