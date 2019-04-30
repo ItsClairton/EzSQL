@@ -14,7 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Exception Handler.  
 - `Table#dropReturningUpdatedLines()` and `Table#truncateReturningUpdatedLines()`.  
 - Warning annotations in the incomplete statements.  
-- 
+- `Table#count()` function.  
+- `Table#sum()` function.  
+- `Table#avg()` function.  
+- `QueryResult#getFirstColumn()` (and `#getFirstColumnAsTYPE()`) function.  
 
 ### Removed
 - The `Ez` classes prefix.  
