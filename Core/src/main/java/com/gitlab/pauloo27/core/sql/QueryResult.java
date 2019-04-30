@@ -173,4 +173,90 @@ public class QueryResult extends Result {
 
         return object;
     }
+
+    public int getFirstColumnAsInt(ExceptionHandler handler) {
+        try(ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getInt(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getFirstColumnAsInt() {
+        return getFirstColumnAsInt(null);
+    }
+
+    public long getFirstColumnAsLong(ExceptionHandler handler) {
+        try(ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getLong(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public long getFirstColumnAsLong() {
+        return getFirstColumnAsLong(null);
+    }
+
+    public boolean getFirstColumnAsBoolean(ExceptionHandler handler) {
+        try(ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getBoolean(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean getFirstColumnAsBoolean() {
+        return getFirstColumnAsBoolean(null);
+    }
+
+
+    public double getFirstColumnAsDouble(ExceptionHandler handler) {
+        try(ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getDouble(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public double getFirstColumnAsDouble() {
+        return getFirstColumnAsDouble(null);
+    }
+
+    public <T> T getFirstColumn(ExceptionHandler handler) {
+        try(ResultSet result = getResultSet()) {
+            if (result.next())
+                return (T) result.getObject(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return null;
+    }
+
+    public <T> T getFirstColumn() {
+        return getFirstColumn(null);
+    }
 }
