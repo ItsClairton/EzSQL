@@ -3,11 +3,65 @@ package com.gitlab.pauloo27.core.sql;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class Tests {
 
-    public void printAndAssert(String expected, String actual) {
-        System.out.println(actual);
+    public void printAndAssert(String expected, String actual, String message) {
+        if (message != null)
+            System.out.printf("[%s] ", message);
+        System.out.printf("%s > %s%n", expected, actual);
+
         Assert.assertEquals(expected, actual);
+    }
+
+    public void printAndAssert(String expected, String actual) {
+        printAndAssert(expected, actual, null);
+    }
+
+    @Test
+    public void testEntryChecker() {
+        Map<String, Boolean> values = new LinkedHashMap<>();
+        values.put("id", true);
+        values.put("name", true);
+
+        values.put("'id", false);
+        values.put("'id'", false);
+
+        values.put("COUNT(*)", true);
+        values.put("COUNT(id)", true);
+
+        values.put("COUNT(id')", false);
+        values.put("COUNT('id', name)", false);
+        values.put("COUNT()", false);
+
+        values.put("COUNT", true); // a column called COUNT
+
+        values.put("COUNT(", false);
+        values.put("COUNT)", false);
+        values.put("COUNT(!!!!!)", false);
+
+        values.put("COUNT(user_email)", true);
+
+        values.put("SUM()", false);
+        values.put("SUM(amount)", true);
+
+        values.put("AVG()", false);
+        values.put("AVG(amount)", true);
+
+        values.put("count(amount)", true);
+        values.put("cOUNt(amount)", true);
+
+        values.put("asd(amount)", false);
+        values.put("COUN(amount)", false);
+        values.put("COUNTSUM(amount)", false);
+
+
+
+        System.out.println("Testing the Entry Checker\n[value] expect > actual\n");
+        values.forEach((value, expected) -> printAndAssert(expected.toString(), String.valueOf(EzSQL.checkEntryName(value)), value));
+
     }
 
     @SuppressWarnings("deprecation")
