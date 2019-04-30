@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -234,6 +235,22 @@ public class Table {
     @CheckReturnValue
     public Select select() {
         return this.select("*");
+    }
+
+    public Select count(String columnsName) {
+        return this.select(String.format("COUNT(%s)", columnsName));
+    }
+
+    public Select count() {
+        return this.select("COUNT(*)");
+    }
+
+    public Select sum(String columnsName) {
+        return this.select(String.format("SUM(%s)", columnsName));
+    }
+
+    public Select avg(String columnsName) {
+        return this.select(String.format("AVG(%s)", columnsName));
     }
 
     /**

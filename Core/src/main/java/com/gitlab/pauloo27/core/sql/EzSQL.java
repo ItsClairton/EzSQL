@@ -94,6 +94,18 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * @return If the name contains only alphabetical characters and a dot or it's a asterisk.
      */
     public static boolean checkEntryName(String name) {
+        if (name.toLowerCase().matches("(avg|sum|count)\\([\\w|\'|\"|\\*]+\\)")) {
+            String method = name.toLowerCase().split("\\(")[0];
+            if (!name.toLowerCase().startsWith(method + "(") || !name.endsWith(")"))
+                return false;
+
+
+            // method.length() + 1 : the method plus a '('
+            String column = name.substring(method.length() + 1, name.length() - 1);
+
+            return checkEntryName(column);
+        }
+
         if (name.equals("*"))
             return true;
 
