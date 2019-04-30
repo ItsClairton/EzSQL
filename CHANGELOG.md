@@ -42,7 +42,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - `withDefaultValue(Object defaultValue, boolean asString)` function.
-- Javadoc deploy to the Gitlab pages in the Gitlab CI.
+- Javadoc deploy to the GitLab pages in the GitLab CI.
 - `INTERVAL` Data Type (from PostgreSQL).
 - `EzColumnBuilder(name, dataTypeName, attributes...)` constructor that use the data type name instead of a EzDataType.
 - `withCustomDriver(driverClass)` function.
@@ -81,13 +81,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `getValue()` function to `getLength()`.
 - `setOrderBy()` function to `orderBy()`.
 - `setLimit()` function to `limit()`.
-- `EzInsert` usage (see issue #5 for more information).
+- `EzInsert` usage (see issue #20 for more information).
 
 ### Deprecated
 - `toString()` function in all subclasses of `EzStatement`.
 
 ### Fixed
-- Type in the `registerDriver()` function name, from (`registerDrive()` to `registerDriver()`).
+- Typo in the `registerDriver()` function name, from (`registerDrive()` to `registerDriver()`).
 
 ### Removed
 - The type's id from `EzDataType`.
