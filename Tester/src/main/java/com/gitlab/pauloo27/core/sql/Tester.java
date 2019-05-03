@@ -68,7 +68,11 @@ public class Tester {
         if (friends.exists())
             friends.drop();
 
+        Assert.assertFalse(friends.exists());
+
         friends = sql.createIfNotExists(Friend.class);
+
+        Assert.assertTrue(friends.exists());
 
         long start = new Date().getTime();
 
@@ -146,6 +150,8 @@ public class Tester {
         if (friends.exists())
             friends.drop();
 
+        Assert.assertFalse(friends.exists());
+
         friends = sql.createIfNotExists(new TableBuilder("friends")
                 .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
                 .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 32, DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE))
@@ -157,6 +163,8 @@ public class Tester {
                         .withDefaultValue(Friend.FriendType.IRL.name())
                 )
         );
+
+        Assert.assertTrue(friends.exists());
 
         long start = new Date().getTime();
 
