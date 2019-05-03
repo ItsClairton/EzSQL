@@ -37,3 +37,6 @@ manifest.mf
 
 # Wiki
 *.wiki
+
+# trash
+*.hidden

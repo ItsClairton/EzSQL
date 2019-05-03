@@ -6,18 +6,17 @@ A library that lets you use SQL without writing queries.
 
 ## EzSQL has
 
-**Database and Tables Manager**: Manages your database and tables.<br>
-**Statements**: Insert data, read data, update data and delete data.<br>
-**The Same Code**: The same code will works with many SQL types.<br>
-**Join**: Uses join statements easily.<br>
-**Database, Table and Column Builder**: Builds databases, tables and columns.<br>
-**Attributes**: Sets attributes to the columns.<br>
-**SQL Injection**: Avoids SQL Injections.<br>
-**Result**: Manages queries and updates results.
-
+**Database and Tables Manager**: Manage your database and tables.  
+**Statements**: Insert, read, update and delete data.
+**Support to**: MySQL, MariaDB, SQLite and PostgreSQL.    
+**The Same Code**: The same code will work with all the supported types.  
+**Join**: Use join statements easily.  
+**Database, Table and Column Builder**: Build databases, tables and columns.  
+**SQL Injection**: Avoid SQL Injections.  
+**Java Object Support**: Use Java objects in instead of queries.  
 
 ## Wiki
-See the wiki: On Building  
+It's not done yet.  
 
 ## Changelog
 [See the CHANGELOG file](./CHANGELOG.md).
