@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ public class Table {
      * @param sql  The SQL.
      * @param name The table's name.
      */
-
     public Table(EzSQL<Database, Table> sql, String name) {
         Preconditions.checkArgument(EzSQL.checkEntryName(name), name + " is not a valid name");
         this.name = name;
@@ -214,7 +212,7 @@ public class Table {
     }
 
     /**
-     * Selects the values from the table.
+     * Selects the table's values.
      *
      * @param columnsName The columns to select name.
      *
@@ -226,7 +224,7 @@ public class Table {
     }
 
     /**
-     * Selects the values from the table. Is the same that use {@code #select("*")}.
+     * Selects the table's values. It's the same that {@code #select("*")}.
      *
      * @return The select statement.
      *
@@ -237,20 +235,50 @@ public class Table {
         return this.select("*");
     }
 
-    public Select count(String columnsName) {
-        return this.select(String.format("COUNT(%s)", columnsName));
+    /**
+     * Counts the table's values. It's the same that {@code #select("COUNT(columnName)")}. You can use {@link
+     * QueryResult#getFirstColumnAsLong()} to the result.
+     *
+     * @param columnName The column to count if it's not null or {@code *} to count all the rows.
+     *
+     * @return The select statement.
+     */
+    public Select count(String columnName) {
+        return this.select(String.format("COUNT(%s)", columnName));
     }
 
+    /**
+     * Counts the values from the table. It's the same that {@code #count("*")} and {@code #select("COUNT(*)")}. You can
+     * use {@link QueryResult#getFirstColumnAsLong()} to the result.
+     *
+     * @return The select statement.
+     */
     public Select count() {
         return this.select("COUNT(*)");
     }
 
-    public Select sum(String columnsName) {
-        return this.select(String.format("SUM(%s)", columnsName));
+    /**
+     * Sums the table's values. It's the same that {@code #select("SUM(columnName)")}. You can use {@link
+     * QueryResult#getFirstColumnAsLong()} to the result.
+     *
+     * @param columnName The column to sum.
+     *
+     * @return The select statement.
+     */
+    public Select sum(String columnName) {
+        return this.select(String.format("SUM(%s)", columnName));
     }
 
-    public Select avg(String columnsName) {
-        return this.select(String.format("AVG(%s)", columnsName));
+    /**
+     * Gets the average of the table's values. It's the same that {@code #select("AVG(columnName)")}. You can use {@link
+     * QueryResult#getFirstColumnAsDouble()} to the result.
+     *
+     * @param columnName The column to avg.
+     *
+     * @return The select statement.
+     */
+    public Select avg(String columnName) {
+        return this.select(String.format("AVG(%s)", columnName));
     }
 
     /**

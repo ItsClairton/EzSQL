@@ -174,77 +174,16 @@ public class QueryResult extends Result {
         return object;
     }
 
-    public int getFirstColumnAsInt(ExceptionHandler handler) {
-        try(ResultSet result = getResultSet()) {
-            if (result.next())
-                return result.getInt(1);
-        } catch (SQLException e) {
-            if (handler != null)
-                handler.onException(e);
-            else
-                e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public int getFirstColumnAsInt() {
-        return getFirstColumnAsInt(null);
-    }
-
-    public long getFirstColumnAsLong(ExceptionHandler handler) {
-        try(ResultSet result = getResultSet()) {
-            if (result.next())
-                return result.getLong(1);
-        } catch (SQLException e) {
-            if (handler != null)
-                handler.onException(e);
-            else
-                e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public long getFirstColumnAsLong() {
-        return getFirstColumnAsLong(null);
-    }
-
-    public boolean getFirstColumnAsBoolean(ExceptionHandler handler) {
-        try(ResultSet result = getResultSet()) {
-            if (result.next())
-                return result.getBoolean(1);
-        } catch (SQLException e) {
-            if (handler != null)
-                handler.onException(e);
-            else
-                e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean getFirstColumnAsBoolean() {
-        return getFirstColumnAsBoolean(null);
-    }
-
-
-    public double getFirstColumnAsDouble(ExceptionHandler handler) {
-        try(ResultSet result = getResultSet()) {
-            if (result.next())
-                return result.getDouble(1);
-        } catch (SQLException e) {
-            if (handler != null)
-                handler.onException(e);
-            else
-                e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public double getFirstColumnAsDouble() {
-        return getFirstColumnAsDouble(null);
-    }
-
+    /**
+     * Gets the first row/column of the query result.
+     *
+     * @param handler The exception handler.
+     * @param <T>     The object type.
+     *
+     * @return The first column/row value.
+     */
     public <T> T getFirstColumn(ExceptionHandler handler) {
-        try(ResultSet result = getResultSet()) {
+        try (ResultSet result = getResultSet()) {
             if (result.next())
                 return (T) result.getObject(1);
         } catch (SQLException e) {
@@ -256,7 +195,141 @@ public class QueryResult extends Result {
         return null;
     }
 
+    /**
+     * Gets the first row/column of the query result with the default exception handler.
+     *
+     * @param <T> The object type.
+     *
+     * @return The first column/row value.
+     *
+     * @see #getFirstColumn(ExceptionHandler) to use a custom handler.
+     */
     public <T> T getFirstColumn() {
         return getFirstColumn(null);
     }
+
+    /**
+     * Gets the first row/column of the query result as an int.
+     *
+     * @param handler The exception handler.
+     *
+     * @return The first column/row value as an int.
+     */
+    public int getFirstColumnAsInt(ExceptionHandler handler) {
+        try (ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getInt(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the first row/column of the query result as an int with the default exception handler.
+     *
+     * @return The first column/row value as an int.
+     *
+     * @see #getFirstColumnAsInt(ExceptionHandler) to use a custom handler.
+     */
+    public int getFirstColumnAsInt() {
+        return getFirstColumnAsInt(null);
+    }
+
+    /**
+     * Gets the first row/column of the query result as a long.
+     *
+     * @param handler The exception handler.
+     *
+     * @return The first column/row value as a long.
+     */
+    public long getFirstColumnAsLong(ExceptionHandler handler) {
+        try (ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getLong(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the first row/column of the query result as a long with the default exception handler.
+     *
+     * @return The first column/row value as a long.
+     *
+     * @see #getFirstColumnAsLong(ExceptionHandler) to use a custom handler.
+     */
+    public long getFirstColumnAsLong() {
+        return getFirstColumnAsLong(null);
+    }
+
+    /**
+     * Gets the first row/column of the query result as a boolean.
+     *
+     * @param handler The exception handler.
+     *
+     * @return The first column/row value as a boolean.
+     */
+    public boolean getFirstColumnAsBoolean(ExceptionHandler handler) {
+        try (ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getBoolean(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Gets the first row/column of the query result as a boolean with the default exception handler.
+     *
+     * @return The first column/row value as a boolean.
+     *
+     * @see #getFirstColumnAsLong(ExceptionHandler) to use a custom handler.
+     */
+    public boolean getFirstColumnAsBoolean() {
+        return getFirstColumnAsBoolean(null);
+    }
+
+    /**
+     * Gets the first row/column of the query result as a double.
+     *
+     * @param handler The exception handler.
+     *
+     * @return The first column/row value as a double.
+     */
+    public double getFirstColumnAsDouble(ExceptionHandler handler) {
+        try (ResultSet result = getResultSet()) {
+            if (result.next())
+                return result.getDouble(1);
+        } catch (SQLException e) {
+            if (handler != null)
+                handler.onException(e);
+            else
+                e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the first row/column of the query result as a double with the default exception handler.
+     *
+     * @return The first column/row value as a double.
+     *
+     * @see #getFirstColumnAsLong(ExceptionHandler) to use a custom handler.
+     */
+    public double getFirstColumnAsDouble() {
+        return getFirstColumnAsDouble(null);
+    }
+
 }

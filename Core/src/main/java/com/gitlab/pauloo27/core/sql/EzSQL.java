@@ -87,11 +87,13 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
 
     /**
      * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection. Uses a
-     * regex that checks if the string is only of alphabetical characters ({@code \w*}).
+     * regex that checks if the string is only of alphabetical characters ({@code \w*}) and a dot, an asterisk or a
+     * {@code AVG, SUM or COUNT} call.
      *
      * @param name The string to check.
      *
-     * @return If the name contains only alphabetical characters and a dot or it's a asterisk.
+     * @return If the string is only of alphabetical characters ({@code \w*}) and a dot, an asterisk or a {@code AVG,
+     * SUM or COUNT} call.
      */
     public static boolean checkEntryName(String name) {
         if (name.toLowerCase().matches("(avg|sum|count)\\([\\w|\'|\"|\\*]+\\)")) {
