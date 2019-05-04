@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Table#sum()` function.  
 - `Table#avg()` function.  
 - `QueryResult#getFirstColumn()` (and `#getFirstColumnAsTYPE()`) function.  
+- `StatementBase#executeThrowing()` function.  
+- `EzSQL#executeUnsafeStatementQuery()` function.  
 
 ### Removed
 - The `Ez` classes prefix.  
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - The statements structure now, it's verbose less.  
 - Change port type to the primitive `int`.  
 - The unit tests.
+- The `EzSQL#executeStatementAndClose()` function name to `executeUnsafeStatementAndClose()`.  
 
 ### Fixed
 - `SELECT *` queries.  
