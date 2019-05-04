@@ -81,7 +81,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      *
      * @return The base statement converted to SQL.
      *
-     * @deprecated Use a `build()` method of EzSQL to build the subclasses of EzStatement.
+     * @deprecated Use a `build()` method of EzSQL to build the subclasses of Statement.
      */
     @Override
     @Deprecated
@@ -100,7 +100,7 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
     public ResultType execute(ExceptionHandler handler) {
         Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
         try {
-            return getResultType();
+            return this.getResultType();
         } catch (SQLException e) {
             if (handler == null)
                 e.printStackTrace();
@@ -117,6 +117,18 @@ public abstract class StatementBase<Statement extends StatementBase, ResultType 
      */
     public ResultType execute() {
         return execute(null);
+    }
+
+    /**
+     * Executes the statement throwing the exception instead of using the {@link ExceptionHandler}.
+     *
+     * @return The statement result.
+     *
+     * @throws SQLException Problems to run statement.
+     */
+    public ResultType executeThrowing() throws SQLException {
+        Preconditions.checkState(sql.isConnected(), new SQLException("Not connected."));
+        return this.getResultType();
     }
 
     /**

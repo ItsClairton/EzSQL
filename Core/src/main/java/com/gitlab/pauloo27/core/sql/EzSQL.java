@@ -87,13 +87,27 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
 
     /**
      * Checks if a entry name is valid. Used to protect the column, table and database names from SQL Injection. Uses a
-     * regex that checks if the string is only of alphabetical characters ({@code \w*}).
+     * regex that checks if the string is only of alphabetical characters ({@code \w*}) and a dot, an asterisk or a
+     * {@code AVG, SUM or COUNT} call.
      *
      * @param name The string to check.
      *
-     * @return If the name contains only alphabetical characters and a dot or it's a asterisk.
+     * @return If the string is only of alphabetical characters ({@code \w*}) and a dot, an asterisk or a {@code AVG,
+     * SUM or COUNT} call.
      */
     public static boolean checkEntryName(String name) {
+        if (name.toLowerCase().matches("(avg|sum|count)\\([\\w|\'|\"|\\*]+\\)")) {
+            String method = name.toLowerCase().split("\\(")[0];
+            if (!name.toLowerCase().startsWith(method + "(") || !name.endsWith(")"))
+                return false;
+
+
+            // method.length() + 1 : the method plus a '('
+            String column = name.substring(method.length() + 1, name.length() - 1);
+
+            return checkEntryName(column);
+        }
+
         if (name.equals("*"))
             return true;
 
@@ -293,7 +307,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public DatabaseType getCurrentDatabase() throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        return getDatabaseByName(this.getConnection().getCatalog());
+        return this.getDatabaseByName(this.getConnection().getCatalog());
     }
 
     /**
@@ -307,7 +321,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public EzSQL<DatabaseType, TableType> changeDatabase(DatabaseType database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("USE %s", database.getName());
+        this.executeUnsafeStatementAndClose("USE %s", database.getName());
         return this;
     }
 
@@ -427,9 +441,23 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * @throws SQLException Error to create the statement.
      */
     public PreparedStatement prepareStatement(String statement, Object... values) throws SQLException {
-        PreparedStatement stmt = getConnection().prepareStatement(statement);
-        setValuesObjects(stmt, new AtomicInteger(), Arrays.asList(values));
+        PreparedStatement stmt = this.getConnection().prepareStatement(statement);
+        this.setValuesObjects(stmt, new AtomicInteger(), Arrays.asList(values));
         return stmt;
+    }
+
+    /**
+     * Builds a non-PreparedStatement in inline using {@link String#format(String, Object...)}.
+     *
+     * @param statement The SQL statement.
+     * @param values    The array os values.
+     *
+     * @return The built Statement.
+     *
+     * @throws SQLException Error to create the statement.
+     */
+    public ResultSet executeUnsafeStatementQuery(String statement, Object... values) throws SQLException {
+        return this.getConnection().createStatement().executeQuery(String.format(statement, values));
     }
 
     /**
@@ -441,7 +469,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      *
      * @throws SQLException Error to create or run the statement.
      */
-    public void executeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
+    public void executeUnsafeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
         Statement stmt = connection.createStatement();
         stmt.execute(String.format(statement, unsafeValues));
         stmt.close();
@@ -588,7 +616,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public TableType createIfNotExists(TableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(this));
+        this.executeUnsafeStatementAndClose("CREATE TABLE IF NOT EXISTS %s (%s)", table.getName(), table.toSQL(this));
         return getTableByName(table.getName());
     }
 
@@ -771,7 +799,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public DatabaseType createIfNotExists(DatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("CREATE DATABASE IF NOT EXISTS %s", database.getName());
+        this.executeUnsafeStatementAndClose("CREATE DATABASE IF NOT EXISTS %s", database.getName());
         return getDatabaseByName(database.getName());
     }
 
@@ -804,7 +832,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public TableType create(TableBuilder table) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("CREATE TABLE %s (%s);", table.getName(), table.toSQL(this));
+        this.executeUnsafeStatementAndClose("CREATE TABLE %s (%s);", table.getName(), table.toSQL(this));
         return getTableByName(table.getName());
     }
 
@@ -819,7 +847,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public DatabaseType create(DatabaseBuilder database) throws SQLException {
         if (!this.isConnected()) throw new SQLException("Not connected");
-        this.executeStatementAndClose("CREATE DATABASE %s", database.getName());
+        this.executeUnsafeStatementAndClose("CREATE DATABASE %s", database.getName());
         return getDatabaseByName(database.getName());
     }
 

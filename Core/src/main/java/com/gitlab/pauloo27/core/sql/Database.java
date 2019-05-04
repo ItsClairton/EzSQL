@@ -2,7 +2,7 @@ package com.gitlab.pauloo27.core.sql;
 
 import com.google.common.base.Preconditions;
 
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -53,9 +53,8 @@ public class Database {
      */
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        try (PreparedStatement statement = sql.getConnection().prepareStatement(String.format("SHOW DATABASES LIKE '%s';", this.getName()))) {
-            QueryResult result = new QueryResult(sql, statement);
-            return result.getResultSet().next();
+        try (ResultSet rs = sql.executeUnsafeStatementQuery("SHOW DATABASES LIKE '%s';", this.getName())) {
+            return rs.next();
         }
     }
 
@@ -66,7 +65,7 @@ public class Database {
      */
     public void drop() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
-        sql.getConnection().prepareStatement(String.format("DROP DATABASE %s;", this.getName())).execute();
+        sql.executeUnsafeStatementAndClose("DROP DATABASE %s;", this.getName());
     }
 
 }

@@ -1,6 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -23,17 +22,27 @@ public class SQLiteTable extends Table {
 
     @Override
     public void truncate() throws SQLException {
-        sql.executeStatementAndClose("DELETE FROM %s", getName());
+        sql.executeUnsafeStatementAndClose("DELETE FROM %s", getName());
     }
 
     @Override
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        // TODO Change to EzTable#count when it's implemented
-        try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?;", getName()).executeQuery()) {
-            if (result.next())
-                return result.getInt(1) == 1;
+        // TO DO Change to EzTable#count when it's implemented
+//        try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?;", getName()).executeQuery()) {
+//            if (result.next())
+//                return result.getInt(1) == 1;
+//        }
+//        return false;
+
+        try {
+            return sql.getTable("sqlite_master")
+                    .count()
+                    .where().equals("type", "table")
+                    .and().equals("name", this.getName())
+                    .execute().getFirstColumnAsInt() == 1;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 }

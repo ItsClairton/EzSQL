@@ -1,6 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -31,12 +30,10 @@ public class PostgreSQLTable extends Table {
     @Override
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        // TODO Change to EzTable#count when it's implemented
-        try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM pg_catalog.pg_tables WHERE tablename = ?;", getName()).executeQuery()) {
-            if (result.next())
-                return result.getInt(1) == 1;
-        }
-        return false;
+        return sql.getTable("pg_catalog.pg_tables")
+                .count()
+                .where().equals("tablename", this.getName())
+                .executeThrowing().getFirstColumnAsInt() == 1;
     }
 
     /**

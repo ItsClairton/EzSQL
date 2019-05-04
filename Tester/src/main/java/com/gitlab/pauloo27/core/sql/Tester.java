@@ -3,6 +3,7 @@ package com.gitlab.pauloo27.core.sql;
 import org.junit.Assert;
 
 import java.sql.ResultSet;
+import com.gitlab.pauloo27.core.sql.StatementBase.OrderByType;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -49,6 +50,17 @@ public class Tester {
 
     }
 
+    private static void countSumAndAvg(Table friends) {
+        System.out.println("Testing with COUNT");
+        Assert.assertEquals(2, friends.count().execute().getFirstColumnAsInt());
+
+        System.out.println("Testing with SUM");
+        Assert.assertEquals(42, friends.sum("age").execute().getFirstColumnAsInt());
+
+        System.out.println("Testing with AVG");
+        Assert.assertEquals(21, friends.avg("age").execute().getFirstColumnAsDouble(), 0);
+    }
+
     private static void testTableWithObject(EzSQL sql) throws SQLException {
         System.out.println("Testing with Objects");
         Table friends = sql.getTable("friends");
@@ -56,13 +68,19 @@ public class Tester {
         if (friends.exists())
             friends.drop();
 
+        Assert.assertFalse(friends.exists());
+
         friends = sql.createIfNotExists(Friend.class);
+
+        Assert.assertTrue(friends.exists());
 
         long start = new Date().getTime();
 
         insertDataWithObject(friends);
 
         checkDataWithObject(friends);
+
+        countSumAndAvg(friends);
 
         updateWithObject(friends);
 
@@ -80,6 +98,7 @@ public class Tester {
 
         friends.insertAll(john, mary).executeAndClose();
 
+        System.out.println("Testing default handler");
         // Handle Exception (should print "Duplicate Key" error)
         Friend test = friends.select().where()
                 .equals("id", 1).execute()
@@ -131,6 +150,8 @@ public class Tester {
         if (friends.exists())
             friends.drop();
 
+        Assert.assertFalse(friends.exists());
+
         friends = sql.createIfNotExists(new TableBuilder("friends")
                 .withColumn(new ColumnBuilder("id", DefaultDataTypes.PRIMARY_KEY))
                 .withColumn(new ColumnBuilder("name", DefaultDataTypes.VARCHAR, 32, DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE))
@@ -143,11 +164,15 @@ public class Tester {
                 )
         );
 
+        Assert.assertTrue(friends.exists());
+
         long start = new Date().getTime();
 
         insertDataWithBuilder(friends);
 
         checkDataWithBuilder(friends);
+
+        countSumAndAvg(friends);
 
         updateDataAndCheckWithBuilder(friends);
 
