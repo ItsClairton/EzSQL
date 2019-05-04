@@ -1,6 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -23,7 +22,7 @@ public class SQLiteTable extends Table {
 
     @Override
     public void truncate() throws SQLException {
-        sql.executeStatementAndClose("DELETE FROM %s", getName());
+        sql.executeUnsafeStatementAndClose("DELETE FROM %s", getName());
     }
 
     @Override

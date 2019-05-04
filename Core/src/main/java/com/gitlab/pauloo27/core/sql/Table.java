@@ -49,20 +49,10 @@ public class Table {
      */
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
-        // TO DO Change to Table#count when it's implemented
-//        try (ResultSet result = sql.prepareStatement("SELECT COUNT(*) FROM information_schema.tables where table_name = ?;", getName()).executeQuery()) {
-//            if (result.next())
-//                return result.getInt(1) == 1;
-//        }
-//        return false;
-        try {
-            return sql.getTable("information_schema.tables")
-                .count()
-                .where().equals("table_name", this.getName())
-                .execute().getFirstColumnAsInt() == 1;
-        } catch (Exception e) {
-            return false;
-        }
+        return sql.getTable("information_schema.tables")
+            .count()
+            .where().equals("table_name", this.getName())
+            .executeThrowing().getFirstColumnAsInt() == 1;
     }
 
     /**
