@@ -3,9 +3,10 @@ package com.gitlab.pauloo27.core.sql;
 import org.junit.Assert;
 
 import java.sql.ResultSet;
-import com.gitlab.pauloo27.core.sql.StatementBase.OrderByType;
 import java.sql.SQLException;
 import java.util.Date;
+
+import static com.gitlab.pauloo27.core.sql.Friend.FriendType;
 
 public class Tester {
 
@@ -93,8 +94,8 @@ public class Tester {
     private static Friend mary;
 
     private static void insertDataWithObject(Table friends) {
-        john = new Friend("John Doe", 21, "321", "johndoe@example.com", Friend.FriendType.IRL);
-        mary = new Friend("Mary Doe", 21, "221", "marydoe@example.com", Friend.FriendType.WEB_FRIEND);
+        john = new Friend("John Doe", 21, "321", "johndoe@example.com", FriendType.IRL);
+        mary = new Friend("Mary Doe", 21, "221", "marydoe@example.com", FriendType.WEB_FRIEND);
 
         friends.insertAll(john, mary).executeAndClose();
 
@@ -159,7 +160,7 @@ public class Tester {
                 .withColumn(new ColumnBuilder("age", DefaultDataTypes.INTEGER, DefaultAttributes.NOT_NULL))
                 .withColumn(new ColumnBuilder("email", DefaultDataTypes.VARCHAR, 64, DefaultAttributes.NOT_NULL, DefaultAttributes.UNIQUE)
                         .withDefaultValue("No e-mail")
-                ).withColumn(new ColumnBuilder("type", DefaultDataTypes.VARCHAR, 10, DefaultAttributes.NOT_NULL)
+                ).withColumn(new ColumnBuilder("friend_type", DefaultDataTypes.VARCHAR, 10, DefaultAttributes.NOT_NULL)
                         .withDefaultValue(Friend.FriendType.IRL.name())
                 )
         );
@@ -184,7 +185,7 @@ public class Tester {
 
     private static void insertDataWithBuilder(Table friends) {
         friends.insert(
-                "name, age, phone, email, type",
+                "name, age, phone, email, friend_type",
                 "John Doe", 21, "321", "johndoe@example.com", Friend.FriendType.IRL.name(),
                 "Mary Doe", 21, "221", "marydoe@example.com", Friend.FriendType.WEB_FRIEND.name()
         ).executeAndClose();
