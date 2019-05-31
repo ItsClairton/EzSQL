@@ -14,11 +14,14 @@ class ReflectionUtils {
      *
      * @return The value of the {@link Name} annotation or the field name if it's absent.
      */
-    public static String getName(Field field) {
+    public static String getName(NameConverter nameConverter, Field field) {
         if (field.isAnnotationPresent(Name.class))
             return field.getAnnotation(Name.class).value();
 
-        return field.getName();
+        if (nameConverter == null)
+            return field.getName();
+        else
+            return nameConverter.convertColumnName(field.getName());
     }
 
     /**
@@ -51,11 +54,15 @@ class ReflectionUtils {
      *
      * @return The value of the {@link Name} annotation or the class name if it's absent.
      */
-    public static <T> String getName(Class<T> clazz) {
+    public static <T> String getName(NameConverter nameConverter, Class<T> clazz) {
         if (clazz.isAnnotationPresent(Name.class))
             return clazz.getAnnotation(Name.class).value();
 
-        return clazz.getSimpleName();
+        if (nameConverter == null)
+            return clazz.getSimpleName();
+        else
+            return nameConverter.convertTableName(clazz.getSimpleName());
+
     }
 
     /**

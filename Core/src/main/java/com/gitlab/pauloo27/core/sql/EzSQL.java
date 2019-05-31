@@ -79,6 +79,8 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     protected String customDriverClass;
 
+    protected NameConverter nameConverter = new DefaultNameConverter();
+
     /**
      * Builds the EzSQL.
      */
@@ -134,6 +136,15 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         this.address = address;
         this.port = port;
         return this;
+    }
+
+    public EzSQL<DatabaseType, TableType> withNameConverter(NameConverter nameConverter) {
+        this.nameConverter = nameConverter;
+        return this;
+    }
+
+    public NameConverter getNameConverter() {
+        return nameConverter;
     }
 
     /**
@@ -737,7 +748,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * @throws SQLException Problems to execute the statement.
      */
     public <T> TableType createIfNotExists(Class<T> clazz) throws SQLException {
-        String tableName = ReflectionUtils.getName(clazz);
+        String tableName = ReflectionUtils.getName(nameConverter, clazz);
 
         TableBuilder tableBuilder = new TableBuilder(tableName);
 
@@ -770,7 +781,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
             });
 
             try {
-                String columnName = ReflectionUtils.getName(field);
+                String columnName = ReflectionUtils.getName(nameConverter, field);
 
                 Object defaultValue = null;
                 if (!field.getType().isPrimitive() || field.isAnnotationPresent(DefaultValue.class)) {

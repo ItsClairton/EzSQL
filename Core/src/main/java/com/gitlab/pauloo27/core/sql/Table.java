@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 
 import java.lang.reflect.Field;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,7 +166,7 @@ public class Table {
                 return;
 
             try {
-                String name = ReflectionUtils.getName(field);
+                String name = ReflectionUtils.getName(sql.getNameConverter(), field);
                 Object value = field.get(object);
 
                 if (value == null)
@@ -301,9 +300,7 @@ public class Table {
     public <T> Update update(T object) {
         Class<T> clazz = (Class<T>) object.getClass();
 
-        Field idField = Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst().orElse(null);
+        Field idField = getIdField(clazz);
 
         Preconditions.checkNotNull(idField);
 
@@ -325,7 +322,7 @@ public class Table {
                 if (ReflectionUtils.isIgnored(field))
                     return;
 
-                String name = ReflectionUtils.getName(field);
+                String name = ReflectionUtils.getName(sql.getNameConverter(), field);
 
                 Object value = null;
                 try {
@@ -392,7 +389,7 @@ public class Table {
      */
     private <T> Field getIdField(Class<T> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class))
+                .filter(ReflectionUtils::isId)
                 .findFirst().orElse(null);
     }
 
