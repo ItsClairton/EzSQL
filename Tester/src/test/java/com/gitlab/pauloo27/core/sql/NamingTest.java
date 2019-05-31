@@ -45,7 +45,7 @@ public class NamingTest {
 
 
         System.out.println("Testing the Default Name Converter\n[value] expect > actual\n");
-        values.forEach((value, expected) -> Tests.printAndAssert(expected, String.valueOf(a.convertColumnName(value)), value));
+        values.forEach((value, expected) -> Tests.printAndAssert(expected, String.valueOf(a.toColumnName(value)), value));
     }
 
 }

@@ -21,7 +21,7 @@ class ReflectionUtils {
         if (nameConverter == null)
             return field.getName();
         else
-            return nameConverter.convertColumnName(field.getName());
+            return nameConverter.toColumnName(field.getName());
     }
 
     /**
@@ -61,7 +61,7 @@ class ReflectionUtils {
         if (nameConverter == null)
             return clazz.getSimpleName();
         else
-            return nameConverter.convertTableName(clazz.getSimpleName());
+            return nameConverter.toTableName(clazz.getSimpleName());
 
     }
 

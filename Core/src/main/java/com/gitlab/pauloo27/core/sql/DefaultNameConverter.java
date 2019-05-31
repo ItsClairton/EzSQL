@@ -6,12 +6,12 @@ import java.util.regex.Pattern;
 public class DefaultNameConverter implements NameConverter {
 
     @Override
-    public String convertTableName(String className) {
+    public String toTableName(String className) {
         return toSnakeCase(className);
     }
 
     @Override
-    public String convertColumnName(String fieldName) {
+    public String toColumnName(String fieldName) {
         return toSnakeCase(fieldName);
     }
 
