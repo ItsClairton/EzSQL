@@ -43,7 +43,7 @@ class ReflectionUtils {
      * @return If the {@link Id} annotation is present.
      */
     public static boolean isId(Field field) {
-        return field.isAnnotationPresent(Id.class);
+        return field.isAnnotationPresent(Id.class) || field.getName().equalsIgnoreCase("id");
     }
 
     /**
