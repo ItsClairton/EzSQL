@@ -23,10 +23,18 @@
     </modules>
 
     <dependencies>
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.1-jre</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <!-- use the same in the tester -->
             <version>4.12</version>
             <scope>test</scope>
         </dependency>

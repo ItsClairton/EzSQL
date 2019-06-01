@@ -13,18 +13,18 @@
     <name>EzSQL-PostgreSQL</name>
 
     <dependencies>
+        <!-- PostgreSQL Driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.5</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- EzSQL -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>ezsql</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-        <!-- PostgreSQL Driver -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.2</version>
-            <scope>compile</scope>
         </dependency>
         <!-- EzSQL Tester -->
         <dependency>

@@ -13,18 +13,18 @@
     <name>EzSQL-MariaDB</name>
 
     <dependencies>
+        <!-- MariaDB Driver -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.4.1</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- EzSQL -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>ezsql</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-        <!-- MariaDB Driver -->
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>2.2.3</version>
-            <scope>compile</scope>
         </dependency>
         <!-- EzSQL Tester -->
         <dependency>

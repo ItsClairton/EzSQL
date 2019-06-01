@@ -13,13 +13,6 @@
     <name>EzSQL-Core</name>
 
     <dependencies>
-        <!-- Guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>21.0</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Annotations -->
         <dependency>
             <groupId>findbugs</groupId>

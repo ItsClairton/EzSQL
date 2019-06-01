@@ -14,13 +14,6 @@
     <description>The modules tests base</description>
 
     <dependencies>
-        <!-- Guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>21.0</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- EzSQL Core -->
         <dependency>
             <groupId>com.gitlab.pauloo27</groupId>
@@ -32,6 +25,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <!-- use the same in the parent -->
             <version>4.12</version>
             <scope>provided</scope>
         </dependency>
