@@ -307,7 +307,7 @@ public class WhereCondition<Statement extends StatementBase> {
          * Builds a Where Condition.
          *
          * @param columnName The column name.
-         * @param whereType The where type.
+         * @param whereType  The where type.
          */
         public Where(String columnName, WhereType whereType) {
             Preconditions.checkArgument(whereType == WhereType.NOT_NULL || whereType == WhereType.NULL,

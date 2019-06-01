@@ -14,16 +14,6 @@ import java.util.regex.Pattern;
  */
 public class DefaultNameConverter implements NameConverter {
 
-    @Override
-    public String toTableName(String className) {
-        return toSnakeCase(className);
-    }
-
-    @Override
-    public String toColumnName(String fieldName) {
-        return toSnakeCase(fieldName);
-    }
-
     /**
      * Converts a String from camel case to snake case.
      *
@@ -54,5 +44,15 @@ public class DefaultNameConverter implements NameConverter {
         }
 
         return convertedString.toString();
+    }
+
+    @Override
+    public String toTableName(String className) {
+        return toSnakeCase(className);
+    }
+
+    @Override
+    public String toColumnName(String fieldName) {
+        return toSnakeCase(fieldName);
     }
 }

@@ -19,33 +19,48 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class EzSQL<DatabaseType extends Database, TableType extends Table> {
 
     /**
-     * The Data Type by the Object.
+     * The default Data Type.
      */
-    private Map<Class<?>, DataType> typesByClass = new HashMap<>();
-
+    private static DataType DEFAULT_DATATYPE = new DataType(
+            "VARCHAR",
+            DefaultAttributes.getDefaultAttributes(),
+            null,
+            "DEFAULT_DATATYPE"
+    );
     /**
-     * A map of the serializers.
+     * The default enum serializer.
      */
-    private Map<Class, DataSerializer> typeSerializer = new HashMap<>();
+    private static DataType ENUM_NAME = new DataType(
+            "VARCHAR",
+            DefaultAttributes.getDefaultAttributes(),
+            null,
+            "ENUM_NAME"
+    );
+    /**
+     * The default data serializer.
+     */
+    private static DataSerializer DEFAULT_DATA_SERIALIZER = new DataSerializer<>(
+            object -> {
+                if (object == null)
+                    return null;
 
-    {
-        registerDataType(String.class, DefaultDataTypes.VARCHAR);
+                if (object.getClass().isEnum()) {
+                    return ((Enum) object).name();
+                }
 
-        registerDataType(byte.class, DefaultDataTypes.TINYINT);
-        registerDataType(short.class, DefaultDataTypes.SMALLINT);
-        registerDataType(int.class, DefaultDataTypes.INTEGER);
-        registerDataType(long.class, DefaultDataTypes.BIGINT);
+                return object;
+            },
 
-        registerDataType(float.class, DefaultDataTypes.FLOAT);
-        registerDataType(double.class, DefaultDataTypes.DOUBLE);
+            (clazz, object) -> {
+                if (clazz.isEnum())
+                    return Arrays.stream(clazz.getEnumConstants())
+                            .filter(member -> ((Enum) member).name().equals(object))
+                            .findFirst()
+                            .orElse(null);
 
-        registerDataType(boolean.class, DefaultDataTypes.BOOLEAN);
-
-        registerDataType(char.class, DefaultDataTypes.CHAR);
-
-        registerDataType(Date.class, DefaultDataTypes.DATE);
-    }
-
+                return object;
+            }
+    );
     /**
      * The SQL connection.
      */
@@ -83,6 +98,32 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      * The name converter used to convert the models (class and field) name to SQL.
      */
     protected NameConverter nameConverter = new DefaultNameConverter();
+    /**
+     * The Data Type by the Object.
+     */
+    private Map<Class<?>, DataType> typesByClass = new HashMap<>();
+    /**
+     * A map of the serializers.
+     */
+    private Map<Class, DataSerializer> typeSerializer = new HashMap<>();
+
+    {
+        registerDataType(String.class, DefaultDataTypes.VARCHAR);
+
+        registerDataType(byte.class, DefaultDataTypes.TINYINT);
+        registerDataType(short.class, DefaultDataTypes.SMALLINT);
+        registerDataType(int.class, DefaultDataTypes.INTEGER);
+        registerDataType(long.class, DefaultDataTypes.BIGINT);
+
+        registerDataType(float.class, DefaultDataTypes.FLOAT);
+        registerDataType(double.class, DefaultDataTypes.DOUBLE);
+
+        registerDataType(boolean.class, DefaultDataTypes.BOOLEAN);
+
+        registerDataType(char.class, DefaultDataTypes.CHAR);
+
+        registerDataType(Date.class, DefaultDataTypes.DATE);
+    }
 
     /**
      * Builds the EzSQL.
@@ -647,26 +688,6 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
     }
 
     /**
-     * The default Data Type.
-     */
-    private static DataType DEFAULT_DATATYPE = new DataType(
-            "VARCHAR",
-            DefaultAttributes.getDefaultAttributes(),
-            null,
-            "DEFAULT_DATATYPE"
-    );
-
-    /**
-     * The default enum serializer.
-     */
-    private static DataType ENUM_NAME = new DataType(
-            "VARCHAR",
-            DefaultAttributes.getDefaultAttributes(),
-            null,
-            "ENUM_NAME"
-    );
-
-    /**
      * Register a new data type.
      *
      * @param clazz    The class type.
@@ -692,32 +713,6 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         typeSerializer.put(clazz, serializer);
         return this;
     }
-
-    /**
-     * The default data serializer.
-     */
-    private static DataSerializer DEFAULT_DATA_SERIALIZER = new DataSerializer<>(
-            object -> {
-                if (object == null)
-                    return null;
-
-                if (object.getClass().isEnum()) {
-                    return ((Enum) object).name();
-                }
-
-                return object;
-            },
-
-            (clazz, object) -> {
-                if (clazz.isEnum())
-                    return Arrays.stream(clazz.getEnumConstants())
-                            .filter(member -> ((Enum) member).name().equals(object))
-                            .findFirst()
-                            .orElse(null);
-
-                return object;
-            }
-    );
 
     /**
      * Gets the data type by the class. The default data type is {@link #DEFAULT_DATATYPE}.

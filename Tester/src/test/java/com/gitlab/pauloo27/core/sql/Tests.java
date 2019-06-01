@@ -58,7 +58,6 @@ public class Tests {
         values.put("COUNTSUM(amount)", false);
 
 
-
         System.out.println("Testing the Entry Checker\n[value] expect > actual\n");
         values.forEach((value, expected) -> printAndAssert(expected.toString(), String.valueOf(EzSQL.checkEntryName(value)), value));
 

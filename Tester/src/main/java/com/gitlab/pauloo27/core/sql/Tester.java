@@ -16,6 +16,8 @@ public class Tester {
     public static int MYSQL_PORT;
     public static String PSQL_HOST;
     public static int PSQL_PORT;
+    private static Friend john;
+    private static Friend mary;
 
     static {
         MARIADB_HOST = System.getenv("MARIADB_HOST") != null ? System.getenv("MARIADB_HOST") : "localhost";
@@ -89,9 +91,6 @@ public class Tester {
 
         printStatus(start);
     }
-
-    private static Friend john;
-    private static Friend mary;
 
     private static void insertDataWithObject(Table friends) {
         john = new Friend("John Doe", 21, "321", "johndoe@example.com", FriendType.IRL);

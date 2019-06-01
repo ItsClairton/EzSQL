@@ -30,9 +30,9 @@ public class PostgreSQLDatabase extends Database {
     @Override
     public boolean exists() throws SQLException {
         if (!sql.isConnected()) throw new SQLException("Not connected.");
-            return sql.getTable("pg_catalog.pg_database")
-                    .count()
-                    .where().equals("datname", this.getName())
-                    .executeThrowing().getFirstColumnAsInt() == 1;
+        return sql.getTable("pg_catalog.pg_database")
+                .count()
+                .where().equals("datname", this.getName())
+                .executeThrowing().getFirstColumnAsInt() == 1;
     }
 }

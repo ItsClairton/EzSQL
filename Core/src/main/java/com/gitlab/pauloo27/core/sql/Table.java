@@ -49,9 +49,9 @@ public class Table {
     public boolean exists() throws SQLException {
         if (!this.sql.isConnected()) throw new SQLException("Not connected.");
         return sql.getTable("information_schema.tables")
-            .count()
-            .where().equals("table_name", this.getName())
-            .executeThrowing().getFirstColumnAsInt() == 1;
+                .count()
+                .where().equals("table_name", this.getName())
+                .executeThrowing().getFirstColumnAsInt() == 1;
     }
 
     /**

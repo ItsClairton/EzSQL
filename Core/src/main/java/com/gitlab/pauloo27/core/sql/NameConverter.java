@@ -2,11 +2,12 @@ package com.gitlab.pauloo27.core.sql;
 
 /**
  * The table and column name converter.
- *
+ * <p>
  * Converts the model fields name to the SQL.
+ *
  * @author Paulo
- * @since 0.4.0
  * @version 1.0
+ * @since 0.4.0
  */
 public interface NameConverter {
 
