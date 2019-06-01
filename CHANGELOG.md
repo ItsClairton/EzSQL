@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `QueryResult#getFirstColumn()` (and `#getFirstColumnAsTYPE()`) function.  
 - `StatementBase#executeThrowing()` function.  
 - `EzSQL#executeUnsafeStatementQuery()` function.  
+- Name Converter for the models.  
+- Add support to model id by field name.  
 
 ### Removed
 - The `Ez` classes prefix.  

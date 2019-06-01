@@ -1,6 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.ResultSet;

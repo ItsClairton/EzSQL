@@ -2,7 +2,6 @@ package com.gitlab.pauloo27.core.sql;
 
 @Name("friends")
 public class Friend {
-    @Id
     int id;
 
     @DefaultAttributes.NotNull
@@ -24,14 +23,14 @@ public class Friend {
     String email = "No e-mail";
 
     @Length(10)
-    FriendType type = FriendType.IRL;
+    FriendType friendType = FriendType.IRL;
 
-    public Friend(String username, int age, String phone, String email, FriendType type) {
+    public Friend(String username, int age, String phone, String email, FriendType friendType) {
         this.username = username;
         this.age = age;
         this.phone = phone;
         this.email = email;
-        this.type = type;
+        this.friendType = friendType;
     }
 
     public Friend() {
@@ -40,7 +39,7 @@ public class Friend {
 
     @Override
     public String toString() {
-        return String.format("{id: %d, name: %s, age: %d, phone: %s, email: %s, type: %s}", id, username, age, phone, email, type.name());
+        return String.format("{id: %d, name: %s, age: %d, phone: %s, email: %s, type: %s}", id, username, age, phone, email, friendType.name());
     }
 
     public enum FriendType {

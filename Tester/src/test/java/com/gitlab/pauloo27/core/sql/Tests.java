@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Tests {
 
-    public void printAndAssert(String expected, String actual, String message) {
+    public static void printAndAssert(String expected, String actual, String message) {
         if (message != null)
             System.out.printf("[%s] ", message);
         System.out.printf("%s > %s%n", expected, actual);
@@ -56,7 +56,6 @@ public class Tests {
         values.put("asd(amount)", false);
         values.put("COUN(amount)", false);
         values.put("COUNTSUM(amount)", false);
-
 
 
         System.out.println("Testing the Entry Checker\n[value] expect > actual\n");

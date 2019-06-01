@@ -157,7 +157,7 @@ public class QueryResult extends Result {
                     if (ReflectionUtils.isIgnored(field))
                         return;
 
-                    String name = ReflectionUtils.getName(field);
+                    String name = ReflectionUtils.getName(sql.getNameConverter(), field);
 
                     try {
                         int columnIndex = result.findColumn(name);

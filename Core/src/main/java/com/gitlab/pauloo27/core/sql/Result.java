@@ -25,7 +25,7 @@ public abstract class Result implements AutoCloseable {
     /**
      * Create a result and close the statement.
      *
-     * @param sql The EzSQL connection.
+     * @param sql       The EzSQL connection.
      * @param statement The statement.
      */
     public Result(EzSQL sql, PreparedStatement statement) {
