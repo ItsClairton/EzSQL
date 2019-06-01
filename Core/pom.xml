@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ezsql-parent</artifactId>
         <groupId>com.gitlab.pauloo27</groupId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,12 +13,11 @@
     <name>EzSQL-Core</name>
 
     <dependencies>
-        <!-- Guava -->
+        <!-- Annotations -->
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>21.0</version>
-            <scope>compile</scope>
+            <groupId>findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

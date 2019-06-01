@@ -5,7 +5,7 @@
 
     <groupId>com.gitlab.pauloo27</groupId>
     <artifactId>ezsql-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 
     <name>EzSQL-Parent</name>
     <modelVersion>4.0.0</modelVersion>
@@ -23,10 +23,18 @@
     </modules>
 
     <dependencies>
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.1-jre</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <!-- use the same in the tester -->
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
