@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - ????-??-??
+## [0.4.0] - 2019-06-01
 
 ### Added
 - `QueryResult#to()` and `QueryResult#toList()` (6e2c4aa6b92e0dc4d4f99102ec7d6b5a7c4e453b).  
