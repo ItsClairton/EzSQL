@@ -10,18 +10,21 @@ class ReflectionUtils {
     /**
      * Gets the column name by a field.
      *
-     * @param field The field.
+     * @param nameConverter The name converter policy implementation.
+     * @param field         The field.
      *
-     * @return The value of the {@link Name} annotation or the field name if it's absent.
+     * @return The value of the {@link Name} annotation or the field name if it's absent. The result will be converted
+     * by the name converter if it's not null.
      */
     public static String getName(NameConverter nameConverter, Field field) {
+        String defaultName = field.getName();
         if (field.isAnnotationPresent(Name.class))
-            return field.getAnnotation(Name.class).value();
+            defaultName = field.getAnnotation(Name.class).value();
 
         if (nameConverter == null)
-            return field.getName();
+            return defaultName;
         else
-            return nameConverter.toColumnName(field.getName());
+            return nameConverter.toColumnName(defaultName);
     }
 
     /**
@@ -40,7 +43,7 @@ class ReflectionUtils {
      *
      * @param field The field.
      *
-     * @return If the {@link Id} annotation is present.
+     * @return If the {@link Id} annotation is present or the field name is equals {@code id}.
      */
     public static boolean isId(Field field) {
         return field.isAnnotationPresent(Id.class) || field.getName().equalsIgnoreCase("id");
@@ -49,19 +52,22 @@ class ReflectionUtils {
     /**
      * Gets the table name by a field.
      *
-     * @param clazz The class.
-     * @param <T>   The class type.
+     * @param nameConverter The name converter policy implementation.
+     * @param clazz         The class.
+     * @param <T>           The class type.
      *
-     * @return The value of the {@link Name} annotation or the class name if it's absent.
+     * @return The value of the {@link Name} annotation or the class name if it's absent. The result will be converted
+     * by the name converter if it's not null.
      */
     public static <T> String getName(NameConverter nameConverter, Class<T> clazz) {
+        String defaultName = clazz.getSimpleName();
         if (clazz.isAnnotationPresent(Name.class))
-            return clazz.getAnnotation(Name.class).value();
+            defaultName = clazz.getAnnotation(Name.class).value();
 
         if (nameConverter == null)
-            return clazz.getSimpleName();
+            return defaultName;
         else
-            return nameConverter.toTableName(clazz.getSimpleName());
+            return nameConverter.toTableName(defaultName);
 
     }
 

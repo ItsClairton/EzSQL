@@ -79,6 +79,9 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     protected String customDriverClass;
 
+    /**
+     * The name converter used to convert the models (class and field) name to SQL.
+     */
     protected NameConverter nameConverter = new DefaultNameConverter();
 
     /**
@@ -102,7 +105,6 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
             String method = name.toLowerCase().split("\\(")[0];
             if (!name.toLowerCase().startsWith(method + "(") || !name.endsWith(")"))
                 return false;
-
 
             // method.length() + 1 : the method plus a '('
             String column = name.substring(method.length() + 1, name.length() - 1);
@@ -138,11 +140,24 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
         return this;
     }
 
+    /**
+     * Sets the name converter used to convert the models (class and field) name. The default is {@link
+     * DefaultNameConverter}.
+     *
+     * @param nameConverter The name converter policy implementation.
+     *
+     * @return The current object instance.
+     */
     public EzSQL<DatabaseType, TableType> withNameConverter(NameConverter nameConverter) {
         this.nameConverter = nameConverter;
         return this;
     }
 
+    /**
+     * Gets the name converter policy implementation.The default is {@link DefaultNameConverter}.
+     *
+     * @return the name converter policy implementation.
+     */
     public NameConverter getNameConverter() {
         return nameConverter;
     }

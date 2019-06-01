@@ -3,6 +3,15 @@ package com.gitlab.pauloo27.core.sql;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The default table and column name converter.
+ * <p>
+ * Converts from camel case to snake case.
+ *
+ * @author Paulo
+ * @version 1.0
+ * @since 0.4.0
+ */
 public class DefaultNameConverter implements NameConverter {
 
     @Override
@@ -15,6 +24,13 @@ public class DefaultNameConverter implements NameConverter {
         return toSnakeCase(fieldName);
     }
 
+    /**
+     * Converts a String from camel case to snake case.
+     *
+     * @param string The String to convert.
+     *
+     * @return The String in snake case.
+     */
     private static String toSnakeCase(String string) {
         if (string == null)
             return null;
