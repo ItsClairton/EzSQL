@@ -47,7 +47,6 @@ cache:
     - 'PostgreSQL/target'
     - 'SQLite/target'
     - 'Shade/target'
-    - '/root/.m2'
 
 pages:
   only:
