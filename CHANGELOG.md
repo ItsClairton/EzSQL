@@ -28,11 +28,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - The project structure. Now the SQL have their implementation in the module (34d023727a146b9110ffe2dd20266d0a3500015f).  
-- The `DataType` and `Attribute` structure ().  
+- The `DataType` and `Attribute` structure (ab65afca3efaf8dbbafbae66525e8ba155ab1d38).  
 - The statements structure to a less verbose usage (5639c9cdc4dcfc4c46209f4e0a90ff3d7c9df0d2).  
 - Change port type to the primitive `int` (15ee7d6e474d8cb0f01974eb27d56bd4ed1ab571).  
-- The unit tests.
-- The `EzSQL#executeStatementAndClose()` function name to `executeUnsafeStatementAndClose()`.  
+- The unit tests (0085538fae23c41c54c85028a022607cac5a4561).  
+- The `EzSQL#executeStatementAndClose()` function name to `executeUnsafeStatementAndClose()` (5138f3534786cdd2b7ea5cf5c8d1ba8b9cae9c2c).  
 
 ### Fixed
 - `SELECT *` queries (8f63156f7d18285d687cf7575c8a9e16a0b9ad81).
