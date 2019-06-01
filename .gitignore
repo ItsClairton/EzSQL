@@ -3,18 +3,18 @@
 .project
 .settings/
 
-# netbeans
+# NetBeans
 nbproject/
 nbactions.xml
 
-# we use maven!
+# Ant
 build.xml
 
-# maven
+# Maven
 target/
 dependency-reduced-pom.xml
 
-# vim
+# VIM
 .*.sw[a-p]
 
 # various other potential build files
@@ -26,7 +26,7 @@ manifest.mf
 # Mac filesystem dust
 .DS_Store/
 
-# intellij
+# IntelliJ
 *.iml
 *.ipr
 *.iws
@@ -37,3 +37,6 @@ manifest.mf
 
 # Wiki
 *.wiki
+
+# trash
+*.hidden

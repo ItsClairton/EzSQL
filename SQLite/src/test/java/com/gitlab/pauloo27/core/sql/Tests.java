@@ -8,9 +8,9 @@ import java.sql.SQLException;
 public class Tests {
 
     @Test
-    public void testWithSQLite() throws SQLException, ClassNotFoundException {
+    public void testWithSQLite() throws SQLException, ClassNotFoundException, IllegalAccessException, InterruptedException, InstantiationException {
         File file = new File("db.sqlite");
-        Tester.testWith(new EzSQL(EzSQLType.SQLITE).asSQLite(file.getPath()));
+        Tester.testWith(new EzSQLite(file.getPath()));
         System.out.println("Deleting file...");
         file.delete();
     }
