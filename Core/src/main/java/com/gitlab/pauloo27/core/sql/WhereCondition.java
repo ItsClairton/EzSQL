@@ -380,7 +380,7 @@ public class WhereCondition<Statement extends StatementBase> {
             /**
              * {@code LIKE}.
              */
-            LIKE("LIKE"),
+            LIKE("LIKE ?"),
             /**
              * {@code < ?}.
              */
