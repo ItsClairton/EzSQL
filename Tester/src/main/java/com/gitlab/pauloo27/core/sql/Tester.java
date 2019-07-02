@@ -120,6 +120,11 @@ public class Tester {
         Assert.assertEquals(2, mary.id);
         Assert.assertEquals("marydoe@example.com", mary.email);
 
+        john = friends.select().where().like("email", "john%").execute().to(Friend.class);
+
+        Assert.assertEquals(1, john.id);
+        Assert.assertEquals("johndoe@example.com", john.email);
+
         friends.select().execute().toList(Friend.class)
                 .forEach(friend ->
                         Assert.assertEquals(
@@ -193,6 +198,17 @@ public class Tester {
     private static void checkDataWithBuilder(Table friends) throws SQLException {
         // select using where
         try (ResultSet result = friends.select().where().equals("name", "John Doe")
+                .execute().getResultSet()) {
+            if (result.next()) {
+                Assert.assertEquals(1, result.getInt("id"));
+                Assert.assertEquals("johndoe@example.com", result.getString("email"));
+            } else {
+                throw new NullPointerException("Result set is empty");
+            }
+        }
+
+        // select using where like
+        try (ResultSet result = friends.select().where().like("email", "john%")
                 .execute().getResultSet()) {
             if (result.next()) {
                 Assert.assertEquals(1, result.getInt("id"));
