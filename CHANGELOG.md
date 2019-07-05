@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Where Like Unit test (#23 | f19a55205e2e9bbeb5041900e03f8567f4691272).  
+- Default Data Types unit test (#22 | acb5193e74f1af065d7d0854b58340a121435484).  
+- Parameter support  to the Data Type class (bf05b11b86ef098e06baee59701cd93882ed23a3).  
+
+### Removed
+- Useless attribute validation by Data Type (bf05b11b86ef098e06baee59701cd93882ed23a3).  
 
 ### Fixed
 - `Where Like` condition (#23 | 7df93252a273757c8de96de4a013d27cf003a248).  
+- `DOUBLE` data type from PostgreSQL (#22 | acb5193e74f1af065d7d0854b58340a121435484).  
 
 ## [0.4.0] - 2019-06-01
 
