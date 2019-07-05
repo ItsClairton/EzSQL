@@ -540,7 +540,6 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public void executeUnsafeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
         Statement stmt = connection.createStatement();
-        System.out.println(String.format(statement, unsafeValues));
         stmt.execute(String.format(statement, unsafeValues));
         stmt.close();
     }
