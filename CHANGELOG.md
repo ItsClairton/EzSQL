@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 - Useless attribute validation by Data Type (bf05b11b86ef098e06baee59701cd93882ed23a3).  
+- Deprecate methods from ColumnBuilder class (3c4e82bea880c9d5756a4dadda573fa9a9ac1298).   
 
 ### Fixed
 - `Where Like` condition (#23 | 7df93252a273757c8de96de4a013d27cf003a248).  
