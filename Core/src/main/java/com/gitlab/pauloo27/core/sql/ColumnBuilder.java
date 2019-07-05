@@ -33,9 +33,9 @@ public class ColumnBuilder {
      */
     private List<String> attributeNames = new ArrayList<>();
     /**
-     * The max column value length. Eg: {@code VARCHAR(20)} - 20 is the length.
+     * The parameter list.
      */
-    private int length;
+    private List<String> parameters;
     /**
      * The column's default value.
      */
@@ -51,10 +51,8 @@ public class ColumnBuilder {
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
-    public ColumnBuilder(String name, DataType dataType, Attribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, DataType dataType, Attribute... attributes) {
         this(name, dataType);
         withAttributes(attributes);
     }
@@ -83,6 +81,7 @@ public class ColumnBuilder {
     public ColumnBuilder(String name, DataType dataType) {
         this.name = name;
         this.dataType = dataType;
+        this.parameters = new ArrayList<>();
     }
 
     /**
@@ -104,10 +103,8 @@ public class ColumnBuilder {
      * @param dataType   The column's data type.
      * @param length     The column's length.
      * @param attributes The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
-    public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) {
         this(name, dataType);
         withLength(length);
         withAttributes(attributes);
@@ -134,11 +131,9 @@ public class ColumnBuilder {
      * @param name         The column's name.
      * @param dataTypeName The column's data type.
      * @param attributes   The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
     @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, Attribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, String dataTypeName, Attribute... attributes) {
         this(name, dataTypeName);
         withAttributes(attributes);
     }
@@ -188,11 +183,9 @@ public class ColumnBuilder {
      * @param dataTypeName The column's data type.
      * @param length       The column's length.
      * @param attributes   The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
     @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, int length, Attribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, String dataTypeName, int length, Attribute... attributes) {
         this(name, dataTypeName);
         withLength(length);
         withAttributes(attributes);
@@ -219,20 +212,8 @@ public class ColumnBuilder {
      * @param attributes Array of attributes.
      *
      * @return The current object instance.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
-    public ColumnBuilder withAttributes(Attribute... attributes) throws SQLException {
-        if (dataType != null) {
-            Attribute invalidAttribute = Arrays.stream(attributes)
-                    .filter(attribute -> !dataType.isValid(attribute))
-                    .findFirst()
-                    .orElse(null);
-
-            if (invalidAttribute != null)
-                throw new SQLException("Attribute " + invalidAttribute.toSQL() + " is not valid to type " + dataType.toSQL());
-
-        }
+    public ColumnBuilder withAttributes(Attribute... attributes) {
         Arrays.stream(attributes).filter(attribute -> !this.attributes.contains(attribute)).forEach(attribute -> this.attributes.add(attribute));
         return this;
     }
@@ -258,7 +239,19 @@ public class ColumnBuilder {
      * @return The current object instance.
      */
     public ColumnBuilder withLength(int length) {
-        this.length = length;
+        if (length != -1) withParameter(String.valueOf(length));
+        return this;
+    }
+
+    /**
+     * Adds parameter to the column.
+     *
+     * @param parameter The parameter
+     *
+     * @return The current object instance.
+     */
+    public ColumnBuilder withParameter(String parameter) {
+        this.parameters.add(parameter);
         return this;
     }
 
@@ -291,12 +284,12 @@ public class ColumnBuilder {
     }
 
     /**
-     * Gets the  column's length. Eg: {@code VARCHAR(20)} - the length is "20".
+     * Gets the parameter list.
      *
-     * @return The length.
+     * @return The parameter list.
      */
-    public int getLength() {
-        return length;
+    public List<String> getParameters() {
+        return parameters;
     }
 
     /**
@@ -333,8 +326,15 @@ public class ColumnBuilder {
      *
      * @return The length converted to String or a empty String if the length is null.
      */
-    public String lengthToString() {
-        return length > 0 ? String.format("(%d)", length) : "";
+    public String parametersToString() {
+        if (parameters.size() > 0) {
+            return String.format("(%s)", String.join(", ", parameters));
+        } else {
+            if (dataType.hasParameters() && dataType.getDefaultParameters() != null)
+                return String.format("(%s)", dataType.getDefaultParameters());
+
+            return "";
+        }
     }
 
     /**
@@ -371,7 +371,7 @@ public class ColumnBuilder {
         return String.format("%s %s%s %s %s",
                 this.name,
                 dataTypeToString(sql),
-                lengthToString(),
+                parametersToString(),
                 attributesToString(sql),
                 defaultValueToString()
         ).replaceAll("\\s+", " ").trim();

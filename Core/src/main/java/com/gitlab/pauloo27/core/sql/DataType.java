@@ -16,13 +16,17 @@ public class DataType {
      */
     private final String sql;
     /**
-     * A list of the valid attributes.
-     */
-    private final List<Attribute> validAttributes;
-    /**
      * A list of the forced attributes of this type.
      */
     private final List<Attribute> forcedAttributes;
+    /**
+     * If the data type have parameters ({@code (parameters)}), like length.
+     */
+    private final boolean hasParameters;
+    /**
+     * The default parameters.
+     */
+    private final String defaultParameters;
     /**
      * An optional type custom name.
      *
@@ -33,24 +37,35 @@ public class DataType {
     /**
      * Builds a data type.
      *
-     * @param sql             The type in SQL.
-     * @param validAttributes A list of valid attributes.
+     * @param sql The type in SQL.
      */
-    public DataType(String sql, List<Attribute> validAttributes) {
-        this(sql, validAttributes, null, null);
+    public DataType(String sql) {
+        this(sql, false, null, null, null);
+    }
+
+    /**
+     * Builds a data type that has parameters.
+     *
+     * @param sql               The type in SQL.
+     * @param defaultParameters The default parameters.
+     */
+    public DataType(String sql, String defaultParameters) {
+        this(sql, true, defaultParameters, null, null);
     }
 
     /**
      * Builds a data type.
      *
-     * @param sql              The type in SQL.
-     * @param validAttributes  A list of valid attributes.
-     * @param forcedAttributes A list of forced attributes.
-     * @param customName       A custom name.
+     * @param sql               The type in SQL.
+     * @param hasParameters     If the type has parameters.
+     * @param defaultParameters The default parameters.
+     * @param forcedAttributes  A list of forced attributes.
+     * @param customName        A custom name.
      */
-    public DataType(String sql, List<Attribute> validAttributes, List<Attribute> forcedAttributes, String customName) {
+    public DataType(String sql, boolean hasParameters, String defaultParameters, List<Attribute> forcedAttributes, String customName) {
         this.sql = sql;
-        this.validAttributes = validAttributes;
+        this.hasParameters = hasParameters;
+        this.defaultParameters = defaultParameters;
         this.forcedAttributes = forcedAttributes;
         this.customName = customName;
     }
@@ -89,15 +104,6 @@ public class DataType {
     }
 
     /**
-     * Gets the valid attributes list.
-     *
-     * @return The valid attributes list.
-     */
-    public List<Attribute> getValidAttributes() {
-        return validAttributes;
-    }
-
-    /**
      * Gets the forced attributes list.
      *
      * @return The forced attributes list.
@@ -107,13 +113,18 @@ public class DataType {
     }
 
     /**
-     * Checks if the {@link #validAttributes} contains the attribute parameter.
-     *
-     * @param attribute The attribute to check.
-     *
-     * @return If the {@link #validAttributes} list contains the attribute.
+     * Checks if the data type has parameters.
+     * @return If the data type has parameters.
      */
-    public boolean isValid(Attribute attribute) {
-        return validAttributes.contains(attribute);
+    public boolean hasParameters() {
+        return hasParameters;
+    }
+
+    /**
+     * Gets the default parameters.
+     * @return The default parameters.
+     */
+    public String getDefaultParameters() {
+        return defaultParameters;
     }
 }

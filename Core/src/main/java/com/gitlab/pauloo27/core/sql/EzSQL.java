@@ -23,7 +23,8 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     private static DataType DEFAULT_DATATYPE = new DataType(
             "VARCHAR",
-            DefaultAttributes.getDefaultAttributes(),
+            true,
+            "64",
             null,
             "DEFAULT_DATATYPE"
     );
@@ -32,7 +33,8 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     private static DataType ENUM_NAME = new DataType(
             "VARCHAR",
-            DefaultAttributes.getDefaultAttributes(),
+            true,
+            "64",
             null,
             "ENUM_NAME"
     );
@@ -538,6 +540,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
      */
     public void executeUnsafeStatementAndClose(String statement, Object... unsafeValues) throws SQLException {
         Statement stmt = connection.createStatement();
+        System.out.println(String.format(statement, unsafeValues));
         stmt.execute(String.format(statement, unsafeValues));
         stmt.close();
     }
@@ -802,7 +805,7 @@ public abstract class EzSQL<DatabaseType extends Database, TableType extends Tab
                 tableBuilder.withColumn(
                         new ColumnBuilder(columnName, dataType, length, attributes.toArray(new Attribute[]{}))
                                 .withDefaultValue(defaultValue));
-            } catch (SQLException | InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         });
