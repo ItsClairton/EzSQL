@@ -101,6 +101,18 @@ public class EzPostgreSQL extends EzSQL<PostgreSQLDatabase, PostgreSQLTable> {
         if (dataType.hasCustomName() && dataType.getCustomName().equalsIgnoreCase("PRIMARY_KEY"))
             return "SERIAL";
 
+        if (dataType.toSQL().equalsIgnoreCase("DOUBLE"))
+            return "DOUBLE PRECISION";
+
+        if(dataType.toSQL().equalsIgnoreCase("TINYINT"))
+            return "SMALLINT";
+
+        if(dataType.toSQL().equalsIgnoreCase("TIME_WITH_TIMEZONE"))
+            return "TIME WITH TIME ZONE";
+
+        if(dataType.toSQL().equalsIgnoreCase("TIMESTAMP_WITH_TIMEZONE"))
+            return "TIMESTAMP WITH TIME ZONE";
+
         return super.build(dataType);
     }
 }

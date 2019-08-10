@@ -1,6 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,17 +32,13 @@ public class ColumnBuilder {
      */
     private List<String> attributeNames = new ArrayList<>();
     /**
-     * The max column value length. Eg: {@code VARCHAR(20)} - 20 is the length.
+     * The parameter list.
      */
-    private int length;
+    private List<String> parameters;
     /**
      * The column's default value.
      */
     private Object defaultValue;
-    /**
-     * The columns data type raw name. If the data type is not in {@link DataType}, this store the raw data type name.
-     */
-    private String dataTypeName;
 
     /**
      * Builds a column using a data type from {@link DataType} and attributes from {@link Attribute}.
@@ -51,23 +46,8 @@ public class ColumnBuilder {
      * @param name       The column's name.
      * @param dataType   The column's data type.
      * @param attributes The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
-    public ColumnBuilder(String name, DataType dataType, Attribute... attributes) throws SQLException {
-        this(name, dataType);
-        withAttributes(attributes);
-    }
-
-    /**
-     * Builds a column using a data type from {@link DataType} and attributes from raw String.
-     *
-     * @param name       The column's name.
-     * @param dataType   The column's data type.
-     * @param attributes The column's attributes.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, DataType dataType, String... attributes) {
+    public ColumnBuilder(String name, DataType dataType, Attribute... attributes) {
         this(name, dataType);
         withAttributes(attributes);
     }
@@ -77,12 +57,11 @@ public class ColumnBuilder {
      *
      * @param name     The column's name.
      * @param dataType The column's data type.
-     *
-     * @see #ColumnBuilder(String, String) Builds using a String as data type.
      */
     public ColumnBuilder(String name, DataType dataType) {
         this.name = name;
         this.dataType = dataType;
+        this.parameters = new ArrayList<>();
     }
 
     /**
@@ -104,137 +83,11 @@ public class ColumnBuilder {
      * @param dataType   The column's data type.
      * @param length     The column's length.
      * @param attributes The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
      */
-    public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) throws SQLException {
+    public ColumnBuilder(String name, DataType dataType, int length, Attribute... attributes) {
         this(name, dataType);
         withLength(length);
         withAttributes(attributes);
-    }
-
-    /**
-     * Builds a column using a data type from {@link DataType}, attributes from a raw String and a length.
-     *
-     * @param name       The column's name.
-     * @param dataType   The column's data type.
-     * @param length     The column's length.
-     * @param attributes The column's attributes.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, DataType dataType, int length, String... attributes) {
-        this(name, dataType);
-        withLength(length);
-        withAttributes(attributes);
-    }
-
-    /**
-     * Builds a column using a data type from {@link DataType} and attributes from {@link Attribute}.
-     *
-     * @param name         The column's name.
-     * @param dataTypeName The column's data type.
-     * @param attributes   The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, Attribute... attributes) throws SQLException {
-        this(name, dataTypeName);
-        withAttributes(attributes);
-    }
-
-    /**
-     * Builds a column using a data type from {@link DataType} and attributes from {@link Attribute}.
-     *
-     * @param name         The column's name.
-     * @param dataTypeName The column's data type.
-     * @param attributes   The column's attributes.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, String... attributes) {
-        this(name, dataTypeName);
-        withAttributes(attributes);
-    }
-
-    /**
-     * Builds a column using a String with the raw data type name.
-     *
-     * @param name         The column's name.
-     * @param dataTypeName The column's data type.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, String dataTypeName) {
-        this.name = name;
-        this.dataTypeName = dataTypeName;
-    }
-
-    /**
-     * Builds a column using a String with the raw data type name and a length.
-     *
-     * @param name         The column's name.
-     * @param dataTypeName The column's data type.
-     * @param length       The column's length.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, int length) {
-        this(name, dataTypeName);
-        withLength(length);
-    }
-
-    /**
-     * Builds a column using a String with the raw data type name, a length and attributes from {@link Attribute}.
-     *
-     * @param name         The column's name.
-     * @param dataTypeName The column's data type.
-     * @param length       The column's length.
-     * @param attributes   The column's attributes.
-     *
-     * @throws SQLException If the attribute are not valid.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, int length, Attribute... attributes) throws SQLException {
-        this(name, dataTypeName);
-        withLength(length);
-        withAttributes(attributes);
-    }
-
-    /**
-     * Builds a column using a String with the raw data type name, a length and attributes from a raw String.
-     *
-     * @param name         The column's name.
-     * @param dataTypeName The column's data type.
-     * @param length       The column's length.
-     * @param attributes   The column's attributes.
-     */
-    @Deprecated
-    public ColumnBuilder(String name, String dataTypeName, int length, String... attributes) {
-        this(name, dataTypeName);
-        withLength(length);
-        withAttributes(attributes);
-    }
-
-    /**
-     * Adds attributes to the column. If the attribute isn't in the Enum, use {@link #withAttributes(String...)}
-     *
-     * @param attributes Array of attributes.
-     *
-     * @return The current object instance.
-     *
-     * @throws SQLException If the attribute are not valid.
-     */
-    public ColumnBuilder withAttributes(Attribute... attributes) throws SQLException {
-        if (dataType != null) {
-            Attribute invalidAttribute = Arrays.stream(attributes)
-                    .filter(attribute -> !dataType.isValid(attribute))
-                    .findFirst()
-                    .orElse(null);
-
-            if (invalidAttribute != null)
-                throw new SQLException("Attribute " + invalidAttribute.toSQL() + " is not valid to type " + dataType.toSQL());
-
-        }
-        Arrays.stream(attributes).filter(attribute -> !this.attributes.contains(attribute)).forEach(attribute -> this.attributes.add(attribute));
-        return this;
     }
 
     /**
@@ -244,9 +97,8 @@ public class ColumnBuilder {
      *
      * @return The current object instance.
      */
-    @Deprecated
-    public ColumnBuilder withAttributes(String... attributes) {
-        Arrays.stream(attributes).filter(attribute -> !this.attributeNames.contains(attribute)).forEach(attribute -> this.attributeNames.add(attribute));
+    public ColumnBuilder withAttributes(Attribute... attributes) {
+        Arrays.stream(attributes).filter(attribute -> !this.attributes.contains(attribute)).forEach(attribute -> this.attributes.add(attribute));
         return this;
     }
 
@@ -258,7 +110,19 @@ public class ColumnBuilder {
      * @return The current object instance.
      */
     public ColumnBuilder withLength(int length) {
-        this.length = length;
+        if (length != -1) withParameter(String.valueOf(length));
+        return this;
+    }
+
+    /**
+     * Adds parameter to the column.
+     *
+     * @param parameter The parameter
+     *
+     * @return The current object instance.
+     */
+    public ColumnBuilder withParameter(String parameter) {
+        this.parameters.add(parameter);
         return this;
     }
 
@@ -291,12 +155,12 @@ public class ColumnBuilder {
     }
 
     /**
-     * Gets the  column's length. Eg: {@code VARCHAR(20)} - the length is "20".
+     * Gets the parameter list.
      *
-     * @return The length.
+     * @return The parameter list.
      */
-    public int getLength() {
-        return length;
+    public List<String> getParameters() {
+        return parameters;
     }
 
     /**
@@ -318,14 +182,14 @@ public class ColumnBuilder {
     }
 
     /**
-     * Gets the column data type name. Return {@link #dataType} if not null and otherwise {@link #dataTypeName}.
+     * Gets the column data type name.
      *
      * @param sql The current EzSQL connection.
      *
      * @return The data type converted to String.
      */
     public String dataTypeToString(EzSQL sql) {
-        return this.dataType == null ? dataTypeName : sql.build(this.dataType);
+        return sql.build(this.dataType);
     }
 
     /**
@@ -333,8 +197,15 @@ public class ColumnBuilder {
      *
      * @return The length converted to String or a empty String if the length is null.
      */
-    public String lengthToString() {
-        return length > 0 ? String.format("(%d)", length) : "";
+    public String parametersToString() {
+        if (parameters.size() > 0) {
+            return String.format("(%s)", String.join(", ", parameters));
+        } else {
+            if (dataType.hasParameters() && dataType.getDefaultParameters() != null)
+                return String.format("(%s)", dataType.getDefaultParameters());
+
+            return "";
+        }
     }
 
     /**
@@ -371,7 +242,7 @@ public class ColumnBuilder {
         return String.format("%s %s%s %s %s",
                 this.name,
                 dataTypeToString(sql),
-                lengthToString(),
+                parametersToString(),
                 attributesToString(sql),
                 defaultValueToString()
         ).replaceAll("\\s+", " ").trim();
@@ -403,15 +274,5 @@ public class ColumnBuilder {
     public Object getDefaultValue() {
         return defaultValue;
     }
-
-    /**
-     * Gets the data type.
-     *
-     * @return The data type.
-     */
-    public String getDataTypeName() {
-        return dataTypeName;
-    }
-
 
 }

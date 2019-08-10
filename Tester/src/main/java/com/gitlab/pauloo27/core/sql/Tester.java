@@ -2,6 +2,8 @@ package com.gitlab.pauloo27.core.sql;
 
 import org.junit.Assert;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -38,12 +40,14 @@ public class Tester {
         }
     }
 
-    public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException {
+    public static void testWith(EzSQL sql) throws SQLException, ClassNotFoundException, IllegalAccessException {
         // Connecting...
         sql.withDefaultDatabase("ezsql")
                 .withLogin("ezsql", "1234")
                 .registerDriver()
                 .connect();
+
+        testDefaultDataTypes(sql);
 
         testTableWithBuilders(sql);
 
@@ -119,6 +123,11 @@ public class Tester {
 
         Assert.assertEquals(2, mary.id);
         Assert.assertEquals("marydoe@example.com", mary.email);
+
+        john = friends.select().where().like("email", "john%").execute().to(Friend.class);
+
+        Assert.assertEquals(1, john.id);
+        Assert.assertEquals("johndoe@example.com", john.email);
 
         friends.select().execute().toList(Friend.class)
                 .forEach(friend ->
@@ -202,6 +211,17 @@ public class Tester {
             }
         }
 
+        // select using where like
+        try (ResultSet result = friends.select().where().like("email", "john%")
+                .execute().getResultSet()) {
+            if (result.next()) {
+                Assert.assertEquals(1, result.getInt("id"));
+                Assert.assertEquals("johndoe@example.com", result.getString("email"));
+            } else {
+                throw new NullPointerException("Result set is empty");
+            }
+        }
+
         // select everything
         try (ResultSet result = friends.select()
                 .execute().getResultSet()) {
@@ -249,6 +269,29 @@ public class Tester {
         System.out.printf("Start > %d%n", start);
         System.out.printf("End > %d%n", end);
         System.out.printf("Time > %d%n", end - start);
+    }
+
+    private static boolean containsBin(int x, int n) {
+        return (x & n) == n;
+    }
+
+    public static void testDefaultDataTypes(EzSQL sql) throws SQLException, IllegalAccessException {
+        System.out.println("Testing types");
+        String tableName = "data_type_test";
+        TableBuilder tb = new TableBuilder(tableName);
+        DefaultDataTypes obj = new DefaultDataTypes();
+        for (Field field : DefaultDataTypes.class.getDeclaredFields()) {
+            int x = field.getModifiers();
+            if (!containsBin(x, Modifier.STATIC) || !containsBin(x, Modifier.PUBLIC))
+                continue;
+
+            tb.withColumn(new ColumnBuilder("c_" + field.getName().toLowerCase() , (DataType) field.get(obj)));
+        }
+
+            if(sql.getTable(tableName).exists())
+                sql.getTable(tableName).drop();
+
+            sql.createIfNotExists(tb).drop();
     }
 
 }

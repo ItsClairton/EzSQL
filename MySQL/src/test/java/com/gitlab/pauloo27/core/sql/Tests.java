@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class Tests {
 
     @Test
-    public void testWithMySQL() throws SQLException, ClassNotFoundException, IllegalAccessException, InterruptedException, InstantiationException {
+    public void testWithMySQL() throws SQLException, ClassNotFoundException, IllegalAccessException {
         Tester.testWith(new EzMySQL().withAddress(Tester.MYSQL_HOST, Tester.MYSQL_PORT).withLogin("ezsql", "1234"));
     }
 

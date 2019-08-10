@@ -1,5 +1,6 @@
 package com.gitlab.pauloo27.core.sql;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.ResultSet;
@@ -7,12 +8,12 @@ import java.sql.SQLException;
 
 public class Tests {
 
-    public void testWithPostgreSQL() throws SQLException, ClassNotFoundException {
+    public void testWithPostgreSQL() throws SQLException, ClassNotFoundException, IllegalAccessException {
         Tester.testWith(new EzPostgreSQL().withAddress(Tester.PSQL_HOST, Tester.PSQL_PORT).withLogin("ezsql", "1234"));
     }
 
     @Test
-    public void testInsertReturning() throws SQLException, ClassNotFoundException {
+    public void testInsertReturning() throws SQLException, ClassNotFoundException, IllegalAccessException {
         testWithPostgreSQL();
 
         EzPostgreSQL sql = (EzPostgreSQL) new EzPostgreSQL()
@@ -33,7 +34,7 @@ public class Tests {
             ResultSet rs = result.getResultSet();
             if (rs.next()) {
                 id = rs.getInt("id");
-//                Assert.assertEquals(4, id);
+                Assert.assertEquals(4, id);
             } else {
                 throw new NullPointerException("Returning id cannot be null");
             }

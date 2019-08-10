@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2019-08-10
+
+### Added
+- Where Like Unit test (#23 | f19a55205e2e9bbeb5041900e03f8567f4691272).  
+- Default Data Types unit test (#22 | acb5193e74f1af065d7d0854b58340a121435484).  
+- Parameter support  to the Data Type class (bf05b11b86ef098e06baee59701cd93882ed23a3).  
+
+### Removed
+- Useless attribute validation by Data Type (bf05b11b86ef098e06baee59701cd93882ed23a3).  
+- Deprecate methods from ColumnBuilder class (3c4e82bea880c9d5756a4dadda573fa9a9ac1298).  
+
+## Changed
+- Updated the maven shade plugin to 3.2.1 (647f5281003c2672b167e11574f7f8505a574167).  
+
+### Fixed
+- `Where Like` condition (#23 | 7df93252a273757c8de96de4a013d27cf003a248).  
+- `DOUBLE` data type from PostgreSQL (#22 | acb5193e74f1af065d7d0854b58340a121435484).   
+
 ## [0.4.0] - 2019-06-01
 
 ### Added

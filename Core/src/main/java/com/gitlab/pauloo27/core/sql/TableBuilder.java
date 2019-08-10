@@ -1,6 +1,5 @@
 package com.gitlab.pauloo27.core.sql;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,14 +71,10 @@ public class TableBuilder {
      * @return The table converted to SQL query.
      */
     public String toSQL(EzSQL sql) {
-        return
-                this.getColumns().stream().map(column -> {
+        return this.getColumns().stream()
+                .map(column -> {
                     if (column.getDataType().getForcedAttributes() != null) {
-                        try {
-                            column.withAttributes(column.getDataType().getForcedAttributes().toArray(new Attribute[0]));
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
+                        column.withAttributes(column.getDataType().getForcedAttributes().toArray(new Attribute[0]));
                     }
                     return column.toSQL(sql);
                 }).collect(Collectors.joining(", ")).trim();
