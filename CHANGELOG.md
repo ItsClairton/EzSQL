@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Useless attribute validation by Data Type (bf05b11b86ef098e06baee59701cd93882ed23a3).  
 - Deprecate methods from ColumnBuilder class (3c4e82bea880c9d5756a4dadda573fa9a9ac1298).   
 
+## Changed
+- Updated the maven shade plugin to 3.2.1 (647f5281003c2672b167e11574f7f8505a574167).  
+
 ### Fixed
 - `Where Like` condition (#23 | 7df93252a273757c8de96de4a013d27cf003a248).  
 - `DOUBLE` data type from PostgreSQL (#22 | acb5193e74f1af065d7d0854b58340a121435484).  
