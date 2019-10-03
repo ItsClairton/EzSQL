@@ -7,8 +7,8 @@ A library that lets you use SQL without writing queries.
 ## EzSQL has
 
 **Database and Tables Manager**: Manage your database and tables.  
-**Statements**: Insert, read, update and delete data.
-**Support to**: MySQL, MariaDB, SQLite and PostgreSQL.    
+**Statements**: Insert, read, update and delete data.  
+**Support to**: MySQL, MariaDB, SQLite and PostgreSQL.  
 **The Same Code**: The same code will work with all the supported types.  
 **Join**: Use join statements easily.  
 **Database, Table and Column Builder**: Build databases, tables and columns.  
