@@ -65,7 +65,7 @@ public class WhereCondition<Statement extends StatementBase> {
      * @return The current statement.
      */
     @CheckReturnValue
-    public WhereCondition openParentheses() {
+    public WhereCondition<Statement> openParentheses() {
         this.statements.add(new Parentheses(Parentheses.ParenthesesType.OPEN, previousSeparator));
         previousSeparator = null;
         return this;
